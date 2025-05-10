@@ -1,0 +1,76 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login" class="custom-back"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="signup-container">
+  <div class="form-wrapper">
+    <h1>Εγγραφή (Βήμα 1)</h1>
+
+    <ion-label class="input-label">Email</ion-label>
+    <ion-input
+      type="email"
+      placeholder="π.χ. username@upatras.gr"
+      fill="solid"
+      class="custom-input"
+    ></ion-input>
+
+    <ion-label class="input-label">Όνομα χρήστη</ion-label>
+    <ion-input
+      type="text"
+      placeholder="π.χ. evelina123"
+      fill="solid"
+      class="custom-input"
+    ></ion-input>
+
+    <ion-label class="input-label">Πλήρες όνομα</ion-label>
+    <ion-input
+      type="text"
+      placeholder="π.χ. Εβελίνα Σταυροπούλου"
+      fill="solid"
+      class="custom-input"
+    ></ion-input>
+
+    <ion-label class="input-label">Κωδικός</ion-label>
+    <ion-input
+      type="password"
+      placeholder="τουλάχιστον 8 χαρακτήρες"
+      fill="solid"
+      class="custom-input"
+    ></ion-input>
+
+    <ion-label class="input-label">Εξάμηνο φοίτησης</ion-label>
+    <ion-input
+      type="number"
+      placeholder="1"
+      fill="solid"
+      class="custom-input"
+      min="1"
+    ></ion-input>
+
+    <ion-label class="input-label">Έτος φοίτησης</ion-label>
+    <ion-input
+      type="number"
+      placeholder="1"
+      fill="solid"
+      class="custom-input"
+      min="1"
+    ></ion-input>
+
+    <ion-label class="input-label">Ημερομηνία γέννησης</ion-label>
+    <ion-input
+      type="text"
+      placeholder="π.χ. 01-01-2002"
+      fill="solid"
+      class="custom-input"
+    ></ion-input>
+
+    <ion-button expand="block" class="next-btn" shape="round" (click)="goToStep2()">
+      Συνέχεια ➔
+    </ion-button>
+  </div>
+</ion-content>
+

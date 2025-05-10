@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Οι Σημειώσεις μου</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="notes.length > 0; else emptyList">
+    <ion-card class="note-card" *ngFor="let note of notes">
+      <ion-card-header>
+        <ion-card-title class="note-title">{{ note.title }}</ion-card-title>
+        <ion-card-subtitle class="note-subtitle">{{ note.course }} • {{ note.category }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="note-section">
+          <strong class="section-title">Περιγραφή:</strong>
+          <p>{{ note.description || 'Χωρίς περιγραφή.' }}</p>
+        </div>        
+        <div class="note-meta">
+          <p class="note-date">Ανέβηκε στις: {{ note.upload_date }}</p>
+          <a [href]="note.filepath" target="_blank" class="file-link">📄 Άνοιγμα αρχείου</a>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <ng-template #emptyList>
+    <p style="text-align:center; color: #999;">Δεν έχεις ανεβάσει ακόμα σημειώσεις.</p>
+  </ng-template>
+</ion-content>

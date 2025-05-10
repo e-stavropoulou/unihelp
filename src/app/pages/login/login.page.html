@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/" class="custom-back"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="login-container">
+  <div class="form-wrapper">
+    <h1>Σύνδεση</h1>
+
+    <ion-input
+    type="email"
+    placeholder="π.χ. username@upatras.gr"
+    fill="solid"
+    class="custom-input"
+  ></ion-input>
+
+ <ion-input
+  type="password"
+  placeholder="Κωδικός"
+  fill="solid"
+  class="custom-input"
+></ion-input>
+
+    <ion-button expand="block" class="login-btn" shape="round" (click)="login()">
+      Σύνδεση
+    </ion-button>
+
+    <div class="extra-links">
+      <p>Ξέχασες τον κωδικό σου; <a href="#">Ανάκτηση</a></p>
+      <p>Δεν έχεις λογαριασμό; <a routerLink="/signup-step1">Εγγραφή</a></p>
+    </div>
+  </div>
+</ion-content>

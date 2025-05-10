@@ -1,0 +1,78 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Όλες οι Σημειώσεις</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Search bar -->
+  <ion-searchbar
+    [(ngModel)]="searchTerm"
+    (ionInput)="applyFilters()"
+    placeholder="Αναζήτηση με τίτλο...">
+  </ion-searchbar>
+
+  <!-- Filters -->
+  <label class="form-label">Κατηγορία</label>
+<ion-select
+  [(ngModel)]="selectedCategory"
+  (ionChange)="applyFilters()"
+  interface="popover"
+  placeholder="Επιλογή κατηγορίας"
+  class="custom-select">
+  <ion-select-option value="">Όλες</ion-select-option>
+  <ion-select-option value="Σημειώσεις">Σημειώσεις</ion-select-option>
+  <ion-select-option value="Διαφάνειες">Διαφάνειες</ion-select-option>
+  <ion-select-option value="Ασκήσεις">Ασκήσεις</ion-select-option>
+  <ion-select-option value="Λυμένες Ασκήσεις">Λυμένες Ασκήσεις</ion-select-option>
+</ion-select>
+
+
+<label class="form-label">Μάθημα</label>
+<ion-select
+  [(ngModel)]="selectedCourse"
+  (ionChange)="applyFilters()"
+  interface="popover"
+  placeholder="Επιλογή μαθήματος"
+  class="custom-select">
+  <ion-select-option value="">Όλα</ion-select-option>
+  <ion-select-option *ngFor="let course of allCourses" [value]="course">
+    {{ course }}
+  </ion-select-option>
+</ion-select>
+
+  <!-- Notes Feed -->
+  <ng-container *ngIf="filteredNotes.length > 0; else noNotes">
+    <ion-card *ngFor="let note of filteredNotes" class="note-card">
+      <ion-card-header>
+        <ion-card-title>{{ note.title }}</ion-card-title>
+        <ion-card-subtitle>{{ note.course }} • {{ note.category }} • από {{ note.uploader }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="note-section">
+          <strong class="section-title">Περιγραφή:</strong>
+          <p>{{ note.description || 'Χωρίς περιγραφή.' }}</p>
+        </div>        
+        <div class="upload-date">📅 Ανέβηκε στις: {{ note.upload_date }}</div>
+        <div class="actions">
+          <a [href]="note.filepath" target="_blank">📄 Άνοιγμα αρχείου</a>
+          <ion-button
+  class="favorite-btn"
+  size="small"
+  fill="outline"
+  [color]="note.isFavorite ? 'danger' : 'medium'"
+  (click)="addToFavorites(note)">
+  {{ note.isFavorite ? '💔 Αφαίρεση' : '❤️ Αγαπημένο' }}
+</ion-button>        
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <ng-template #noNotes>
+    <p style="text-align:center; color: #888;">Δεν υπάρχουν σημειώσεις.</p>
+  </ng-template>
+</ion-content>
+
+
+<app-footer-nav></app-footer-nav>

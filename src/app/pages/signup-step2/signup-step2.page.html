@@ -1,0 +1,55 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/signup-step1" class="custom-back"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Αυτοαξιολόγηση</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="signup-step2-container">
+  <div class="form-wrapper">
+    <h1>Αυτοαξιολόγηση</h1>
+    <p class="instructions">
+      Στο UniHelp είμαστε μία ομάδα! Μοιράσου μαζί μας τα μαθήματα που μπορείς να προσφέρεις βοήθεια! 
+    </p>
+
+    <ion-searchbar
+    [(ngModel)]="searchTerm"
+    (ionInput)="filterCourses()"
+    (ionFocus)="onFocus()"
+    (ionBlur)="onBlur()"
+    placeholder="Αναζήτηση μαθήματος"
+  ></ion-searchbar>
+  
+
+  <ion-list class="course-list-box" *ngIf="isFocused && filteredCourses.length > 0">
+    <ion-item
+      *ngFor="let course of filteredCourses"
+      button
+      detail="false"
+      (click)="selectCourse(course)"
+    >
+      {{ course }}
+    </ion-item>
+  </ion-list>  
+  
+
+  <div class="selected-courses" *ngIf="selectedCourses.length > 0">
+    <ion-chip *ngFor="let course of selectedCourses">
+      <ion-label>{{ course }}</ion-label>
+      <ion-icon
+      name="close-circle"
+      class="remove-icon"
+      size="small"
+      (click)="removeCourse(course)"
+    ></ion-icon>    
+    </ion-chip>
+  </div>
+  
+
+    <ion-button expand="block" class="submit-btn" shape="round" (click)="submit()">
+      Υποβολή
+    </ion-button>
+  </div>
+</ion-content>

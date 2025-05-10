@@ -1,0 +1,9 @@
+package-lock.json
+package.json
+src/app/app.routes.ts
+src/environments/environment.prod.ts
+src/environments/environment.ts
+src/global.scss
+src/index.html
+src/main.ts
+src/theme/variables.scss

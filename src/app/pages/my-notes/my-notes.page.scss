@@ -1,0 +1,46 @@
+.note-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 20px;
+  border: 1px solid #eee;
+}
+
+.note-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #8C1310;
+}
+
+.note-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.note-description {
+  margin-top: 10px;
+  font-size: 15px;
+  color: #333;
+}
+
+.note-meta {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  color: #555;
+}
+
+.file-link {
+  color: #8C1310;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.note-date {
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+  margin-top: 6px;
+}

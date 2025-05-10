@@ -1,0 +1,63 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Ανέβασε Σημειώσεις</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="form-box">
+    <form (submit)="onSubmit()">
+
+      <label class="form-label">Τίτλος</label>
+      <ion-input [(ngModel)]="title" name="title" required></ion-input>
+    
+      <label class="form-label">Κατηγορία</label>
+      <ion-select
+  [(ngModel)]="category"
+  interface="alert"
+  interfaceOptions="{ header: 'Επίλεξε Κατηγορία', cssClass: 'custom-alert' }"
+  name="category"
+  required
+>
+  <ion-select-option value="Σημειώσεις">Σημειώσεις</ion-select-option>
+  <ion-select-option value="Διαφάνειες">Διαφάνειες</ion-select-option>
+  <ion-select-option value="Ασκήσεις">Ασκήσεις</ion-select-option>
+  <ion-select-option value="Λυμένες Ασκήσεις">Λυμένες Ασκήσεις</ion-select-option>
+</ion-select>
+
+    
+      <label class="form-label">Μάθημα</label>
+      <ion-select
+  [(ngModel)]="courseId"
+  interface="alert"
+  interfaceOptions="{ header: 'Επίλεξε Μάθημα' }"
+  name="course"
+  required
+>
+  <ion-select-option *ngFor="let course of courses" [value]="course.id">
+    {{ course.name }}
+  </ion-select-option>
+</ion-select>
+
+    
+      <label class="form-label">Περιγραφή (προαιρετικά)</label>
+      <ion-textarea [(ngModel)]="description" name="description"></ion-textarea>
+    
+      <label class="form-label">Αρχεία</label>
+      <input type="file" multiple (change)="onFileChange($event)" />
+    
+      <ion-button
+  expand="block"
+  type="button"
+  class="custom-red-btn"
+  (click)="handleUploadClick()"
+>
+  Ανέβασε
+</ion-button>
+
+    </form>    
+  </div>
+</ion-content>

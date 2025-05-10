@@ -1,0 +1,76 @@
+.signup-step2-container {
+    --background: #ffffff;
+  
+    .form-wrapper {
+      padding: 32px;
+  
+      h1 {
+        text-align: center;
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 16px;
+      }
+  
+      .instructions {
+        font-size: 15px;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+  
+      ion-searchbar {
+        --background: #f2f2f2;
+        margin-bottom: 10px;
+      }
+  
+      .selected-courses {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+      }
+  
+      .submit-btn {
+        --background: #8C1310;
+        --color: white;
+        margin-top: 30px;
+      }
+    }
+  }
+  
+  .custom-back {
+    color: #8C1310;
+  }
+  
+  .course-list-box {
+    border: 1px solid #8C1310;
+    border-radius: 12px;
+    padding: 8px;
+    margin-top: 8px;
+    background-color: #fff;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .selected-courses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  
+  ion-chip {
+    background-color: #FDF2F2;
+    color: #8C1310;
+    border: 1px solid #8C1310;
+    border-radius: 16px;
+  }
+  
+  .remove-icon {
+    margin-left: 6px;
+    cursor: pointer;
+    color: #8C1310;
+  }
+  

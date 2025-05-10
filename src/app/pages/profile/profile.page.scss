@@ -1,0 +1,144 @@
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.avatar-settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-settings {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.avatar-upload {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.settings-icon-btn {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 2;
+  --border-radius: 50%;
+  --border-width: 1px;
+  --border-color: #8C1310;
+  color: #fff;
+  --padding-start: 4px;
+  --padding-end: 4px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  font-size: 16px;
+}
+
+.avatar-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid #8C1310;
+  object-fit: cover;
+}
+
+
+.info-card {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  box-shadow: none;
+}
+
+
+
+.button-row ion-button {
+  margin-top: 10px;
+}
+
+.footer-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 22px;
+  color: #8C1310;
+}
+
+
+ion-button {
+  --background: #8C1310;
+  --background-hover: #a2211f;
+  --background-activated: #7a100d;
+  --color: #fff;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+ion-button[color="danger"][fill="outline"] {
+  --border-color: #8C1310;
+  --color: #8C1310;
+}
+
+.custom-red-btn {
+  --background: #8C1310;
+  --background-hover: #a2211f;
+  --color: white;
+  --border-radius: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-transform: none;
+}
+
+
+.custom-outline-btn {
+  --color: #8C1310;
+  --border-color: #8C1310;
+  --background: #fff;
+  --border-width: 2px;
+  --border-radius: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-transform: none;
+}
+
+
+.upoints-tag {
+  background-color: #8C1310;
+  color: white;
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: inline-block;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+
+ion-footer {
+  ion-toolbar {
+    --background: #fff !important;
+    --border-color: transparent !important;
+    --border-width: 0 !important;
+    border-top: none !important;
+    box-shadow: none !important;
+    background-color: #fff !important;
+  }
+}
+
+.profile-content {
+  --background: #f9f9f9;
+}
+
+
+.footer-toolbar {
+  --background: #fafafa;
+  --ion-color-base: #fafafa;
+  --ion-color-contrast: #8C1310;
+  box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+}
+

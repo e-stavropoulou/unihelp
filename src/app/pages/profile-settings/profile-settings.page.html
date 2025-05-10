@@ -1,0 +1,83 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-title>Ρυθμίσεις Προφίλ</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/profile"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="saveChanges()" #form="ngForm">
+    
+    <div class="form-group">
+      <label class="form-label">Ονοματεπώνυμο</label>
+      <ion-input
+        [(ngModel)]="userData.full_name"
+        name="full_name"
+        required
+        class="custom-input">
+      </ion-input>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Username</label>
+      <ion-input
+        [(ngModel)]="userData.username"
+        name="username"
+        required
+        class="custom-input">
+      </ion-input>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <ion-input
+        [(ngModel)]="userData.email"
+        name="email"
+        type="email"
+        required
+        class="custom-input">
+      </ion-input>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Νέος Κωδικός</label>
+      <ion-input
+        [(ngModel)]="newPassword"
+        name="newPassword"
+        type="password"
+        class="custom-input">
+      </ion-input>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Αυτοαξιολόγηση (Μαθήματα)</label>
+      <ion-select
+        [(ngModel)]="userData.courses"
+        name="courses"
+        multiple
+        interface="alert"
+        interfaceOptions="{ header: 'Επίλεξε Μαθήματα' }"
+        class="custom-select"
+        expand="block"
+      >
+        <ion-select-option *ngFor="let course of allCourses" [value]="course.name">
+          {{ course.name }}
+        </ion-select-option>
+      </ion-select>
+    </div>
+
+    <div class="avatar-upload-wrapper">
+      <label class="avatar-clickable">
+        <input type="file" accept="image/*" hidden (change)="onAvatarChange($event)" />
+        <img [src]="avatarUrl || 'assets/img/placeholder-avatar.png'" class="avatar-img-clickable" />
+      </label>
+      <div class="avatar-text">Αλλαγή avatar</div>
+    </div>
+
+    <ion-button expand="block" type="submit" color="primary" [disabled]="!changesMade()">
+      Αποθήκευση Αλλαγών
+    </ion-button>
+  </form>
+</ion-content>

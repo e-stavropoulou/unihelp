@@ -1,0 +1,189 @@
+ios/App/App.xcodeproj/xcuserdata/evelina.xcuserdatad/xcschemes/xcschememanagement.plist
+ios/App/App/capacitor.config.json
+ios/App/App/config.xml
+ios/App/App/public/3rdpartylicenses.txt
+ios/App/App/public/assets/icon/favicon.png
+ios/App/App/public/assets/img/placeholder-avatar.png
+ios/App/App/public/assets/shapes.svg
+ios/App/App/public/chunk-2OUJHQAH.js
+ios/App/App/public/chunk-2Q474RUS.js
+ios/App/App/public/chunk-2WNWRKHP.js
+ios/App/App/public/chunk-3537T4CH.js
+ios/App/App/public/chunk-3HDTP3LI.js
+ios/App/App/public/chunk-3KUZV4UT.js
+ios/App/App/public/chunk-3NIO5DEC.js
+ios/App/App/public/chunk-3TZHS7H3.js
+ios/App/App/public/chunk-4ISDGP23.js
+ios/App/App/public/chunk-4MMRWXWC.js
+ios/App/App/public/chunk-4U6PRYVA.js
+ios/App/App/public/chunk-5AL2LIQG.js
+ios/App/App/public/chunk-5OMUW5VI.js
+ios/App/App/public/chunk-5X4HMWFG.js
+ios/App/App/public/chunk-5ZDI5UDW.js
+ios/App/App/public/chunk-64YB4YY7.js
+ios/App/App/public/chunk-6BU23L3N.js
+ios/App/App/public/chunk-6DX4B6A7.js
+ios/App/App/public/chunk-6HOACLGR.js
+ios/App/App/public/chunk-6PLA2HUG.js
+ios/App/App/public/chunk-7E4Y4UQZ.js
+ios/App/App/public/chunk-7HI2BJAU.js
+ios/App/App/public/chunk-7KXXZ5W4.js
+ios/App/App/public/chunk-7MRKO2E6.js
+ios/App/App/public/chunk-7VSVCZ7D.js
+ios/App/App/public/chunk-7XSU44XX.js
+ios/App/App/public/chunk-AB6FVHLK.js
+ios/App/App/public/chunk-ARQSGI3C.js
+ios/App/App/public/chunk-BAKMWPBW.js
+ios/App/App/public/chunk-BLBI3KUH.js
+ios/App/App/public/chunk-BNKP22CK.js
+ios/App/App/public/chunk-BXUY4QLH.js
+ios/App/App/public/chunk-C45TVOZU.js
+ios/App/App/public/chunk-C5RQ2IC2.js
+ios/App/App/public/chunk-C6TWYN5N.js
+ios/App/App/public/chunk-C7BEO34T.js
+ios/App/App/public/chunk-CUDLISKU.js
+ios/App/App/public/chunk-CXTVNVRW.js
+ios/App/App/public/chunk-D4VGNZLR.js
+ios/App/App/public/chunk-DB2ZABMO.js
+ios/App/App/public/chunk-DIA4MJYG.js
+ios/App/App/public/chunk-E4BL7Y3V.js
+ios/App/App/public/chunk-EHABBOIS.js
+ios/App/App/public/chunk-EL2PHI2H.js
+ios/App/App/public/chunk-ET44ATE5.js
+ios/App/App/public/chunk-ETFHVDFC.js
+ios/App/App/public/chunk-EXKKUTCI.js
+ios/App/App/public/chunk-F3W25QGZ.js
+ios/App/App/public/chunk-F6FNI2JN.js
+ios/App/App/public/chunk-FIIRYJMA.js
+ios/App/App/public/chunk-FTBOPNKD.js
+ios/App/App/public/chunk-G5UDMJNE.js
+ios/App/App/public/chunk-GFAQE7C7.js
+ios/App/App/public/chunk-GGGXXLEF.js
+ios/App/App/public/chunk-GGJ3SWR2.js
+ios/App/App/public/chunk-GJZKZXL4.js
+ios/App/App/public/chunk-GMXOAC5L.js
+ios/App/App/public/chunk-GNOVVPTF.js
+ios/App/App/public/chunk-GNZJS4BJ.js
+ios/App/App/public/chunk-GOWQWRZR.js
+ios/App/App/public/chunk-GSI5CD6C.js
+ios/App/App/public/chunk-HC6MZPB3.js
+ios/App/App/public/chunk-HFCVCOVA.js
+ios/App/App/public/chunk-HQK53J7X.js
+ios/App/App/public/chunk-HTF3ITV5.js
+ios/App/App/public/chunk-HU6UQ5WL.js
+ios/App/App/public/chunk-I34FAO2T.js
+ios/App/App/public/chunk-IFNCDCK6.js
+ios/App/App/public/chunk-IFRBDKG6.js
+ios/App/App/public/chunk-IP3IRUG3.js
+ios/App/App/public/chunk-IZGR7QPO.js
+ios/App/App/public/chunk-JE3FXFC3.js
+ios/App/App/public/chunk-JEJYMY43.js
+ios/App/App/public/chunk-JFIMG5JN.js
+ios/App/App/public/chunk-JGTGHJ4P.js
+ios/App/App/public/chunk-JH2YZP3C.js
+ios/App/App/public/chunk-JHLW7V75.js
+ios/App/App/public/chunk-JWIEPCRG.js
+ios/App/App/public/chunk-K5XY5SFY.js
+ios/App/App/public/chunk-KFG7UFI4.js
+ios/App/App/public/chunk-KI5M7U44.js
+ios/App/App/public/chunk-KQLRXVLC.js
+ios/App/App/public/chunk-LPJK6LGO.js
+ios/App/App/public/chunk-LXHZS5XV.js
+ios/App/App/public/chunk-M24N72VW.js
+ios/App/App/public/chunk-MCRJI3T3.js
+ios/App/App/public/chunk-MH6KLPVN.js
+ios/App/App/public/chunk-MKVXSL2O.js
+ios/App/App/public/chunk-MRTKPBUH.js
+ios/App/App/public/chunk-NBIXKWD5.js
+ios/App/App/public/chunk-NVX445V5.js
+ios/App/App/public/chunk-NW6DUZ75.js
+ios/App/App/public/chunk-O3XFDD5Y.js
+ios/App/App/public/chunk-OBXDPQ3V.js
+ios/App/App/public/chunk-OMB27VJZ.js
+ios/App/App/public/chunk-ONYYCQBF.js
+ios/App/App/public/chunk-P5HVLSWA.js
+ios/App/App/public/chunk-PF47SF2J.js
+ios/App/App/public/chunk-PLS44IOX.js
+ios/App/App/public/chunk-Q6V44JDG.js
+ios/App/App/public/chunk-RKEOOETC.js
+ios/App/App/public/chunk-RMJ7PCZJ.js
+ios/App/App/public/chunk-RUUN3CF7.js
+ios/App/App/public/chunk-RW4GY4BD.js
+ios/App/App/public/chunk-RXCJKD5H.js
+ios/App/App/public/chunk-SMWLGVHW.js
+ios/App/App/public/chunk-SO2M2T3Y.js
+ios/App/App/public/chunk-SV7S5NYR.js
+ios/App/App/public/chunk-T6KC3XNK.js
+ios/App/App/public/chunk-TBU4EDR6.js
+ios/App/App/public/chunk-TC5HPMOQ.js
+ios/App/App/public/chunk-TJOIYR6D.js
+ios/App/App/public/chunk-TK24NPRB.js
+ios/App/App/public/chunk-TKLIX3P5.js
+ios/App/App/public/chunk-TRVKXTQP.js
+ios/App/App/public/chunk-U3Y53635.js
+ios/App/App/public/chunk-U6IXQDSK.js
+ios/App/App/public/chunk-U7FPAHTA.js
+ios/App/App/public/chunk-UJENIS7D.js
+ios/App/App/public/chunk-ULTAR2LX.js
+ios/App/App/public/chunk-UNHUYKWX.js
+ios/App/App/public/chunk-URWQOCDQ.js
+ios/App/App/public/chunk-UYRPLB3C.js
+ios/App/App/public/chunk-VGLQ4DML.js
+ios/App/App/public/chunk-VKAB2FBR.js
+ios/App/App/public/chunk-VX2NSFF3.js
+ios/App/App/public/chunk-W2DKFL3W.js
+ios/App/App/public/chunk-W2LUUNI7.js
+ios/App/App/public/chunk-WAJVALQM.js
+ios/App/App/public/chunk-WGYWJ45M.js
+ios/App/App/public/chunk-WJCK52CD.js
+ios/App/App/public/chunk-WMEG6PAA.js
+ios/App/App/public/chunk-WVZBV5GR.js
+ios/App/App/public/chunk-XOFK7PKV.js
+ios/App/App/public/chunk-XPFIYDPP.js
+ios/App/App/public/chunk-Y4NXEKJD.js
+ios/App/App/public/chunk-YFUIW3DT.js
+ios/App/App/public/chunk-YNOVCGAS.js
+ios/App/App/public/chunk-ZEIS7JY3.js
+ios/App/App/public/chunk-ZLMLGF2F.js
+ios/App/App/public/chunk-ZWMHAEA3.js
+ios/App/App/public/cordova.js
+ios/App/App/public/cordova_plugins.js
+ios/App/App/public/index.html
+ios/App/App/public/main-WS5SZI4N.js
+ios/App/App/public/polyfills-4BK4MXU4.js
+ios/App/App/public/prerendered-routes.json
+ios/App/App/public/styles-WWBOVMYW.css
+ios/App/Pods/Local Podspecs/Capacitor.podspec.json
+ios/App/Pods/Local Podspecs/CapacitorCordova.podspec.json
+ios/App/Pods/Manifest.lock
+ios/App/Pods/Pods.xcodeproj/project.pbxproj
+ios/App/Pods/Pods.xcodeproj/xcuserdata/evelina.xcuserdatad/xcschemes/Capacitor.xcscheme
+ios/App/Pods/Pods.xcodeproj/xcuserdata/evelina.xcuserdatad/xcschemes/CapacitorCordova.xcscheme
+ios/App/Pods/Pods.xcodeproj/xcuserdata/evelina.xcuserdatad/xcschemes/Pods-App.xcscheme
+ios/App/Pods/Pods.xcodeproj/xcuserdata/evelina.xcuserdatad/xcschemes/xcschememanagement.plist
+ios/App/Pods/Target Support Files/Capacitor/Capacitor-Info.plist
+ios/App/Pods/Target Support Files/Capacitor/Capacitor-dummy.m
+ios/App/Pods/Target Support Files/Capacitor/Capacitor-prefix.pch
+ios/App/Pods/Target Support Files/Capacitor/Capacitor.debug.xcconfig
+ios/App/Pods/Target Support Files/Capacitor/Capacitor.modulemap
+ios/App/Pods/Target Support Files/Capacitor/Capacitor.release.xcconfig
+ios/App/Pods/Target Support Files/CapacitorCordova/CapacitorCordova-Info.plist
+ios/App/Pods/Target Support Files/CapacitorCordova/CapacitorCordova-dummy.m
+ios/App/Pods/Target Support Files/CapacitorCordova/CapacitorCordova-prefix.pch
+ios/App/Pods/Target Support Files/CapacitorCordova/CapacitorCordova.debug.xcconfig
+ios/App/Pods/Target Support Files/CapacitorCordova/CapacitorCordova.modulemap
+ios/App/Pods/Target Support Files/CapacitorCordova/CapacitorCordova.release.xcconfig
+ios/App/Pods/Target Support Files/Pods-App/Pods-App-Info.plist
+ios/App/Pods/Target Support Files/Pods-App/Pods-App-acknowledgements.markdown
+ios/App/Pods/Target Support Files/Pods-App/Pods-App-acknowledgements.plist
+ios/App/Pods/Target Support Files/Pods-App/Pods-App-dummy.m
+ios/App/Pods/Target Support Files/Pods-App/Pods-App-frameworks.sh
+ios/App/Pods/Target Support Files/Pods-App/Pods-App-umbrella.h
+ios/App/Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig
+ios/App/Pods/Target Support Files/Pods-App/Pods-App.modulemap
+ios/App/Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig
+ios/capacitor-cordova-ios-plugins/CordovaPlugins.podspec
+ios/capacitor-cordova-ios-plugins/CordovaPluginsResources.podspec
+ios/capacitor-cordova-ios-plugins/CordovaPluginsStatic.podspec
+ios/capacitor-cordova-ios-plugins/resources/.gitkeep
+ios/capacitor-cordova-ios-plugins/sources/.gitkeep
