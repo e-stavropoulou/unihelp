@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
 
-
 @Component({
   selector: 'app-favorite-notes',
   standalone: true,
@@ -22,12 +21,12 @@ export class FavoriteNotesPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    const email = this.authService.getCurrentUserEmail();
-    if (email) {
-      this.http.get<any[]>(`${environment.API_URL}/favorites/${email}`)
-        .subscribe(data => {
-          this.favoriteNotes = data;
-        });
-    }
+    this.http.get<any[]>(`${environment.API_URL}/favorites`, {
+      headers: {
+        Authorization: `Bearer ${this.authService.getToken()}`
+      }
+    }).subscribe(data => {
+      this.favoriteNotes = data;
+    });
   }
 }

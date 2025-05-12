@@ -17,7 +17,7 @@ export class FooterNavComponent {
   constructor(private router: Router, private toastController: ToastController, private authService: AuthService) {}
 
   async logout() {
-    this.authService.clearUser(); 
+    this.authService.clearToken();
     const toast = await this.toastController.create({
       message: 'Αποσυνδεθήκατε.',
       duration: 2000,

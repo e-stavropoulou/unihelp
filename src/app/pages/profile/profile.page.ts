@@ -49,17 +49,18 @@ export class ProfilePage implements OnInit {
   constructor(private router: Router, private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit() {
-    const email = this.authService.getCurrentUserEmail();
-    console.log('Φόρτωση προφίλ για email:', email);
-
-    if (!email) {
+    const token = this.authService.getToken();
+    if (!token) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.http.get<any>(`${environment.API_URL}/profile/${email}`).subscribe({
+    this.http.get<any>(`${environment.API_URL}/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).subscribe({
       next: (data) => {
-        console.log('Δεδομένα χρήστη:', data);
         this.userData = data;
         this.avatarUrl = data.avatar_url || 'assets/img/placeholder-avatar.png';
       },
@@ -75,14 +76,27 @@ export class ProfilePage implements OnInit {
     if (input.files && input.files[0]) {
       const file = input.files[0];
       const formData = new FormData();
-  
       formData.append('avatar', file);
-      formData.append('email', this.userData.email); 
-  
-      this.http.post<any>(`${environment.API_URL}/upload-avatar`, formData).subscribe({
+
+      this.http.post<any>(`${environment.API_URL}/upload-avatar`, formData, {
+        headers: {
+          Authorization: `Bearer ${this.authService.getToken()}`
+        }
+      }).subscribe({
         next: (res) => {
           this.avatarUrl = res.avatar_url;
-          this.userData.avatar_url = res.avatar_url;
+
+          // Reload updated profile
+          this.http.get<any>(`${environment.API_URL}/profile`, {
+            headers: {
+              Authorization: `Bearer ${this.authService.getToken()}`
+            }
+          }).subscribe({
+            next: (data) => {
+              this.userData = data;
+              this.avatarUrl = data.avatar_url || 'assets/img/placeholder-avatar.png';
+            }
+          });
         },
         error: (err) => {
           console.error('Σφάλμα στο ανέβασμα avatar:', err);

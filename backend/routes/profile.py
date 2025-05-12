@@ -1,26 +1,27 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_from_directory
 import os
 from werkzeug.utils import secure_filename
-from flask import send_from_directory
 from models.shared import db
 from models.user import User
 from models.course import Course
 from werkzeug.security import generate_password_hash
+from config import BASE_URL
+from utils.jwt_utils import require_token  # JWT έλεγχος
 
 profile_bp = Blueprint('profile_bp', __name__)
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', 'avatars')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-@profile_bp.route('/profile/<email>', methods=['GET'])
-def get_profile(email):
-    user = User.query.filter_by(email=email).first()
-
+@profile_bp.route('/profile', methods=['GET'])
+@require_token
+def get_profile():
+    user = User.query.filter_by(email=request.user_email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
     return jsonify({
-        'email': user.email, 
+        'email': user.email,
         'username': user.username,
         'department': user.department,
         'courses': [course.name for course in user.courses],
@@ -28,14 +29,13 @@ def get_profile(email):
     })
 
 @profile_bp.route('/upload-avatar', methods=['POST'])
+@require_token
 def upload_avatar():
     file = request.files.get('avatar')
-    email = request.form.get('email')
+    if not file:
+        return jsonify({'error': 'Missing file'}), 400
 
-    if not file or not email:
-        return jsonify({'error': 'Missing file or email'}), 400
-
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=request.user_email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -43,7 +43,7 @@ def upload_avatar():
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
 
-    avatar_url = f'http://127.0.0.1:5000/static/avatars/{filename}'
+    avatar_url = f'{BASE_URL}/static/avatars/{filename}'
     user.avatar_url = avatar_url
     db.session.commit()
 
@@ -54,23 +54,20 @@ def serve_avatar(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 @profile_bp.route('/update-profile', methods=['POST'])
+@require_token
 def update_profile():
     data = request.get_json()
-    email = data.get('email')
-
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=request.user_email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
     user.full_name = data.get('full_name', user.full_name)
     user.username = data.get('username', user.username)
 
-    # Αν θέλει να αλλάξει password
     new_password = data.get('new_password')
     if new_password:
         user.password = generate_password_hash(new_password)
 
-    # Αν θέλει να αλλάξει courses
     selected_courses = data.get('courses', [])
     if selected_courses:
         user.courses = []
@@ -80,5 +77,4 @@ def update_profile():
                 user.courses.append(course)
 
     db.session.commit()
-
     return jsonify({'message': 'Το προφίλ ενημερώθηκε επιτυχώς.'}), 200

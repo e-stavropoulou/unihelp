@@ -4,21 +4,21 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly EMAIL_KEY = 'email';
+  private readonly TOKEN_KEY = 'token';
 
-  setUserEmail(email: string) {
-    localStorage.setItem(this.EMAIL_KEY, email);
+  setToken(token: string) {
+    localStorage.setItem(this.TOKEN_KEY, token);
   }
 
-  getCurrentUserEmail(): string | null {
-    return localStorage.getItem(this.EMAIL_KEY);
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  clearUser() {
-    localStorage.removeItem(this.EMAIL_KEY);
+  clearToken() {
+    localStorage.removeItem(this.TOKEN_KEY);
   }
 
   isLoggedIn(): boolean {
-    return !!this.getCurrentUserEmail();
+    return !!this.getToken();
   }
 }

@@ -51,3 +51,14 @@
 .custom-back {
   color: #8C1310; 
 }
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper ion-input {
+  flex: 1;
+}
+

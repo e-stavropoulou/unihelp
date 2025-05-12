@@ -20,12 +20,15 @@ import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
+import { FormsModule } from '@angular/forms';
+
 
 
 @Component({
   selector: 'app-signup-step2',
   standalone: true,
   imports: [
+    FormsModule, 
     IonLabel,
     IonBackButton,
     IonButtons,

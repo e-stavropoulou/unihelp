@@ -13,16 +13,17 @@ def create_app():
     db.init_app(app)
     migrate = Migrate(app, db)
 
-    # ✅ CORS επιτρέποντας προσωρινά όλα τα origins και headers
-    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True, allow_headers=["Content-Type"])
+    # CORS επιτρέποντας προσωρινά όλα τα origins και headers
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
-    # ✅ Imports μοντέλων (για migrations)
+
+    # Imports μοντέλων (για migrations)
     from models.user import User
     from models.course import Course
     from models.note import Note
     from models.favorite import Favorite
 
-    # ✅ Καταχώρηση blueprints
+    # Καταχώρηση blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
 

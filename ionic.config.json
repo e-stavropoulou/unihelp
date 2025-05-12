@@ -1,5 +1,7 @@
 {
   "name": "unihelp",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "angular-standalone"
 }

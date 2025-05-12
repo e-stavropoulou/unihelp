@@ -7,7 +7,6 @@ import { FooterNavComponent } from '../../components/footer-nav/footer-nav.compo
 import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
 
-
 @Component({
   selector: 'app-notes-feed',
   standalone: true,
@@ -23,20 +22,22 @@ export class NotesFeedPage implements OnInit {
   selectedCategory: string = '';
   selectedCourse: string = '';
 
-  constructor(private http: HttpClient, private toastCtrl: ToastController, private authService: AuthService) {}
+  constructor(
+    private http: HttpClient,
+    private toastCtrl: ToastController,
+    private authService: AuthService
+  ) {}
 
   ngOnInit() {
     this.loadAllNotes();
   }
 
   loadAllNotes() {
-    const email = this.authService.getCurrentUserEmail();
-    let url = `${environment.API_URL}/all-notes`;
-if (email) {
-  url += `?email=${encodeURIComponent(email)}`;
-}
-
-this.http.get<any[]>(url).subscribe(data => {
+    this.http.get<any[]>(`${environment.API_URL}/all-notes`, {
+      headers: {
+        Authorization: `Bearer ${this.authService.getToken()}`
+      }
+    }).subscribe(data => {
       this.notes = data;
       this.allCourses = [...new Set(data.map(note => note.course))];
       this.applyFilters();
@@ -65,9 +66,9 @@ this.http.get<any[]>(url).subscribe(data => {
   }
 
   async addToFavorites(note: any) {
-    const email = this.authService.getCurrentUserEmail();
-  
-    if (!email) {
+    const token = this.authService.getToken();
+
+    if (!token) {
       const toast = await this.toastCtrl.create({
         message: 'Πρέπει να είσαι συνδεδεμένος για να προσθέσεις αγαπημένα.',
         duration: 1500,
@@ -76,12 +77,13 @@ this.http.get<any[]>(url).subscribe(data => {
       await toast.present();
       return;
     }
-  
-    const wasFavorite = note.isFavorite;
-  
+
     this.http.post(`${environment.API_URL}/favorite`, {
-      email: email,
       note_id: note.id
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     }).subscribe({
       next: async (res: any) => {
         const toast = await this.toastCtrl.create({
@@ -90,7 +92,7 @@ this.http.get<any[]>(url).subscribe(data => {
           color: 'success',
         });
         await toast.present();
-  
+
         this.loadAllNotes();
       },
       error: async (err) => {
@@ -103,6 +105,5 @@ this.http.get<any[]>(url).subscribe(data => {
         console.error(err);
       }
     });
-  }  
-  
+  }
 }

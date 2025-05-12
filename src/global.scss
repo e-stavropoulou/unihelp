@@ -51,7 +51,7 @@
 }
 
 /* ------------------------ Buttons ------------------------ */
-ion-button {
+ion-button:not([fill="clear"]) {
   --background: #8C1310;
   --background-hover: #a2211f;
   --background-activated: #7a100d;
@@ -60,6 +60,7 @@ ion-button {
   font-weight: 600;
   text-transform: none;
 }
+
 
 ion-button[color="danger"][fill="outline"] {
   --border-color: #8C1310;

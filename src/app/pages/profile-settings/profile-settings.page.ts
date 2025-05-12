@@ -21,7 +21,7 @@ export class ProfileSettingsPage implements OnInit {
     email: '',
     courses: []
   };
-  initialData: any = {}; // Για σύγκριση
+  initialData: any = {};
   allCourses: any[] = [];
   avatarFile: File | null = null;
   avatarUrl: string | null = null;
@@ -35,17 +35,21 @@ export class ProfileSettingsPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    const email = this.authService.getCurrentUserEmail();
-    if (!email) {
+    const token = this.authService.getToken();
+    if (!token) {
       this.router.navigate(['/login']);
       return;
     }
 
-    this.http.get<any>(`${environment.API_URL}/profile/${email}`).subscribe({
+    this.http.get<any>(`${environment.API_URL}/profile`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).subscribe({
       next: (data) => {
         this.userData = data;
         this.avatarUrl = data.avatar_url || null;
-        this.initialData = { ...data, courses: [...data.courses] }; // Αρχική τιμή
+        this.initialData = { ...data, courses: [...data.courses] };
       },
       error: () => {
         this.router.navigate(['/login']);
@@ -84,6 +88,7 @@ export class ProfileSettingsPage implements OnInit {
   }
 
   async saveChanges() {
+    const token = this.authService.getToken();
     const payload: any = {
       full_name: this.userData.full_name,
       username: this.userData.username,
@@ -95,13 +100,21 @@ export class ProfileSettingsPage implements OnInit {
       payload.new_password = this.newPassword;
     }
 
-    this.http.post(`${environment.API_URL}/update-profile`, payload).subscribe({
+    this.http.post(`${environment.API_URL}/update-profile`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }).subscribe({
       next: async () => {
         if (this.avatarFile) {
           const formData = new FormData();
           formData.append('avatar', this.avatarFile);
-          formData.append('email', this.userData.email);
-          await this.http.post(`${environment.API_URL}/upload-avatar`, formData).toPromise();
+
+          await this.http.post(`${environment.API_URL}/upload-avatar`, formData, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }).toPromise();
         }
 
         const toast = await this.toastCtrl.create({
@@ -110,7 +123,9 @@ export class ProfileSettingsPage implements OnInit {
           color: 'success'
         });
         await toast.present();
-        this.router.navigate(['/profile']);
+        this.router.navigateByUrl('/profile', { replaceUrl: true }).then(() => {
+          window.location.reload();
+        });   
       },
       error: async () => {
         const toast = await this.toastCtrl.create({
@@ -118,7 +133,7 @@ export class ProfileSettingsPage implements OnInit {
           duration: 1500,
           color: 'danger'
         });
-        await toast.present();
+        await toast.present();   
       }
     });
   }

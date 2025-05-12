@@ -5,7 +5,7 @@ import { IonicModule, NavController } from '@ionic/angular';
 import { HttpClient } from '@angular/common/http';
 import { ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
-
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-upload-notes',
@@ -23,16 +23,15 @@ export class UploadNotesPage implements OnInit {
   files: File[] = [];
 
   courses: any[] = [];
-  userEmail: string = ''; // θα έρθει από το προφίλ ή το auth service
 
   constructor(
     private http: HttpClient,
     private navCtrl: NavController,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    this.userEmail = localStorage.getItem('email') || ''; // ή αλλιώς αν το περνάς αλλού
     this.loadCourses();
   }
 
@@ -46,7 +45,6 @@ export class UploadNotesPage implements OnInit {
     this.files = Array.from(event.target.files);
   }
 
-  
   isFormValid(): boolean {
     return (
       this.title.trim() !== '' &&
@@ -56,7 +54,6 @@ export class UploadNotesPage implements OnInit {
     );
   }
 
-  
   handleUploadClick() {
     if (!this.isFormValid()) {
       this.toastService.present('Παρακαλώ συμπλήρωσε όλα τα υποχρεωτικά πεδία.');
@@ -68,7 +65,6 @@ export class UploadNotesPage implements OnInit {
 
   async onSubmit() {
     const formData = new FormData();
-    formData.append('email', this.userEmail);
     formData.append('title', this.title);
     formData.append('description', this.description || '');
     formData.append('category', this.category);
@@ -78,7 +74,11 @@ export class UploadNotesPage implements OnInit {
       formData.append('files', file);
     }
 
-    this.http.post(`${environment.API_URL}/upload-note`, formData).subscribe({
+    this.http.post(`${environment.API_URL}/upload-note`, formData, {
+      headers: {
+        Authorization: `Bearer ${this.authService.getToken()}`
+      }
+    }).subscribe({
       next: async res => {
         this.toastService.present('Οι σημειώσεις ανέβηκαν με επιτυχία!', 'success');
         this.navCtrl.back();
