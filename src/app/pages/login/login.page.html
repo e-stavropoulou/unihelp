@@ -12,8 +12,7 @@
 
     <ion-input
       type="email"
-      
-      placeholder="π.χ. username@upatras.gr"
+      placeholder="upXXXXXXX@upatras.gr ή stXXXXXXX@ceid.upatras.gr"
       fill="solid"
       class="custom-input"
       [(ngModel)]="email"
@@ -31,8 +30,20 @@
       Σύνδεση
     </ion-button>
 
+    <!-- Εμφάνιση κουμπιού μόνο αν χρειάζεται -->
+    <ion-button
+      *ngIf="showResend"
+      expand="block"
+      fill="outline"
+      color="medium"
+      shape="round"
+      (click)="resendVerification()"
+    >
+      Αποστολή ξανά email επιβεβαίωσης
+    </ion-button>
+
     <div class="extra-links">
-      <p>Ξέχασες τον κωδικό σου; <a href="#">Ανάκτηση</a></p>
+      <p>Ξέχασες τον κωδικό σου; <a routerLink="/forgot-password">Ανάκτηση</a></p>
       <p>Δεν έχεις λογαριασμό; <a routerLink="/signup-step1">Εγγραφή</a></p>
     </div>
   </div>

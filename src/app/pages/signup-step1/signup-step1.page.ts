@@ -11,7 +11,7 @@ import { AuthApiService } from 'src/app/services/auth-api.service';
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule, RouterModule],
   templateUrl: './signup-step1.page.html',
-  styleUrls: ['./signup-step1.page.scss'],
+  styleUrls: ['./signup-step1.page.scss']
 })
 export class SignupStep1Page {
   email = '';
@@ -29,9 +29,17 @@ export class SignupStep1Page {
   ) {}
 
   goToStep2() {
-    const validEmail = this.email.endsWith('@upatras.gr') || this.email.endsWith('.ceid.upatras.gr');
+    const validEmail = this.email.endsWith('@upatras.gr') || this.email.endsWith('@ceid.upatras.gr');
 
-    if (!this.email || !this.username || !this.fullName || !this.password || !this.semester || !this.year || !this.birthdate) {
+    if (
+      this.email.trim() === '' ||
+      this.username.trim() === '' ||
+      this.fullName.trim() === '' ||
+      this.password.trim() === '' ||
+      this.semester === null ||
+      this.year === null ||
+      this.birthdate.trim() === ''
+    ) {
       this.toastService.present('Συμπλήρωσε όλα τα πεδία!', 'warning');
       return;
     }
@@ -72,7 +80,6 @@ export class SignupStep1Page {
       return;
     }
 
-    // Κλήση στο backend για έλεγχο email/username
     this.authApi.checkCredentials(this.email, this.username).subscribe({
       next: (res) => {
         if (res.email_exists) {
@@ -80,7 +87,6 @@ export class SignupStep1Page {
         } else if (res.username_exists) {
           this.toastService.present('Το username χρησιμοποιείται ήδη.', 'warning');
         } else {
-          // Όλα εντάξει → πάμε στο Βήμα 2
           this.router.navigate(['/signup-step2'], {
             state: {
               email: this.email,

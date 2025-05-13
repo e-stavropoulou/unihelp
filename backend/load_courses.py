@@ -1,6 +1,6 @@
 from __init__ import create_app
-from models.user import db
 from models.course import Course
+from models.shared import db  
 
 app = create_app()
 
@@ -14,9 +14,8 @@ courses_list = [
 ]
 
 with app.app_context():
-    db.create_all()  # δημιουργεί τους πίνακες αν δεν υπάρχουν
     for name in courses_list:
         if not Course.query.filter_by(name=name).first():
             db.session.add(Course(name=name))
     db.session.commit()
-    print("✔ Τα μαθήματα φορτώθηκαν στη βάση!")
+    print("✔ Τα μαθήματα φορτώθηκαν στη MySQL βάση!")

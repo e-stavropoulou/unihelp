@@ -19,11 +19,12 @@ import { FormsModule } from '@angular/forms';
     FormsModule
   ],
   templateUrl: './login.page.html',
-  styleUrls: ['./login.page.scss'],
+  styleUrls: ['./login.page.scss']
 })
 export class LoginPage {
   email: string = '';
   password: string = '';
+  showResend: boolean = false;
 
   constructor(
     private router: Router,
@@ -33,24 +34,46 @@ export class LoginPage {
   ) {}
 
   login() {
-    console.log('Login button clicked');
     if (!this.email || !this.password) {
       this.toastService.present('Συμπλήρωσε όλα τα πεδία!', 'error');
       return;
     }
 
-    this.http.post<{ message: string; token: string }>(`${environment.API_URL}/login`, {
+    this.http.post<{ message: string; token: string; email: string }>(`${environment.API_URL}/login`, {
       email: this.email,
       password: this.password
     }).subscribe({
       next: (res) => {
-        this.authService.setToken(res.token);
-        this.router.navigateByUrl('/profile', { replaceUrl: true }).then(() => {
-          window.location.reload(); // Για να φορτωθούν τα δεδομένα με token
-        });
+        this.authService.setToken(res.token, res.email);
+        this.showResend = false;
+        this.router.navigateByUrl('/profile', { replaceUrl: true });
       },
       error: (err) => {
-        this.toastService.present(err.error?.error || 'Σφάλμα σύνδεσης');
+        const errorMessage = err.error?.error || 'Σφάλμα σύνδεσης';
+        this.toastService.present(errorMessage);
+
+        // Αν αφορά ενεργοποίηση, εμφάνιση κουμπιού resend
+        if (errorMessage.includes('ενεργοποιηθεί')) {
+          this.showResend = true;
+        } else {
+          this.showResend = false;
+        }
+      }
+    });
+  }
+
+  resendVerification() {
+    if (!this.email) {
+      this.toastService.present('Συμπλήρωσε πρώτα το email σου!', 'error');
+      return;
+    }
+
+    this.authService.resendVerificationEmail(this.email).subscribe({
+      next: (res) => {
+        this.toastService.present(res.message || 'Το email επιβεβαίωσης εστάλη ξανά.');
+      },
+      error: () => {
+        this.toastService.present('Αποτυχία αποστολής email επιβεβαίωσης.');
       }
     });
   }

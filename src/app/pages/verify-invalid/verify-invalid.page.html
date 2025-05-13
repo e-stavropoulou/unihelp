@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Άκυρος Σύνδεσμος</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h2>❌ Ο σύνδεσμος επιβεβαίωσης δεν είναι έγκυρος</h2>
+  <p>Ίσως έχει ήδη χρησιμοποιηθεί ή έχει λήξει.</p>
+
+  <ion-item>
+    <ion-input
+      [(ngModel)]="email"
+      placeholder="Εισάγε το email σου για νέα αποστολή"
+      type="email"
+    ></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" (click)="resendVerification()">
+    Αποστολή ξανά email επιβεβαίωσης
+  </ion-button>
+
+  <ion-button expand="block" fill="clear" (click)="goToLogin()">
+    Επιστροφή στη σύνδεση
+  </ion-button>
+</ion-content>

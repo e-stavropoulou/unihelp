@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
@@ -12,7 +12,7 @@ import { AuthService } from 'src/app/services/auth.service';
   standalone: true,
   imports: [CommonModule, IonicModule, FormsModule],
   templateUrl: './profile-settings.page.html',
-  styleUrls: ['./profile-settings.page.scss'],
+  styleUrls: ['./profile-settings.page.scss']
 })
 export class ProfileSettingsPage implements OnInit {
   userData: any = {
@@ -41,11 +41,11 @@ export class ProfileSettingsPage implements OnInit {
       return;
     }
 
-    this.http.get<any>(`${environment.API_URL}/profile`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }).subscribe({
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    this.http.get<any>(`${environment.API_URL}/profile`, { headers }).subscribe({
       next: (data) => {
         this.userData = data;
         this.avatarUrl = data.avatar_url || null;
@@ -89,32 +89,30 @@ export class ProfileSettingsPage implements OnInit {
 
   async saveChanges() {
     const token = this.authService.getToken();
+    if (!token) return;
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
     const payload: any = {
       full_name: this.userData.full_name,
       username: this.userData.username,
       email: this.userData.email,
-      courses: this.userData.courses,
+      courses: this.userData.courses
     };
 
     if (this.newPassword.trim()) {
       payload.new_password = this.newPassword;
     }
 
-    this.http.post(`${environment.API_URL}/update-profile`, payload, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }).subscribe({
+    this.http.post(`${environment.API_URL}/update-profile`, payload, { headers }).subscribe({
       next: async () => {
         if (this.avatarFile) {
           const formData = new FormData();
           formData.append('avatar', this.avatarFile);
 
-          await this.http.post(`${environment.API_URL}/upload-avatar`, formData, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }).toPromise();
+          await this.http.post(`${environment.API_URL}/upload-avatar`, formData, { headers }).toPromise();
         }
 
         const toast = await this.toastCtrl.create({
@@ -123,9 +121,7 @@ export class ProfileSettingsPage implements OnInit {
           color: 'success'
         });
         await toast.present();
-        this.router.navigateByUrl('/profile', { replaceUrl: true }).then(() => {
-          window.location.reload();
-        });   
+        this.router.navigateByUrl('/profile', { replaceUrl: true });
       },
       error: async () => {
         const toast = await this.toastCtrl.create({
@@ -133,7 +129,7 @@ export class ProfileSettingsPage implements OnInit {
           duration: 1500,
           color: 'danger'
         });
-        await toast.present();   
+        await toast.present();
       }
     });
   }

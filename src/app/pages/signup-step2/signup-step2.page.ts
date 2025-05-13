@@ -21,14 +21,19 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from 'src/app/services/auth.service';
 
-
+interface RegisterResponse {
+  message: string;
+  token: string;
+  email: string;
+}
 
 @Component({
   selector: 'app-signup-step2',
   standalone: true,
   imports: [
-    FormsModule, 
+    FormsModule,
     IonLabel,
     IonBackButton,
     IonButtons,
@@ -47,7 +52,7 @@ import { FormsModule } from '@angular/forms';
     HttpClientModule
   ],
   templateUrl: './signup-step2.page.html',
-  styleUrls: ['./signup-step2.page.scss'],
+  styleUrls: ['./signup-step2.page.scss']
 })
 export class SignupStep2Page {
   searchTerm: string = '';
@@ -58,8 +63,12 @@ export class SignupStep2Page {
   userData: any;
   isFocused: boolean = false;
 
-
-  constructor(private router: Router, private http: HttpClient, private toastService: ToastService) {
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private toastService: ToastService,
+    private authService: AuthService
+  ) {
     const nav = this.router.getCurrentNavigation();
     this.userData = nav?.extras?.state;
 
@@ -102,18 +111,16 @@ export class SignupStep2Page {
       this.toastService.present('Επίλεξε τουλάχιστον 1 μάθημα.', 'warning');
       return;
     }
-  
+
     const payload = {
       ...this.userData,
       skills: this.selectedCourses
     };
-  
-    this.http.post(`${environment.API_URL}/register`, payload).subscribe({
-      next: () => {
-        this.toastService.present('Εγγραφή επιτυχής!', 'success');
-        this.router.navigate(['/profile'], {
-          state: { email: this.userData.email }
-        });
+
+    this.http.post<RegisterResponse>(`${environment.API_URL}/register`, payload).subscribe({
+      next: (res) => {
+        this.toastService.present('Η εγγραφή σου ολοκληρώθηκε! Έλεγξε το email σου.', 'success');
+        this.router.navigate(['/verify-info'], { replaceUrl: true });
       },
       error: (err) => {
         this.toastService.present(err.error?.error || 'Κάτι πήγε λάθος.', 'error');
@@ -124,11 +131,11 @@ export class SignupStep2Page {
   onFocus() {
     this.isFocused = true;
   }
-  
+
   onBlur() {
     setTimeout(() => {
       this.isFocused = false;
-    }, 200);  // επιτρέπει να πατήσεις επιλογή πριν κρυφτεί
+    }, 200);
   }
-  
 }
+

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_from_directory
+from flask import Blueprint, request, jsonify, send_from_directory, redirect, current_app
 from models.user import db, User
 from models.course import Course
 from models.note import Note
@@ -6,11 +6,17 @@ from models.favorite import Favorite
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-from config import BASE_URL, JWT_SECRET
-from utils.jwt_utils import require_token
+from config import BASE_URL
+from flask_jwt_extended import (
+    create_access_token,
+    jwt_required,
+    get_jwt_identity
+)
 import os
-import jwt
 import re
+import secrets
+from utils.email_utils import send_verification_email, send_reset_email
+
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -22,33 +28,50 @@ os.makedirs(NOTES_UPLOAD_FOLDER, exist_ok=True)
 
 JWT_EXPIRATION_MINUTES = 60
 
-# Μη προστατευμένα endpoints
+# ----------------------------- REGISTER -----------------------------
 @auth_bp.route('/register', methods=['POST'])
 def register():
+    print("🚀 Register endpoint reached")
+
     data = request.json
+    print("📥 Data received:", data)
+
+    skills = data.get('skills')
+    if not skills or not isinstance(skills, list) or len(skills) == 0:
+        print("❌ No skills provided!")
+        return jsonify({'error': 'Πρέπει να επιλέξεις τουλάχιστον 1 μάθημα.'}), 400
+
     email = data.get('email', '').strip()
     password = data.get('password', '')
     birthdate_str = data.get('birthdate', '')
+    print("📨 Registering:", email)
 
     if not re.match(r'.+@(upatras\.gr|ceid\.upatras\.gr)$', email):
+        print("❌ Invalid email format!")
         return jsonify({'error': 'Μη έγκυρο email'}), 400
     if User.query.filter_by(email=email).first():
+        print("❌ Email already exists!")
         return jsonify({'error': 'Το email υπάρχει ήδη'}), 400
     if len(password) < 8:
+        print("❌ Password too short!")
         return jsonify({'error': 'Ο κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.'}), 400
+
     try:
         birthdate_obj = datetime.strptime(birthdate_str, "%d-%m-%Y")
     except ValueError:
+        print("❌ Invalid birthdate format!")
         return jsonify({'error': 'Μη έγκυρη μορφή ημερομηνίας.'}), 400
+
     today = datetime.today()
     age = (today - birthdate_obj).days // 365
     if birthdate_obj > today or age < 17:
+        print("❌ Underage or future birthdate!")
         return jsonify({'error': 'Πρέπει να είσαι τουλάχιστον 17 ετών.'}), 400
 
     user = User(
         email=email,
         username=data.get('username'),
-        full_name=data.get('fullName'),
+        full_name=data.get('full_name') or data.get('fullName'),
         password=generate_password_hash(password),
         semester=data.get('semester'),
         year=data.get('year'),
@@ -56,31 +79,34 @@ def register():
         department=data.get('department', "Μηχανικών Η/Υ και Πληροφορικής")
     )
 
-    for course_name in data.get('skills', []):
+    print("📘 Adding selected courses:", skills)
+    for course_name in skills:
         course = Course.query.filter_by(name=course_name).first()
         if course:
             user.courses.append(course)
+        else:
+            print(f"⚠️ Course not found: {course_name}")
+
+    token = secrets.token_urlsafe(32)
+    user.verification_token = token
+    user.is_verified = False
 
     db.session.add(user)
     db.session.commit()
+    print("✅ User committed to DB")
 
-    return jsonify({'message': 'Εγγραφή επιτυχής'}), 201
+    print("📧 Sending verification email to:", user.email)
+    send_verification_email(user.email, token)
 
-@auth_bp.route('/check-credentials', methods=['POST'])
-def check_credentials():
-    data = request.json
-    email = data.get('email', '').strip()
-    username = data.get('username', '').strip()
+    print("✅ All done! Returning response")
     return jsonify({
-        'email_exists': User.query.filter_by(email=email).first() is not None,
-        'username_exists': User.query.filter_by(username=username).first() is not None
-    }), 200
+        'message': 'Εγγραφή επιτυχής',
+        'token': token,
+        'email': user.email
+    }), 201
 
-@auth_bp.route('/courses', methods=['GET'])
-def get_courses():
-    courses = Course.query.all()
-    return jsonify([{"id": c.id, "name": c.name} for c in courses]), 200
 
+# ----------------------------- LOGIN -----------------------------
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -92,20 +118,40 @@ def login():
         return jsonify({'error': 'Ο χρήστης δεν βρέθηκε'}), 404
     if not check_password_hash(user.password, password):
         return jsonify({'error': 'Λανθασμένος κωδικός'}), 401
+    if not user.is_verified:
+        return jsonify({'error': 'Ο λογαριασμός σου δεν έχει ενεργοποιηθεί. Έλεγξε το email σου.'}), 401
 
-    payload = {
+    token = create_access_token(identity=user.email)
+
+    return jsonify({
+        'message': 'Επιτυχής σύνδεση',
         'email': user.email,
-        'exp': datetime.utcnow() + timedelta(minutes=JWT_EXPIRATION_MINUTES)
-    }
-    token = jwt.encode(payload, JWT_SECRET, algorithm='HS256')
-    return jsonify({'message': 'Επιτυχής σύνδεση', 'email': user.email, 'token': token}), 200
+        'token': token
+    }), 200
 
-# Προστατευμένα endpoints
+# ----------------------------- CHECK CREDENTIALS -----------------------------
+@auth_bp.route('/check-credentials', methods=['POST'])
+def check_credentials():
+    data = request.json
+    email = data.get('email', '').strip()
+    username = data.get('username', '').strip()
+    return jsonify({
+        'email_exists': User.query.filter_by(email=email).first() is not None,
+        'username_exists': User.query.filter_by(username=username).first() is not None
+    }), 200
+
+# ----------------------------- COURSES -----------------------------
+@auth_bp.route('/courses', methods=['GET'])
+def get_courses():
+    courses = Course.query.all()
+    return jsonify([{ "id": c.id, "name": c.name } for c in courses]), 200
+
+# ----------------------------- UPLOAD NOTE -----------------------------
 @auth_bp.route('/upload-note', methods=['POST'])
-@require_token
+@jwt_required()
 def upload_note():
-    user_email = request.user_email
-    user = User.query.filter_by(email=user_email).first()
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
 
     files = request.files.getlist('files')
     course_id = request.form.get('course_id')
@@ -138,10 +184,12 @@ def upload_note():
     db.session.commit()
     return jsonify({'message': 'Οι σημειώσεις ανέβηκαν επιτυχώς', 'files': uploaded_files}), 200
 
+# ----------------------------- MY NOTES -----------------------------
 @auth_bp.route('/my-notes', methods=['GET'])
-@require_token
+@jwt_required()
 def get_my_notes():
-    user = User.query.filter_by(email=request.user_email).first()
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
     notes = Note.query.filter_by(user_id=user.id).order_by(Note.upload_date.desc()).all()
     result = [{
         'title': note.title,
@@ -153,10 +201,12 @@ def get_my_notes():
     } for note in notes]
     return jsonify(result), 200
 
+# ----------------------------- ALL NOTES -----------------------------
 @auth_bp.route('/all-notes', methods=['GET'])
-@require_token
+@jwt_required()
 def get_all_notes():
-    user = User.query.filter_by(email=request.user_email).first()
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
     fav_ids = [fav.note_id for fav in Favorite.query.filter_by(user_id=user.id).all()]
     notes = Note.query.order_by(Note.upload_date.desc()).all()
     result = []
@@ -176,10 +226,12 @@ def get_all_notes():
         })
     return jsonify(result), 200
 
+# ----------------------------- FAVORITES -----------------------------
 @auth_bp.route('/favorites', methods=['GET'])
-@require_token
+@jwt_required()
 def get_favorites():
-    user = User.query.filter_by(email=request.user_email).first()
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
     favorites = Favorite.query.filter_by(user_id=user.id).all()
     note_ids = [fav.note_id for fav in favorites]
     notes = Note.query.filter(Note.id.in_(note_ids)).order_by(Note.upload_date.desc()).all()
@@ -195,10 +247,12 @@ def get_favorites():
     } for note in notes]
     return jsonify(result), 200
 
+# ----------------------------- TOGGLE FAVORITE -----------------------------
 @auth_bp.route('/favorite', methods=['POST'])
-@require_token
+@jwt_required()
 def toggle_favorite():
-    user = User.query.filter_by(email=request.user_email).first()
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
     data = request.json
     note_id = data.get('note_id')
 
@@ -213,7 +267,87 @@ def toggle_favorite():
         db.session.commit()
         return jsonify({'message': 'Προστέθηκε στα αγαπημένα!'}), 201
 
+# ----------------------------- SERVE FILE -----------------------------
 @auth_bp.route('/static/notes/<filename>')
 def serve_note_file(filename):
     return send_from_directory(NOTES_UPLOAD_FOLDER, filename)
 
+
+# επιβεβαιώση email
+
+@auth_bp.route('/verify/<token>', methods=['GET'])
+def verify_email(token):
+    user = User.query.filter_by(verification_token=token).first()
+
+    if not user:
+        # Redirect σε σελίδα αποτυχίας
+        return redirect(f"{current_app.config['BASE_URL'].replace(':5050', ':8100')}/verify-invalid")
+
+    user.is_verified = True
+    user.verification_token = None
+    db.session.commit()
+
+    # Redirect σε σελίδα επιτυχίας
+    return redirect(f"{current_app.config['BASE_URL'].replace(':5050', ':8100')}/email-verified")
+
+
+
+@auth_bp.route('/resend-verification', methods=['POST'])
+def resend_verification():
+    data = request.json
+    email = data.get('email', '').strip()
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'Ο χρήστης δεν βρέθηκε.'}), 404
+    if user.is_verified:
+        return jsonify({'message': 'Ο λογαριασμός σου είναι ήδη ενεργοποιημένος.'}), 200
+
+    import secrets
+    from utils.email_utils import send_verification_email
+
+    user.verification_token = secrets.token_urlsafe(32)
+    db.session.commit()
+
+    send_verification_email(user.email, user.verification_token)
+
+    return jsonify({'message': 'Το email επιβεβαίωσης εστάλη ξανά.'}), 200
+
+@auth_bp.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    data = request.json
+    email = data.get('email', '').strip()
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'Δεν βρέθηκε χρήστης με αυτό το email.'}), 404
+
+    token = secrets.token_urlsafe(32)
+    expiry = datetime.utcnow() + timedelta(hours=1)
+
+    user.reset_token = token
+    user.reset_token_expiry = expiry
+    db.session.commit()
+
+    send_reset_email(user.email, token)
+
+    return jsonify({'message': 'Στάλθηκε email επαναφοράς κωδικού.'}), 200
+
+@auth_bp.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    data = request.json
+    new_password = data.get('password', '')
+
+    if len(new_password) < 8:
+        return jsonify({'error': 'Ο νέος κωδικός πρέπει να έχει τουλάχιστον 8 χαρακτήρες.'}), 400
+
+    user = User.query.filter_by(reset_token=token).first()
+    if not user or user.reset_token_expiry < datetime.utcnow():
+        return jsonify({'error': 'Ο σύνδεσμος έχει λήξει ή δεν είναι έγκυρος.'}), 400
+
+    user.password = generate_password_hash(new_password)
+    user.reset_token = None
+    user.reset_token_expiry = None
+    db.session.commit()
+
+    return jsonify({'message': 'Ο νέος κωδικός ορίστηκε με επιτυχία!'}), 200

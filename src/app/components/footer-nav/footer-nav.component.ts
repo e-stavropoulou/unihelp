@@ -25,8 +25,6 @@ export class FooterNavComponent {
       cssClass: 'toast-error'
     });
     await toast.present();
-    this.router.navigateByUrl('/login', { replaceUrl: true }).then(() => {
-      window.location.reload(); // Αναγκαστικό refresh μετά την αποσύνδεση
-    });
+    this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 }

@@ -13,6 +13,7 @@
     <ion-label class="input-label">Email</ion-label>
     <ion-input
       type="email"
+      [(ngModel)]="email"
       placeholder="π.χ. username@upatras.gr"
       fill="solid"
       class="custom-input"
@@ -21,6 +22,7 @@
     <ion-label class="input-label">Όνομα χρήστη</ion-label>
     <ion-input
       type="text"
+      [(ngModel)]="username"
       placeholder="π.χ. evelina123"
       fill="solid"
       class="custom-input"
@@ -29,6 +31,7 @@
     <ion-label class="input-label">Πλήρες όνομα</ion-label>
     <ion-input
       type="text"
+      [(ngModel)]="fullName"
       placeholder="π.χ. Εβελίνα Σταυροπούλου"
       fill="solid"
       class="custom-input"
@@ -37,6 +40,7 @@
     <ion-label class="input-label">Κωδικός</ion-label>
     <ion-input
       type="password"
+      [(ngModel)]="password"
       placeholder="τουλάχιστον 8 χαρακτήρες"
       fill="solid"
       class="custom-input"
@@ -45,6 +49,7 @@
     <ion-label class="input-label">Εξάμηνο φοίτησης</ion-label>
     <ion-input
       type="number"
+      [(ngModel)]="semester"
       placeholder="1"
       fill="solid"
       class="custom-input"
@@ -54,6 +59,7 @@
     <ion-label class="input-label">Έτος φοίτησης</ion-label>
     <ion-input
       type="number"
+      [(ngModel)]="year"
       placeholder="1"
       fill="solid"
       class="custom-input"
@@ -63,6 +69,7 @@
     <ion-label class="input-label">Ημερομηνία γέννησης</ion-label>
     <ion-input
       type="text"
+      [(ngModel)]="birthdate"
       placeholder="π.χ. 01-01-2002"
       fill="solid"
       class="custom-input"
@@ -73,4 +80,5 @@
     </ion-button>
   </div>
 </ion-content>
+
 

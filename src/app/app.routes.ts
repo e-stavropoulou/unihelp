@@ -47,7 +47,28 @@ export const routes: Routes = [
   {
     path: 'profile-settings',
     loadComponent: () => import('./pages/profile-settings/profile-settings.page').then( m => m.ProfileSettingsPage)
+  },
+  {
+    path: 'verify-info',
+    loadComponent: () => import('./pages/verify-info/verify-info.page').then( m => m.VerifyInfoPage)
+  },
+  {
+    path: 'email-verified',
+    loadComponent: () => import('./pages/email-verified/email-verified.page').then( m => m.EmailVerifiedPage)
+  },
+  {
+    path: 'verify-invalid',
+    loadComponent: () => import('./pages/verify-invalid/verify-invalid.page').then( m => m.VerifyInvalidPage)
+  },
+  {
+    path: 'forgot-password',
+    loadComponent: () => import('./pages/forgot-password/forgot-password.page').then( m => m.ForgotPasswordPage)
+  },
+  {
+    path: 'reset-password/:token',
+    loadComponent: () => import('./pages/reset-password/reset-password.page').then(m => m.ResetPasswordPage)
   }
+  
  
  
 ];

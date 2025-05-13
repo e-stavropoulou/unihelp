@@ -6,7 +6,7 @@ from models.user import User
 from models.course import Course
 from werkzeug.security import generate_password_hash
 from config import BASE_URL
-from utils.jwt_utils import require_token  # JWT έλεγχος
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 profile_bp = Blueprint('profile_bp', __name__)
 
@@ -14,9 +14,10 @@ UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', 'avatars')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @profile_bp.route('/profile', methods=['GET'])
-@require_token
+@jwt_required()
 def get_profile():
-    user = User.query.filter_by(email=request.user_email).first()
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -29,13 +30,14 @@ def get_profile():
     })
 
 @profile_bp.route('/upload-avatar', methods=['POST'])
-@require_token
+@jwt_required()
 def upload_avatar():
     file = request.files.get('avatar')
     if not file:
         return jsonify({'error': 'Missing file'}), 400
 
-    user = User.query.filter_by(email=request.user_email).first()
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -54,10 +56,11 @@ def serve_avatar(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
 @profile_bp.route('/update-profile', methods=['POST'])
-@require_token
+@jwt_required()
 def update_profile():
     data = request.get_json()
-    user = User.query.filter_by(email=request.user_email).first()
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
 

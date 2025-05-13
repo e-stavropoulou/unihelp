@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, ToastController } from '@ionic/angular';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { FooterNavComponent } from '../../components/footer-nav/footer-nav.component';
 import { AuthService } from 'src/app/services/auth.service';
@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
   standalone: true,
   imports: [CommonModule, IonicModule, FormsModule, FooterNavComponent],
   templateUrl: './notes-feed.page.html',
-  styleUrls: ['./notes-feed.page.scss'],
+  styleUrls: ['./notes-feed.page.scss']
 })
 export class NotesFeedPage implements OnInit {
   notes: any[] = [];
@@ -33,15 +33,24 @@ export class NotesFeedPage implements OnInit {
   }
 
   loadAllNotes() {
-    this.http.get<any[]>(`${environment.API_URL}/all-notes`, {
-      headers: {
-        Authorization: `Bearer ${this.authService.getToken()}`
-      }
-    }).subscribe(data => {
-      this.notes = data;
-      this.allCourses = [...new Set(data.map(note => note.course))];
-      this.applyFilters();
+    const token = this.authService.getToken();
+    if (!token) return;
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
     });
+
+    this.http.get<any[]>(`${environment.API_URL}/all-notes`, { headers })
+      .subscribe({
+        next: (data) => {
+          this.notes = data;
+          this.allCourses = [...new Set(data.map(note => note.course))];
+          this.applyFilters();
+        },
+        error: (err) => {
+          console.error('Failed to load notes feed:', err);
+        }
+      });
   }
 
   applyFilters() {
@@ -72,34 +81,34 @@ export class NotesFeedPage implements OnInit {
       const toast = await this.toastCtrl.create({
         message: 'Πρέπει να είσαι συνδεδεμένος για να προσθέσεις αγαπημένα.',
         duration: 1500,
-        color: 'danger',
+        color: 'danger'
       });
       await toast.present();
       return;
     }
 
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
     this.http.post(`${environment.API_URL}/favorite`, {
       note_id: note.id
-    }, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    }).subscribe({
+    }, { headers })
+    .subscribe({
       next: async (res: any) => {
         const toast = await this.toastCtrl.create({
           message: res.message,
           duration: 1200,
-          color: 'success',
+          color: 'success'
         });
         await toast.present();
-
         this.loadAllNotes();
       },
       error: async (err) => {
         const toast = await this.toastCtrl.create({
           message: 'Σφάλμα κατά την αποθήκευση στα αγαπημένα.',
           duration: 1500,
-          color: 'danger',
+          color: 'danger'
         });
         await toast.present();
         console.error(err);
@@ -107,3 +116,4 @@ export class NotesFeedPage implements OnInit {
     });
   }
 }
+
