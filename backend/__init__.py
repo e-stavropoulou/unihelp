@@ -1,9 +1,15 @@
+import pymysql
+pymysql.install_as_MySQLdb()
+
+
 from flask import Flask
 from flask_cors import CORS
 from flask_migrate import Migrate
 from models.shared import db
 from routes.auth import auth_bp
 from routes.profile import profile_bp
+from routes.search_users import search_users_bp
+from routes.user_profile import user_profile_bp
 from config import ( SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, JWT_SECRET, EMAIL_USER, EMAIL_PASS, BASE_URL )
 from flask_jwt_extended import JWTManager
 
@@ -27,7 +33,7 @@ def create_app():
     migrate = Migrate(app, db)
 
     
-    CORS(app, resources={r"/*": {"origins": ["http://localhost:8100", "http://192.168.1.3:8100"]}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:8100", "http://192.168.1.2:8100"]}}, supports_credentials=True)
 
 
     # Imports μοντέλων για να "τα βλέπει" η migrate
@@ -39,6 +45,8 @@ def create_app():
     # Καταχώρηση blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
+    app.register_blueprint(search_users_bp)
+    app.register_blueprint(user_profile_bp)
 
     return app
 

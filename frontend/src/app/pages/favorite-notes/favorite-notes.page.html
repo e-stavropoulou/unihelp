@@ -15,9 +15,16 @@
         {{ note.course }} • {{ note.category }}
       </ion-card-subtitle>
     </ion-card-header>
+
     <ion-card-content>
       <p>{{ note.description || 'Χωρίς περιγραφή.' }}</p>
-      <div class="upload-date">📅 Ανέβηκε στις: {{ note.upload_date }}</div>
+
+      <div class="note-meta">
+        <p><strong>Εξάμηνο:</strong> {{ note.semester }}ο</p>
+        <p><strong>Τύπος:</strong> {{ note.type }}</p>
+        <p><strong>📅 Ανέβηκε:</strong> {{ note.upload_date }}</p>
+      </div>
+
       <div class="actions">
         <a [href]="note.filepath" target="_blank">📄 Άνοιγμα αρχείου</a>
       </div>
@@ -28,4 +35,3 @@
     <p style="text-align:center; margin-top: 2rem;">Δεν έχεις αγαπημένες σημειώσεις ακόμα.</p>
   </ion-text>
 </ion-content>
-

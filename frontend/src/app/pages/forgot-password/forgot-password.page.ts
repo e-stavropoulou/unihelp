@@ -29,9 +29,10 @@ export class ForgotPasswordPage {
       next: () => {
         this.toast.present('Στάλθηκε email επαναφοράς κωδικού!', 'success');
       },
-      error: () => {
-        this.toast.present('Αποτυχία αποστολής. Δοκίμασε ξανά.', 'error');
-      }
+      error: (err) => {
+        const message = err.error?.error || 'Αποτυχία αποστολής. Δοκίμασε ξανά.';
+        this.toast.present(message, 'error');
+      }      
     });
   }
 }

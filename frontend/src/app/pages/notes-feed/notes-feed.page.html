@@ -41,6 +41,33 @@
   </ion-select-option>
 </ion-select>
 
+<label class="form-label">Εξάμηνο</label>
+<ion-select
+  [(ngModel)]="selectedSemester"
+  (ionChange)="applyFilters()"
+  interface="popover"
+  placeholder="Επιλογή εξαμήνου"
+  class="custom-select">
+  <ion-select-option value="">Όλα</ion-select-option>
+  <ion-select-option *ngFor="let sem of semesters" [value]="sem">
+    {{ sem }}ο
+  </ion-select-option>  
+</ion-select>
+
+<label class="form-label">Τύπος</label>
+<ion-select
+  [(ngModel)]="selectedType"
+  (ionChange)="applyFilters()"
+  interface="popover"
+  placeholder="Επιλογή τύπου"
+  class="custom-select">
+  <ion-select-option value="">Όλοι</ion-select-option>
+  <ion-select-option value="υποχρεωτικό">Υποχρεωτικό</ion-select-option>
+  <ion-select-option value="επιλογής χειμερινού">Επιλογής χειμερινού</ion-select-option>
+  <ion-select-option value="επιλογής εαρινού">Επιλογής εαρινού</ion-select-option>
+  <ion-select-option value="επιλογής γενικής παιδείας">Επιλογής γενικής παιδείας</ion-select-option>
+</ion-select>
+
   <!-- Notes Feed -->
   <ng-container *ngIf="filteredNotes.length > 0; else noNotes">
     <ion-card *ngFor="let note of filteredNotes" class="note-card">
@@ -54,6 +81,10 @@
           <p>{{ note.description || 'Χωρίς περιγραφή.' }}</p>
         </div>        
         <div class="upload-date">📅 Ανέβηκε στις: {{ note.upload_date }}</div>
+        <div class="note-meta">
+          <p><strong>Εξάμηνο:</strong> {{ note.semester }}ο</p>
+          <p><strong>Τύπος:</strong> {{ note.type }}</p>
+        </div>        
         <div class="actions">
           <a [href]="note.filepath" target="_blank">📄 Άνοιγμα αρχείου</a>
           <ion-button

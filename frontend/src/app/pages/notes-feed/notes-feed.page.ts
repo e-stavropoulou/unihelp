@@ -21,6 +21,11 @@ export class NotesFeedPage implements OnInit {
   searchTerm: string = '';
   selectedCategory: string = '';
   selectedCourse: string = '';
+  selectedSemester: number | '' = '';
+  selectedType: string = '';
+  semesters: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
+
+
 
   constructor(
     private http: HttpClient,
@@ -58,8 +63,11 @@ export class NotesFeedPage implements OnInit {
       const matchesSearch = note.title.toLowerCase().includes(this.searchTerm.toLowerCase());
       const matchesCategory = this.selectedCategory ? note.category === this.selectedCategory : true;
       const matchesCourse = this.selectedCourse ? note.course === this.selectedCourse : true;
-      return matchesSearch && matchesCategory && matchesCourse;
-    });
+      const matchesSemester = this.selectedSemester ? note.semester === this.selectedSemester : true;
+      const matchesType = this.selectedType ? note.type === this.selectedType : true;
+    
+      return matchesSearch && matchesCategory && matchesCourse && matchesSemester && matchesType;
+    });    
   }
 
   onSearchChange() {

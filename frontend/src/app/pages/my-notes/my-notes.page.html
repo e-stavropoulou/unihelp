@@ -18,12 +18,29 @@
         <div class="note-section">
           <strong class="section-title">Περιγραφή:</strong>
           <p>{{ note.description || 'Χωρίς περιγραφή.' }}</p>
-        </div>        
-        <div class="note-meta">
-          <p class="note-date">Ανέβηκε στις: {{ note.upload_date }}</p>
-          <a [href]="note.filepath" target="_blank" class="file-link">📄 Άνοιγμα αρχείου</a>
         </div>
-      </ion-card-content>
+      
+        <div class="note-meta">
+          <div class="meta-block">
+            <p><strong>Ανέβηκε στις:</strong> {{ note.upload_date }}</p>
+            <p><strong>Εξάμηνο:</strong> {{ note.semester }}ο</p>
+            <p><strong>Τύπος:</strong> {{ note.type }}</p>
+          </div>
+        
+          <div class="file-block">
+            <a [href]="note.filepath" target="_blank" class="file-link">📄 Άνοιγμα αρχείου</a>
+          </div>        
+      
+          <div class="note-actions" style="margin-top: 1rem; display: flex; gap: 8px;">
+            <ion-button fill="outline" size="small" color="primary" (click)="editNote(note)">
+              ✏️ Επεξεργασία
+            </ion-button>            
+            <ion-button fill="outline" size="small" color="danger" (click)="deleteNote(note)">
+              🗑️ Διαγραφή
+            </ion-button>
+          </div>          
+        </div>
+      </ion-card-content>      
     </ion-card>
   </ng-container>
 

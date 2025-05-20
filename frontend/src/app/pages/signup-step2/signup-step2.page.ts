@@ -29,6 +29,13 @@ interface RegisterResponse {
   email: string;
 }
 
+interface Course {
+  id: number;
+  name: string;
+  semester: number;
+}
+
+
 @Component({
   selector: 'app-signup-step2',
   standalone: true,
@@ -56,9 +63,11 @@ interface RegisterResponse {
 })
 export class SignupStep2Page {
   searchTerm: string = '';
-  allCourses: string[] = [];
-  filteredCourses: string[] = [];
-  selectedCourses: string[] = [];
+  allCourses: Course[] = [];
+  filteredCourses: Course[] = [];
+  selectedCourses: Course[] = [];
+
+
 
   userData: any;
   isFocused: boolean = false;
@@ -80,29 +89,29 @@ export class SignupStep2Page {
   }
 
   loadCourses() {
-    this.http.get<any[]>(`${environment.API_URL}/courses`).subscribe((data) => {
-      this.allCourses = data.map((course) => course.name);
+    this.http.get<Course[]>(`${environment.API_URL}/courses`).subscribe((data) => {
+      this.allCourses = data;
       this.filteredCourses = this.allCourses;
-    });
+    });    
   }
 
   filterCourses() {
     const term = this.searchTerm.toLowerCase();
     this.filteredCourses = this.allCourses.filter(course =>
-      course.toLowerCase().includes(term) &&
-      !this.selectedCourses.includes(course)
-    );
+      course.name.toLowerCase().includes(term) &&
+      !this.selectedCourses.find(c => c.name === course.name)
+    );    
   }
 
-  selectCourse(course: string) {
-    if (!this.selectedCourses.includes(course)) {
+  selectCourse(course: Course) {
+    if (!this.selectedCourses.find(c => c.name === course.name)) {
       this.selectedCourses.push(course);
       this.filterCourses();
-    }
+    }    
   }
 
-  removeCourse(course: string) {
-    this.selectedCourses = this.selectedCourses.filter(c => c !== course);
+  removeCourse(course: Course) {
+    this.selectedCourses = this.selectedCourses.filter(c => c.name !== course.name);
     this.filterCourses();
   }
 
@@ -114,7 +123,7 @@ export class SignupStep2Page {
 
     const payload = {
       ...this.userData,
-      skills: this.selectedCourses
+      skills: this.selectedCourses.map(c => c.name)
     };
 
     this.http.post<RegisterResponse>(`${environment.API_URL}/register`, payload).subscribe({

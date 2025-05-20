@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE_URL = os.getenv("BASE_URL", "http://192.168.1.3:5050")
+BASE_URL = os.getenv("BASE_URL", "http://localhost:5050")
 JWT_SECRET = os.getenv("JWT_SECRET", "fallback-secret")
 SQLALCHEMY_DATABASE_URI = os.getenv(
     "DATABASE_URI",

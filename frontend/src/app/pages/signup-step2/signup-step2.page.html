@@ -9,7 +9,7 @@
 
 <ion-content class="signup-step2-container">
   <div class="form-wrapper">
-    <h1>Αυτοαξιολόγηση</h1>
+    <h1>Η βοήθεια σου μετράει!</h1>
     <p class="instructions">
       Στο UniHelp είμαστε μία ομάδα! Μοιράσου μαζί μας τα μαθήματα που μπορείς να προσφέρεις βοήθεια! 
     </p>
@@ -24,20 +24,22 @@
   
 
   <ion-list class="course-list-box" *ngIf="isFocused && filteredCourses.length > 0">
-    <ion-item
-      *ngFor="let course of filteredCourses"
-      button
-      detail="false"
-      (click)="selectCourse(course)"
-    >
-      {{ course }}
-    </ion-item>
+    <ion-item *ngFor="let course of filteredCourses" button detail="false" (click)="selectCourse(course)">
+      <ion-label class="course-label">
+        <div class="course-row">
+          <span class="course-name">{{ course.name }}</span>
+          <span class="course-semester">Εξάμηνο: {{ course.semester }}ο</span>
+        </div>
+      </ion-label>
+    </ion-item>    
   </ion-list>  
   
 
   <div class="selected-courses" *ngIf="selectedCourses.length > 0">
     <ion-chip *ngFor="let course of selectedCourses">
-      <ion-label>{{ course }}</ion-label>
+      <ion-label>
+        {{ course.name }} ({{ course.semester }}ο)
+      </ion-label>    
       <ion-icon
       name="close-circle"
       class="remove-icon"

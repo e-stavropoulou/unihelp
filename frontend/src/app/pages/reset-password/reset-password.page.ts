@@ -51,8 +51,9 @@ export class ResetPasswordPage {
         this.toast.present('Ο κωδικός ορίστηκε! Μπορείς τώρα να συνδεθείς.', 'success');
         this.router.navigate(['/login'], { replaceUrl: true });
       },
-      error: () => {
-        this.toast.present('Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει.', 'error');
+      error: (err) => {
+        const msg = err?.error?.error || 'Ο σύνδεσμος δεν είναι έγκυρος ή έχει λήξει.';
+        this.toast.present(msg, 'error');
       }
     });
   }

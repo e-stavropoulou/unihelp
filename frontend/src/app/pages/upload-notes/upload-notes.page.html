@@ -29,18 +29,46 @@
 </ion-select>
 
     
-      <label class="form-label">Μάθημα</label>
-      <ion-select
-  [(ngModel)]="courseId"
-  interface="alert"
-  interfaceOptions="{ header: 'Επίλεξε Μάθημα' }"
-  name="course"
-  required
->
-  <ion-select-option *ngFor="let course of courses" [value]="course.id">
-    {{ course.name }}
-  </ion-select-option>
-</ion-select>
+<label class="form-label">Αναζήτηση Μαθήματος</label>
+<div class="search-wrapper">
+  <ion-searchbar
+    [(ngModel)]="searchTerm"
+    [ngModelOptions]="{ standalone: true }"
+    (ionInput)="filterCourses()"
+    placeholder="Πληκτρολόγησε όνομα μαθήματος..."
+    class="custom-search"
+  ></ion-searchbar>
+</div>
+
+
+
+<ion-list *ngIf="searchTerm && filteredCourses.length > 0" class="custom-dropdown">
+  <ion-item
+    *ngFor="let course of filteredCourses"
+    (click)="selectCourse(course)"
+    lines="full"
+    class="custom-option"
+  >
+    {{ course.name }} ({{ course.semester }}ο • {{ course.type }})
+  </ion-item>
+</ion-list>
+
+<div class="selected-courses" *ngIf="selectedCourseName">
+  <ion-chip>
+    <ion-label class="course-row">
+      <span class="course-name">{{ selectedCourseName }}</span>
+      <span class="course-semester">
+        ({{ selectedCourseSemester }}ο)
+      </span>
+    </ion-label>
+    <ion-icon
+      name="close-circle"
+      class="remove-icon"
+      size="small"
+      (click)="clearSelectedCourse()"
+    ></ion-icon>
+  </ion-chip>
+</div>
 
     
       <label class="form-label">Περιγραφή (προαιρετικά)</label>

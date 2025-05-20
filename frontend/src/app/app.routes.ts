@@ -67,7 +67,24 @@ export const routes: Routes = [
   {
     path: 'reset-password/:token',
     loadComponent: () => import('./pages/reset-password/reset-password.page').then(m => m.ResetPasswordPage)
+  },
+  {
+    path: 'edit-note/:id',
+    loadComponent: () =>
+      import('./pages/edit-note/edit-note.page').then(m => m.EditNotePage)
+  },   {
+    path: 'search-users',
+    loadComponent: () => import('./pages/search-users/search-users.page').then( m => m.SearchUsersPage)
+  },
+  {
+    path: 'user/:id',
+    loadComponent: () => import('./pages/user-profile/user-profile.page').then( m => m.UserProfilePage)
+  },
+  {
+    path: 'edit-needs-help',
+    loadComponent: () => import('./pages/edit-needs-help/edit-needs-help.page').then( m => m.EditNeedsHelpPage)
   }
+  
   
  
  

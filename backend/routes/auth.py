@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, send_from_directory, redirect, current_app
 from models.user import db, User
-from models.course import Course
+from models.course import Course, UserCourse
 from models.note import Note
 from models.favorite import Favorite
 from werkzeug.utils import secure_filename
@@ -36,7 +36,7 @@ def register():
     data = request.json
     print("📥 Data received:", data)
 
-    skills = data.get('skills')
+    skills = data.get('skills')  # λίστα με course names για τα οποία μπορεί να βοηθήσει
     if not skills or not isinstance(skills, list) or len(skills) == 0:
         print("❌ No skills provided!")
         return jsonify({'error': 'Πρέπει να επιλέξεις τουλάχιστον 1 μάθημα.'}), 400
@@ -79,21 +79,24 @@ def register():
         department=data.get('department', "Μηχανικών Η/Υ και Πληροφορικής")
     )
 
-    print("📘 Adding selected courses:", skills)
+    # Δημιουργία σχέσης UserCourse με can_help = True
+    print("📚 Adding selected skills (can_help=True):", skills)
     for course_name in skills:
         course = Course.query.filter_by(name=course_name).first()
         if course:
-            user.courses.append(course)
+            uc = UserCourse(user=user, course=course, can_help=True)
+            db.session.add(uc)
         else:
             print(f"⚠️ Course not found: {course_name}")
 
+    # Token για επαλήθευση email
     token = secrets.token_urlsafe(32)
     user.verification_token = token
     user.is_verified = False
 
     db.session.add(user)
     db.session.commit()
-    print("✅ User committed to DB")
+    print("✅ User and skills committed to DB")
 
     print("📧 Sending verification email to:", user.email)
     send_verification_email(user.email, token)
@@ -106,6 +109,7 @@ def register():
     }), 201
 
 
+
 # ----------------------------- LOGIN -----------------------------
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -115,11 +119,12 @@ def login():
     user = User.query.filter_by(email=email).first()
 
     if not user:
-        return jsonify({'error': 'Ο χρήστης δεν βρέθηκε'}), 404
+        return jsonify({'message': 'Ο χρήστης δεν βρέθηκε'}), 404
     if not check_password_hash(user.password, password):
-        return jsonify({'error': 'Λανθασμένος κωδικός'}), 401
+        return jsonify({'message': 'Λανθασμένος κωδικός'}), 401
     if not user.is_verified:
-        return jsonify({'error': 'Ο λογαριασμός σου δεν έχει ενεργοποιηθεί. Έλεγξε το email σου.'}), 401
+        return jsonify({'message': 'Ο λογαριασμός σου δεν έχει ενεργοποιηθεί. Έλεγξε το email σου.', 'error': 'not_verified'}), 403
+
 
     token = create_access_token(identity=user.email)
 
@@ -144,7 +149,15 @@ def check_credentials():
 @auth_bp.route('/courses', methods=['GET'])
 def get_courses():
     courses = Course.query.all()
-    return jsonify([{ "id": c.id, "name": c.name } for c in courses]), 200
+    return jsonify([
+    {
+        "id": c.id,
+        "name": c.name,
+        "semester": c.semester,
+        "type": c.type
+    } for c in courses
+]), 200
+
 
 # ----------------------------- UPLOAD NOTE -----------------------------
 @auth_bp.route('/upload-note', methods=['POST'])
@@ -191,27 +204,9 @@ def get_my_notes():
     email = get_jwt_identity()
     user = User.query.filter_by(email=email).first()
     notes = Note.query.filter_by(user_id=user.id).order_by(Note.upload_date.desc()).all()
-    result = [{
-        'title': note.title,
-        'description': note.description,
-        'category': note.category,
-        'upload_date': note.upload_date.strftime('%d/%m/%Y'),
-        'filepath': f'{BASE_URL}/static/notes/{note.filename}',
-        'course': Course.query.get(note.course_id).name if Course.query.get(note.course_id) else 'Άγνωστο'
-    } for note in notes]
-    return jsonify(result), 200
-
-# ----------------------------- ALL NOTES -----------------------------
-@auth_bp.route('/all-notes', methods=['GET'])
-@jwt_required()
-def get_all_notes():
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
-    fav_ids = [fav.note_id for fav in Favorite.query.filter_by(user_id=user.id).all()]
-    notes = Note.query.order_by(Note.upload_date.desc()).all()
     result = []
+
     for note in notes:
-        user_ = User.query.get(note.user_id)
         course = Course.query.get(note.course_id)
         result.append({
             'id': note.id,
@@ -221,10 +216,133 @@ def get_all_notes():
             'upload_date': note.upload_date.strftime('%d/%m/%Y'),
             'filepath': f'{BASE_URL}/static/notes/{note.filename}',
             'course': course.name if course else 'Άγνωστο',
+            'semester': course.semester if course else None,
+            'type': course.type if course else None
+        })
+
+    return jsonify(result), 200
+
+
+# ----------------------------- ALL NOTES -----------------------------
+@auth_bp.route('/all-notes', methods=['GET'])
+@jwt_required()
+def get_all_notes():
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+    fav_ids = [fav.note_id for fav in Favorite.query.filter_by(user_id=user.id).all()]
+    notes = Note.query.order_by(Note.upload_date.desc()).all()
+
+    result = []
+    for note in notes:
+        user_ = User.query.get(note.user_id)
+        course = Course.query.get(note.course_id)
+
+        result.append({
+            'id': note.id,
+            'title': note.title,
+            'description': note.description,
+            'category': note.category,
+            'upload_date': note.upload_date.strftime('%d/%m/%Y'),
+            'filepath': f'{BASE_URL}/static/notes/{note.filename}',
+            'course': course.name if course else 'Άγνωστο',
+            'semester': course.semester if course else None,
+            'type': course.type if course else None,
             'uploader': user_.username if user_ else 'Άγνωστος',
             'isFavorite': note.id in fav_ids
         })
+
     return jsonify(result), 200
+
+
+# -----------------------------   edit NOTE -----------------------------
+@auth_bp.route('/edit-note/<int:note_id>', methods=['PUT'])
+@jwt_required()
+def edit_note(note_id):
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+    note = Note.query.get(note_id)
+
+    if not note or note.user_id != user.id:
+        return jsonify({'error': 'Δεν έχεις δικαίωμα επεξεργασίας αυτής της σημείωσης.'}), 403
+
+    # ❗ Διαβάζουμε από request.form αντί για request.json
+    title = request.form.get('title')
+    description = request.form.get('description')
+    category = request.form.get('category')
+    course_id = request.form.get('course_id')
+
+    note.title = title or note.title
+    note.description = description or note.description
+    note.category = category or note.category
+    note.course_id = course_id or note.course_id
+
+    # ✅ Ανέβηκε νέο αρχείο;
+    new_file = request.files.get('file')
+    if new_file:
+        if note.filepath and os.path.exists(note.filepath):
+            os.remove(note.filepath)
+
+        from werkzeug.utils import secure_filename
+        filename = secure_filename(new_file.filename)
+        filepath = os.path.join(NOTES_UPLOAD_FOLDER, filename)
+        new_file.save(filepath)
+
+        note.filename = filename
+        note.filepath = filepath
+
+    db.session.commit()
+    return jsonify({'message': 'Η σημείωση ενημερώθηκε επιτυχώς.'}), 200
+
+
+# ----------------------------- DELETE NOTE -----------------------------
+@auth_bp.route('/delete-note/<int:note_id>', methods=['DELETE'])
+@jwt_required()
+def delete_note(note_id):
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+    note = Note.query.get(note_id)
+
+    if not note:
+        return jsonify({'error': 'Η σημείωση δεν βρέθηκε.'}), 404
+
+    if note.user_id != user.id:
+        return jsonify({'error': 'Δεν έχεις δικαίωμα διαγραφής αυτής της σημείωσης.'}), 403
+
+    try:
+        if note.filepath and os.path.exists(note.filepath):
+            os.remove(note.filepath)
+        db.session.delete(note)
+        db.session.commit()
+        return jsonify({'message': 'Η σημείωση διαγράφηκε επιτυχώς.'}), 200
+    except Exception as e:
+        return jsonify({'error': 'Σφάλμα κατά τη διαγραφή της σημείωσης.'}), 500
+    
+# ----------------------------- GET NOTE -----------------------------    
+@auth_bp.route('/get-note/<int:note_id>', methods=['GET'])
+@jwt_required()
+def get_note(note_id):
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+    note = Note.query.get(note_id)
+
+    if not note or note.user_id != user.id:
+        return jsonify({'error': 'Δεν έχεις πρόσβαση σε αυτή τη σημείωση.'}), 403
+
+    course = Course.query.get(note.course_id)
+
+    return jsonify({
+        'id': note.id,
+        'title': note.title,
+        'description': note.description,
+        'category': note.category,
+        'course_id': note.course_id,
+        'course': {
+            'id': course.id,
+            'name': course.name,
+            'semester': course.semester
+        } if course else None
+    }), 200
+
 
 # ----------------------------- FAVORITES -----------------------------
 @auth_bp.route('/favorites', methods=['GET'])
@@ -235,17 +353,27 @@ def get_favorites():
     favorites = Favorite.query.filter_by(user_id=user.id).all()
     note_ids = [fav.note_id for fav in favorites]
     notes = Note.query.filter(Note.id.in_(note_ids)).order_by(Note.upload_date.desc()).all()
-    result = [{
-        'id': note.id,
-        'title': note.title,
-        'description': note.description,
-        'category': note.category,
-        'upload_date': note.upload_date.strftime('%d/%m/%Y'),
-        'filepath': f'{BASE_URL}/static/notes/{note.filename}',
-        'course': Course.query.get(note.course_id).name if Course.query.get(note.course_id) else 'Άγνωστο',
-        'uploader': User.query.get(note.user_id).username if User.query.get(note.user_id) else 'Άγνωστος'
-    } for note in notes]
+
+    result = []
+    for note in notes:
+        course = Course.query.get(note.course_id)
+        uploader = User.query.get(note.user_id)
+
+        result.append({
+            'id': note.id,
+            'title': note.title,
+            'description': note.description,
+            'category': note.category,
+            'upload_date': note.upload_date.strftime('%d/%m/%Y'),
+            'filepath': f'{BASE_URL}/static/notes/{note.filename}',
+            'course': course.name if course else 'Άγνωστο',
+            'semester': course.semester if course else None,
+            'type': course.type if course else None,
+            'uploader': uploader.username if uploader else 'Άγνωστος'
+        })
+
     return jsonify(result), 200
+
 
 # ----------------------------- TOGGLE FAVORITE -----------------------------
 @auth_bp.route('/favorite', methods=['POST'])
@@ -299,9 +427,16 @@ def resend_verification():
 
     user = User.query.filter_by(email=email).first()
     if not user:
-        return jsonify({'error': 'Ο χρήστης δεν βρέθηκε.'}), 404
+        return jsonify({
+        'error': 'user_not_found',
+        'message': 'Δεν υπάρχει χρήστης με αυτό το email.'
+    }), 404
     if user.is_verified:
-        return jsonify({'message': 'Ο λογαριασμός σου είναι ήδη ενεργοποιημένος.'}), 200
+        return jsonify({
+        'error': 'already_verified',
+        'message': 'Ο λογαριασμός σου είναι ήδη επιβεβαιωμένος. Μπορείς να συνδεθείς.'
+    }), 403
+
 
     import secrets
     from utils.email_utils import send_verification_email
@@ -344,6 +479,10 @@ def reset_password(token):
     user = User.query.filter_by(reset_token=token).first()
     if not user or user.reset_token_expiry < datetime.utcnow():
         return jsonify({'error': 'Ο σύνδεσμος έχει λήξει ή δεν είναι έγκυρος.'}), 400
+
+    # Έλεγχος αν ο νέος κωδικός είναι ίδιος με τον παλιό
+    if check_password_hash(user.password, new_password):
+        return jsonify({'error': 'Ο νέος κωδικός δεν μπορεί να είναι ίδιος με τον τρέχοντα.'}), 400
 
     user.password = generate_password_hash(new_password)
     user.reset_token = None
