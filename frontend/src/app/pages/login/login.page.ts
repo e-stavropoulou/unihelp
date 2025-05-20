@@ -49,32 +49,50 @@ export class LoginPage {
         this.router.navigateByUrl('/profile', { replaceUrl: true });
       },
       error: (err) => {
-        const errorMessage = err.error?.error || 'Σφάλμα σύνδεσης';
+        const errorMessage = err.error?.message || 'Σφάλμα σύνδεσης';
+      
         this.toastService.present(errorMessage);
-
-        // Αν αφορά ενεργοποίηση, εμφάνιση κουμπιού resend
-        if (errorMessage.includes('ενεργοποιηθεί')) {
+      
+        if (err.error?.error === 'not_verified') {
           this.showResend = true;
         } else {
           this.showResend = false;
         }
-      }
+      }      
     });
   }
 
   resendVerification() {
-    if (!this.email) {
-      this.toastService.present('Συμπλήρωσε πρώτα το email σου!', 'error');
+    if (!this.email.trim()) {
+      this.toastService.present('Συμπλήρωσε πρώτα το email σου!', 'warning');
       return;
     }
-
+  
     this.authService.resendVerificationEmail(this.email).subscribe({
-      next: (res) => {
-        this.toastService.present(res.message || 'Το email επιβεβαίωσης εστάλη ξανά.');
+      next: (res: any) => {
+        // Αν όλα πήγαν καλά και δεν ήρθε error (status 200)
+        this.toastService.present(res.message || 'Το email επιβεβαίωσης εστάλη ξανά.', 'success');
       },
-      error: () => {
-        this.toastService.present('Αποτυχία αποστολής email επιβεβαίωσης.');
-      }
+      error: (err) => {
+        console.log('FULL ERROR', err);
+        console.log('ERROR BODY', err.error);
+      
+        const code = err.status;
+        const errCode = err.error?.error;
+        const msg = err.error?.message || 'Αποτυχία αποστολής email επιβεβαίωσης.';
+      
+        if (code === 403 && errCode === 'already_verified') {
+          this.toastService.present(msg, 'success');
+          setTimeout(() => this.router.navigate(['/login']), 1500);
+        } else if (code === 404) {
+          this.toastService.present('Δεν υπάρχει χρήστης με αυτό το email.', 'error');
+        } else if (code === 400) {
+          this.toastService.present('Συμπλήρωσε σωστά το email σου.', 'warning');
+        } else {
+          this.toastService.present(msg, 'error');
+        }
+      }      
     });
-  }
+   }
+  
 }

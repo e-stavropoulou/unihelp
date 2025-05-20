@@ -1,0 +1,82 @@
+ion-item {
+    --background: transparent;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.05);
+  }
+  
+  ion-label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #444;
+  }
+  
+  input[type="file"] {
+    padding: 8px 0;
+    font-size: 0.9rem;
+  }
+  
+  ion-note {
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: block;
+    font-style: italic;
+  }
+  
+  ion-button {
+    margin-top: 20px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  
+  ion-select, ion-input, ion-textarea {
+    font-size: 0.95rem;
+  }
+  
+  form {
+    padding-bottom: 3rem;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .custom-searchbar {
+    --background: #f2f2f2;
+    --border-radius: 10px;
+    --padding-start: 16px;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+  
+  .selected-courses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  
+  ion-chip {
+    background-color: #FDF2F2;
+    color: #8C1310;
+    border: 1px solid #8C1310;
+    border-radius: 16px;
+  }
+  
+  .remove-icon {
+    margin-left: 6px;
+    cursor: pointer;
+    color: #8C1310;
+  }
+  
+  .course-list-box {
+    border: 1px solid #8C1310;
+    border-radius: 12px;
+    padding: 8px;
+    margin-top: 8px;
+    background-color: #fff;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  

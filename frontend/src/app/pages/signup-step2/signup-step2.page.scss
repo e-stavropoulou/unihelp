@@ -74,3 +74,20 @@
     color: #8C1310;
   }
   
+  .course-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .course-name {
+    font-weight: 600;
+    margin-right: 8px; // ✅ Δίνει "ανάσα"
+  }
+  
+  .course-semester {
+    font-size: 14px;
+    color: #666;
+    white-space: nowrap;
+  }
+  

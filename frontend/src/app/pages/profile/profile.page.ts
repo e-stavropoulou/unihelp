@@ -19,7 +19,7 @@ import {
   IonBackButton,
   IonCard,
   IonCardContent,
-  IonIcon 
+  IonIcon
 } from '@ionic/angular/standalone';
 
 @Component({
@@ -37,18 +37,29 @@ import {
     IonButton,
     IonCard,
     IonCardContent,
-    IonIcon 
+    IonIcon
   ],
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss']
 })
 export class ProfilePage implements OnInit {
   userData: any = null;
+  canHelpCourses: string[] = [];
+  needsHelpCourses: string[] = [];
   avatarUrl: string | null = null;
+  avatarVisible = false; // για animation
 
   constructor(private router: Router, private http: HttpClient, private authService: AuthService) {}
 
   ngOnInit() {
+    this.loadUserData();
+  }
+
+  ionViewWillEnter() {
+    this.loadUserData();
+  }
+
+  loadUserData() {
     const token = this.authService.getToken();
     if (!token) {
       this.router.navigate(['/login']);
@@ -59,16 +70,22 @@ export class ProfilePage implements OnInit {
       Authorization: `Bearer ${token}`
     });
 
-    this.http.get<any>(`${environment.API_URL}/profile`, { headers })
-      .subscribe({
-        next: (data) => {
-          this.userData = data;
+    this.http.get<any>(`${environment.API_URL}/profile`, { headers }).subscribe({
+      next: (data) => {
+        this.userData = data;
+        this.canHelpCourses = data.can_help_courses || [];
+        this.needsHelpCourses = data.needs_help_courses || [];
+
+        this.avatarVisible = false; // για fade-in
+        setTimeout(() => {
           this.avatarUrl = data.avatar_url || 'assets/img/placeholder-avatar.png';
-        },
-        error: () => {
-          this.router.navigate(['/login']);
-        }
-      });
+          this.avatarVisible = true;
+        }, 100); // λίγο delay για να ενεργοποιηθεί το animation
+      },
+      error: () => {
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
   onAvatarChange(event: Event) {
@@ -86,24 +103,14 @@ export class ProfilePage implements OnInit {
         Authorization: `Bearer ${token}`
       });
 
-      this.http.post<any>(`${environment.API_URL}/upload-avatar`, formData, { headers })
-        .subscribe({
-          next: (res) => {
-            this.avatarUrl = res.avatar_url;
-
-            // Reload updated profile
-            this.http.get<any>(`${environment.API_URL}/profile`, { headers })
-              .subscribe({
-                next: (data) => {
-                  this.userData = data;
-                  this.avatarUrl = data.avatar_url || 'assets/img/placeholder-avatar.png';
-                }
-              });
-          },
-          error: (err) => {
-            console.error('Σφάλμα στο ανέβασμα avatar:', err);
-          }
-        });
+      this.http.post<any>(`${environment.API_URL}/upload-avatar`, formData, { headers }).subscribe({
+        next: () => {
+          this.loadUserData(); 
+        },
+        error: (err) => {
+          console.error('Σφάλμα στο ανέβασμα avatar:', err);
+        }
+      });
     }
   }
 }

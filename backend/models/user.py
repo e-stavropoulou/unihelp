@@ -1,6 +1,5 @@
 from .shared import db
-from .course import Course, user_course
-
+from .course import Course, UserCourse  # όχι πια user_course (όχι πίνακας)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -11,7 +10,6 @@ class User(db.Model):
     semester = db.Column(db.Integer, nullable=False)
     year = db.Column(db.Integer, nullable=False)
     birthdate = db.Column(db.String(20), nullable=False)
-    courses = db.relationship('Course', secondary='user_course', backref='users')
     department = db.Column(db.String(100), nullable=False)
     avatar_url = db.Column(db.String(255), nullable=True)
     is_verified = db.Column(db.Boolean, default=False, nullable=False)
@@ -19,7 +17,7 @@ class User(db.Model):
     reset_token = db.Column(db.String(100), nullable=True)
     reset_token_expiry = db.Column(db.DateTime, nullable=True)
 
-
+    user_courses = db.relationship('UserCourse', back_populates='user')
 
     def to_dict(self):
         return {
@@ -30,7 +28,6 @@ class User(db.Model):
             "year": self.year,
             "birthdate": self.birthdate,
             "department": self.department,
-            "courses": [course.name for course in self.courses],
+            "courses": [uc.course.name for uc in self.user_courses if uc.can_help],
             "avatar_url": self.avatar_url 
         }
-

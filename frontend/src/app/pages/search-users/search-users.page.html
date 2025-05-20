@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Αναζήτηση Χρηστών</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-searchbar
+    [(ngModel)]="query"
+    (ionInput)="searchUsers()"
+    placeholder="Αναζήτησε με όνομα ή email">
+  </ion-searchbar>
+
+  <ion-list>
+    <ion-item *ngFor="let user of users" [routerLink]="['/user', user.id]">
+      <ion-label>
+        <h2>{{ user.username }}</h2>
+        <p>{{ user.email }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  
+
+  <!-- ✅ Μήνυμα όταν δεν βρέθηκαν χρήστες -->
+  <div *ngIf="query.trim() && users.length === 0" class="no-results">
+    <p>😕 Δεν βρέθηκαν χρήστες για: <strong>{{ query }}</strong></p>
+
+    
+  </div>
+</ion-content>
+
+<app-footer-nav></app-footer-nav>

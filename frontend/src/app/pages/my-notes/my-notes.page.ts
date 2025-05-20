@@ -1,9 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, AlertController } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
+import { ToastService } from 'src/app/services/toast.service';
+
 
 @Component({
   selector: 'app-my-notes',
@@ -17,12 +20,20 @@ export class MyNotesPage implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router,
+    private alertCtrl: AlertController,
+    private toastService: ToastService,
   ) {}
 
   ngOnInit() {
     this.loadNotes(); 
   }
+
+  ionViewWillEnter() {
+    this.loadNotes();
+  }
+  
 
   loadNotes() {
     const token = this.authService.getToken();
@@ -42,4 +53,44 @@ export class MyNotesPage implements OnInit {
         error: err => console.error('Error loading notes:', err)
       });
   }
+
+  editNote(note: any) {
+    console.log('note:', note);
+    this.router.navigate(['/edit-note', note.id]);
+  }  
+  
+  async deleteNote(note: any) {
+    const alert = await this.alertCtrl.create({
+      header: 'Επιβεβαίωση',
+      message: `Θες σίγουρα να διαγράψεις τη σημείωση "${note.title}";`,
+      buttons: [
+        {
+          text: 'Ακύρωση',
+          role: 'cancel'
+        },
+        {
+          text: 'Διαγραφή',
+          role: 'destructive',
+          handler: () => {
+            const token = this.authService.getToken();
+            const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+  
+            this.http.delete(`${environment.API_URL}/delete-note/${note.id}`, { headers }).subscribe({
+              next: () => {
+                this.toastService.present('Η σημείωση διαγράφηκε επιτυχώς!', 'success');
+                this.loadNotes();
+              },
+              error: err => {
+                console.error(err);
+                this.toastService.present('Σφάλμα κατά τη διαγραφή.', 'error');
+              }
+            });
+          }
+        }
+      ]
+    });
+  
+    await alert.present();
+  }  
+  
 }

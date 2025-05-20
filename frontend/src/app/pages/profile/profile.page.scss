@@ -39,12 +39,20 @@
 }
 
 .avatar-img {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
-  border: 2px solid #8C1310;
   object-fit: cover;
+  transition: opacity 0.5s ease-in-out;
+  opacity: 0;
+
+  border: 2px solid #8C1310;
 }
+
+.avatar-img.visible {
+  opacity: 1;
+}
+
 
 
 .info-card {
@@ -141,4 +149,20 @@ ion-footer {
   --ion-color-contrast: #8C1310;
   box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
 }
+
+.mini-btn {
+  font-size: 13px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --background: #8C1310;
+  --color: #fff;
+  --border-radius: 8px;
+}
+
+.centered-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
 

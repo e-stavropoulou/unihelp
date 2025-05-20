@@ -28,16 +28,30 @@ export class VerifyInvalidPage {
       this.toastService.present('Συμπλήρωσε το email σου.', 'warning');
       return;
     }
-
+  
     this.http.post(`${environment.API_URL}/resend-verification`, { email: this.email }).subscribe({
-      next: () => {
-        this.toastService.present('Το email επιβεβαίωσης εστάλη ξανά.', 'success');
+      next: (res: any) => {
+        if (res.message?.includes('ήδη επιβεβαιωμένος')) {
+          this.toastService.present(res.message, 'success');
+          setTimeout(() => this.router.navigate(['/login']), 1500);
+        } else {
+          this.toastService.present(res.message || 'Το email επιβεβαίωσης εστάλη ξανά.', 'success');
+        }
       },
-      error: () => {
-        this.toastService.present('Σφάλμα κατά την αποστολή. Δοκίμασε ξανά.', 'error');
+      error: (err) => {
+        const msg = err.error?.message || 'Σφάλμα κατά την αποστολή.';
+  
+        if (err.status === 404) {
+          this.toastService.present('Δεν υπάρχει χρήστης με αυτό το email.', 'error');
+        } else if (err.status === 403 && err.error?.error === 'already_verified') {
+          this.toastService.present(msg, 'success');
+          setTimeout(() => this.router.navigate(['/login']), 1500);
+        } else {
+          this.toastService.present(msg, 'error');
+        }
       }
     });
-  }
+  }  
 
   goToLogin() {
     this.router.navigate(['/login']);

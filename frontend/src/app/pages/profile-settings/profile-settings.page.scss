@@ -62,3 +62,36 @@ ion-item {
   --highlight-color-focused: #8C1310;
   --border-color: #8C1310;
 }
+
+
+.selected-courses {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+ion-chip {
+  background-color: #FDF2F2;
+  color: #8C1310;
+  border: 1px solid #8C1310;
+  border-radius: 16px;
+}
+
+.remove-icon {
+  margin-left: 6px;
+  cursor: pointer;
+  color: #8C1310;
+}
+
+.course-list-box {
+  border: 1px solid #8C1310;
+  border-radius: 12px;
+  padding: 8px;
+  margin-top: 8px;
+  background-color: #fff;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}

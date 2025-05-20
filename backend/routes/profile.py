@@ -3,7 +3,7 @@ import os
 from werkzeug.utils import secure_filename
 from models.shared import db
 from models.user import User
-from models.course import Course
+from models.course import Course, UserCourse
 from werkzeug.security import generate_password_hash
 from config import BASE_URL
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -22,12 +22,17 @@ def get_profile():
         return jsonify({'error': 'User not found'}), 404
 
     return jsonify({
-        'email': user.email,
-        'username': user.username,
-        'department': user.department,
-        'courses': [course.name for course in user.courses],
-        'avatar_url': user.avatar_url if user.avatar_url else None
-    })
+    'email': user.email,
+    'username': user.username,
+    'department': user.department,
+    'avatar_url': user.avatar_url if user.avatar_url else None,
+    'can_help_courses': [uc.course.name for uc in user.user_courses if uc.can_help],
+    'can_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.can_help],
+    'needs_help_courses': [uc.course.name for uc in user.user_courses if uc.needs_help],
+    'needs_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.needs_help]
+})
+
+
 
 @profile_bp.route('/upload-avatar', methods=['POST'])
 @jwt_required()
@@ -74,10 +79,71 @@ def update_profile():
     selected_courses = data.get('courses', [])
     if selected_courses:
         user.courses = []
-        for course_name in selected_courses:
-            course = Course.query.filter_by(name=course_name).first()
-            if course:
-                user.courses.append(course)
+    for course_id in selected_courses:
+        course = Course.query.get(course_id)
+        if course:
+            user.courses.append(course)
+
 
     db.session.commit()
     return jsonify({'message': 'Το προφίλ ενημερώθηκε επιτυχώς.'}), 200
+
+@profile_bp.route('/update-needs-help', methods=['POST'])
+@jwt_required()
+def update_needs_help():
+    data = request.get_json()
+    course_id = data.get('course_id')
+    needs_help = data.get('needs_help')
+
+    if course_id is None or needs_help is None:
+        return jsonify({'error': 'Missing course_id or needs_help'}), 400
+
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    uc = next((uc for uc in user.user_courses if uc.course_id == course_id), None)
+
+    if uc:
+        uc.needs_help = needs_help
+    else:
+        db.session.add(UserCourse(
+            user_id=user.id,
+            course_id=course_id,
+            can_help=False,
+            needs_help=needs_help
+        ))
+
+    db.session.commit()
+    return jsonify({'message': 'Ενημερώθηκε η λίστα μαθημάτων που χρειάζεσαι βοήθεια'}), 200
+
+@profile_bp.route('/update-can-help', methods=['POST'])
+@jwt_required()
+def update_can_help():
+    data = request.get_json()
+    course_id = data.get('course_id')
+    can_help = data.get('can_help')
+
+    if course_id is None or can_help is None:
+        return jsonify({'error': 'Missing course_id or can_help'}), 400
+
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    uc = next((uc for uc in user.user_courses if uc.course_id == course_id), None)
+
+    if uc:
+        uc.can_help = can_help
+    else:
+        db.session.add(UserCourse(
+            user_id=user.id,
+            course_id=course_id,
+            can_help=can_help,
+            needs_help=False  # ή True/False ανάλογα με το προεπιλεγμένο
+        ))
+
+    db.session.commit()
+    return jsonify({'message': 'Η λίστα μαθημάτων ενημερώθηκε (can_help).'}), 200

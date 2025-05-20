@@ -1,0 +1,99 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/my-notes"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Επεξεργασία Σημείωσης</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="form-box">
+    <form (submit)="handleUpdateClick()">
+
+      <label class="form-label">Τίτλος</label>
+      <ion-input [(ngModel)]="title" name="title"></ion-input>
+
+      <label class="form-label">Κατηγορία</label>
+      <ion-select
+        [(ngModel)]="category"
+        interface="alert"
+        interfaceOptions="{ header: 'Επίλεξε Κατηγορία' }"
+        name="category"
+      >
+        <ion-select-option value="Σημειώσεις">Σημειώσεις</ion-select-option>
+        <ion-select-option value="Διαφάνειες">Διαφάνειες</ion-select-option>
+        <ion-select-option value="Ασκήσεις">Ασκήσεις</ion-select-option>
+        <ion-select-option value="Λυμένες Ασκήσεις">Λυμένες Ασκήσεις</ion-select-option>
+      </ion-select>
+
+      <div class="form-group">
+        <label class="form-label">Μάθημα</label>
+      
+        <ion-searchbar
+          [(ngModel)]="searchTerm"
+          [ngModelOptions]="{ standalone: true }"
+          (ionInput)="filterCourses()"
+          (ionFocus)="onFocus()"
+          (ionBlur)="onBlur()"
+          placeholder="Αναζήτηση μαθήματος"
+          class="custom-searchbar"
+        ></ion-searchbar>
+      
+        <div class="selected-courses" *ngIf="selectedCourse">
+          <ion-chip>
+            <ion-label>{{ selectedCourse.name }} ({{ selectedCourse.semester }}ο)</ion-label>
+            <ion-icon
+              name="close-circle"
+              class="remove-icon"
+              size="small"
+              (click)="clearSelectedCourse()"
+            ></ion-icon>
+          </ion-chip>
+        </div>
+      
+        <ion-list class="course-list-box" *ngIf="isFocused && filteredCourses.length > 0">
+          <ion-item
+            *ngFor="let course of filteredCourses"
+            button
+            detail="false"
+            (click)="selectCourse(course)"
+          >
+            <div class="course-row">
+              <span class="course-name">{{ course.name }}</span>
+              <span class="course-semester">({{ course.semester }}ο)</span>
+            </div>
+            <ion-icon
+              slot="end"
+              [name]="selectedCourse?.id === course.id ? 'checkmark-circle' : 'ellipse-outline'"
+              color="primary"
+            ></ion-icon>
+          </ion-item>
+        </ion-list>
+      </div>
+      
+
+      <label class="form-label">Περιγραφή (προαιρετικά)</label>
+      <ion-textarea [(ngModel)]="description" name="description"></ion-textarea>
+
+      <label class="form-label">Αρχείο (θα αντικαταστήσει το παλιό)</label>
+      <input type="file" (change)="onFileChange($event)" />
+
+      <div *ngIf="filenamePreview" class="file-preview-row">
+        <ion-note color="medium">Επιλεγμένο αρχείο: {{ filenamePreview }}</ion-note>
+        <ion-button size="small" fill="clear" color="danger" (click)="removeSelectedFile()">
+          ✖ Αφαίρεση
+        </ion-button>
+      </div>
+
+      <ion-button
+        expand="block"
+        type="submit"
+        class="custom-red-btn"
+      >
+        Αποθήκευση Αλλαγών
+      </ion-button>
+
+    </form>
+  </div>
+</ion-content>

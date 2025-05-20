@@ -12,15 +12,15 @@
     </div>
     <div class="avatar-settings">
       <img
-  [src]="avatarUrl || 'assets/img/placeholder-avatar.png'"
-  alt="avatar"
-  class="avatar-img"
-/>
+        [src]="avatarUrl || 'assets/img/placeholder-avatar.png'"
+        alt="avatar"
+        class="avatar-img"
+        [class.visible]="avatarVisible"
+      />
 
       <ion-button fill="outline" size="small" class="settings-icon-btn" [routerLink]="['/profile-settings']">
         <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
       </ion-button>
-      
     </div>
   </div>
 
@@ -33,10 +33,28 @@
   <ion-card class="info-card">
     <ion-card-content>
       <p><strong>Μπορώ να βοηθήσω:</strong></p>
-      <ul *ngIf="userData?.courses?.length > 0">
-        <li *ngFor="let course of userData.courses">{{ course }}</li>
+      <ul *ngIf="canHelpCourses.length > 0">
+        <li *ngFor="let course of canHelpCourses">{{ course }}</li>
       </ul>
-      <p *ngIf="!userData?.courses?.length">Δεν έχετε επιλέξει μαθήματα ακόμα.</p>
+      <p *ngIf="canHelpCourses.length === 0">Δεν έχετε επιλέξει μαθήματα ακόμα.</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card class="info-card">
+    <ion-card-content>
+      <p><strong>Χρειάζομαι βοήθεια:</strong></p>
+      <ul *ngIf="needsHelpCourses.length > 0">
+        <li *ngFor="let course of needsHelpCourses">{{ course }}</li>
+      </ul>
+      <p *ngIf="needsHelpCourses.length === 0">Δεν έχετε δηλώσει ότι χρειάζεστε βοήθεια ακόμα.</p>
+
+      <div class="centered-button">
+        <ion-button class="custom-red-btn mini-btn" size="small" routerLink="/edit-needs-help">
+          Ζητά βοήθεια από την κοινότητα του UniHelp!
+        </ion-button>
+      </div>
+      
+           
     </ion-card-content>
   </ion-card>
 
@@ -44,10 +62,10 @@
     <ion-button expand="block" class="custom-red-btn" routerLink="/upload-notes">
       Ανέβασε σημειώσεις
     </ion-button>    
-    <ion-button expand="block" class="custom-red-btn" [routerLink]="['/my-notes']">
+    <ion-button expand="block" class="custom-red-btn" routerLink="/my-notes">
       Οι Σημειώσεις μου
     </ion-button>         
-    <ion-button expand="block" fill="outline" class="custom-outline-btn" [routerLink]="['/favorite-notes']">
+    <ion-button expand="block" fill="outline" class="custom-outline-btn" routerLink="/favorite-notes">
       <ion-icon name="heart-outline" slot="start"></ion-icon>
       Αγαπημένα
     </ion-button>      

@@ -14,3 +14,67 @@ ion-alert.custom-alert {
     font-weight: 600;
   }
   
+  .selected-courses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  
+  ion-chip {
+    background-color: #FDF2F2;
+    color: #8C1310;
+    border: 1px solid #8C1310;
+    border-radius: 16px;
+  }
+  
+  .remove-icon {
+    margin-left: 6px;
+    cursor: pointer;
+    color: #8C1310;
+  }
+  
+  .course-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .course-name {
+    font-weight: 600;
+    margin-right: 8px;
+  }
+  
+  .course-semester {
+    font-size: 14px;
+    color: #666;
+    white-space: nowrap;
+  }
+  
+  /* γενική εμφάνιση */
+.custom-search {
+  --background: #fff;
+  --border-color: #8C1310;   /* μπορντό */
+  --border-width: 1px;
+  --border-radius: 8px;
+  --box-shadow: none;
+  --icon-color: #8C1310;
+  --cancel-button-color: #8C1310;
+  --placeholder-color: #999;
+}
+
+/* λίγο padding στο εσωτερικό input */
+.custom-search .searchbar-input-container {
+  padding: 0 8px;
+}
+
+.custom-search .searchbar-input {
+  font-size: 15px;
+}
+
+.search-wrapper {
+  border: 1px solid #8C1310;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}

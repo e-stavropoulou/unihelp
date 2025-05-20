@@ -21,6 +21,12 @@ export class UploadNotesPage implements OnInit {
   category: string = '';
   courseId: number | null = null;
   files: File[] = [];
+  searchTerm: string = '';
+filteredCourses: any[] = [];
+selectedCourseName: string = ''; 
+selectedCourseSemester: number | null = null;
+
+
 
   courses: any[] = [];
 
@@ -38,6 +44,7 @@ export class UploadNotesPage implements OnInit {
   loadCourses() {
     this.http.get<any[]>(`${environment.API_URL}/courses`).subscribe(data => {
       this.courses = data;
+      this.filteredCourses = data;
     });
   }
 
@@ -62,6 +69,28 @@ export class UploadNotesPage implements OnInit {
 
     this.onSubmit();
   }
+
+  filterCourses() {
+    const term = this.searchTerm.toLowerCase();
+    this.filteredCourses = this.courses.filter(course =>
+      course.name.toLowerCase().includes(term)
+    );
+  }
+  
+  selectCourse(course: any) {
+    this.courseId = course.id;
+    this.selectedCourseName = course.name;
+    this.searchTerm = '';
+    this.filteredCourses = [];
+    this.selectedCourseSemester = course.semester;
+  }
+  
+  clearSelectedCourse() {
+    this.courseId = null;
+    this.selectedCourseName = '';
+    this.selectedCourseSemester = null;
+  }
+  
 
   async onSubmit() {
     const formData = new FormData();
