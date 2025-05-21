@@ -104,26 +104,29 @@ input[type="file"] {
 }
 
 /* ------------------------ Styled inputs/select/textarea ------------------------ */
+
 ion-input,
 ion-select,
 ion-textarea {
-  --highlight-color-focused: #8C1310 !important;
-  --highlight-color: #8C1310 !important;
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 14px;
-  border: 1px solid #8C1310;
-  border-radius: 8px;
-  background: #fff;
-  --border-color: #8C1310 !important;
+  --highlight-color-focused: #8C1310;
+  --highlight-color: #8C1310;
   --color: #000;
 }
 
 /* Fix για caret και focus */
 ion-input::part(native),
-ion-textarea::part(native) {
-  caret-color: #8C1310;
+ion-textarea::part(native),
+ion-select::part(native) {
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #8C1310;
+  border-radius: 8px;
+  background: #fff;
+  color: #000;
+  min-height: 40px;
+  box-sizing: border-box;
 }
+
 
 /* ------------------------ Footer ------------------------ */
 ion-footer {

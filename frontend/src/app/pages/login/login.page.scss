@@ -63,5 +63,17 @@
 }
 
 
+.custom-input {
+  --background: #f2f2f2;
+  --padding-start: 16px;
+  --border-radius: 10px;
+  font-size: 14px;
 
+  input::placeholder {
+    font-size: 12px;
+  }
+
+  --highlight-color-focused: #8C1310;
+  --highlight-color: #8C1310;
+}
 

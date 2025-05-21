@@ -33,7 +33,7 @@ def create_app():
     migrate = Migrate(app, db)
 
     
-    CORS(app, resources={r"/*": {"origins": ["http://localhost:8100", "http://192.168.1.2:8100"]}}, supports_credentials=True)
+    CORS(app, resources={r"/*": {"origins": ["http://localhost:8100", "http://192.168.1.2:8100", "http://127.0.0.1:8100"]}}, supports_credentials=True)
 
 
     # Imports μοντέλων για να "τα βλέπει" η migrate

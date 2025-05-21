@@ -38,5 +38,29 @@ export class FavoriteNotesPage implements OnInit {
         error: err => console.error('Error loading favorites:', err)
       });
   }
-}
 
+  
+  removeFromFavorites(noteId: number) {
+    const token = this.authService.getToken();
+
+    if (!token) {
+      console.warn('No token found');
+      return;
+    }
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    this.http.post(`${environment.API_URL}/favorite`, { note_id: noteId }, { headers })
+      .subscribe({
+        next: () => {
+          this.favoriteNotes = this.favoriteNotes.filter(note => note.id !== noteId);
+          console.log(`Note ${noteId} removed from favorites`);
+        },
+        error: (err) => {
+          console.error('❌ Σφάλμα κατά την αφαίρεση από τα αγαπημένα:', err);
+        }
+      });
+  }
+}

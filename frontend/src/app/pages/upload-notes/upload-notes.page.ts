@@ -22,13 +22,13 @@ export class UploadNotesPage implements OnInit {
   courseId: number | null = null;
   files: File[] = [];
   searchTerm: string = '';
-filteredCourses: any[] = [];
-selectedCourseName: string = ''; 
-selectedCourseSemester: number | null = null;
-
-
-
+  filteredCourses: any[] = [];
+  selectedCourseName: string = ''; 
+  selectedCourseSemester: number | null = null;
   courses: any[] = [];
+  showDropdown: boolean = false;
+  
+
 
   constructor(
     private http: HttpClient,
@@ -39,7 +39,14 @@ selectedCourseSemester: number | null = null;
 
   ngOnInit() {
     this.loadCourses();
+
+    document.addEventListener('click', this.handleOutsideClick.bind(this));
   }
+
+  ngOnDestroy() {
+    document.removeEventListener('click', this.handleOutsideClick.bind(this));
+  }
+  
 
   loadCourses() {
     this.http.get<any[]>(`${environment.API_URL}/courses`).subscribe(data => {
@@ -70,6 +77,26 @@ selectedCourseSemester: number | null = null;
     this.onSubmit();
   }
 
+  handleOutsideClick(event: MouseEvent) {
+    const searchWrapper = document.querySelector('.search-wrapper');
+    const dropdown = document.querySelector('.custom-dropdown');
+  
+    if (
+      searchWrapper &&
+      !searchWrapper.contains(event.target as Node) &&
+      dropdown &&
+      !dropdown.contains(event.target as Node)
+    ) {
+      this.showDropdown = false;
+    }
+  }
+
+  onSearchWrapperClick(event: Event) {
+    event.stopPropagation();
+  }
+  
+  
+
   filterCourses() {
     const term = this.searchTerm.toLowerCase();
     this.filteredCourses = this.courses.filter(course =>
@@ -89,7 +116,11 @@ selectedCourseSemester: number | null = null;
     this.courseId = null;
     this.selectedCourseName = '';
     this.selectedCourseSemester = null;
+    this.searchTerm = '';
+    this.filteredCourses = [...this.courses];  
+    this.showDropdown = true;                  
   }
+  
   
 
   async onSubmit() {
