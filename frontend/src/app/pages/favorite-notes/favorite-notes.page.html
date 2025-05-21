@@ -26,8 +26,19 @@
       </div>
 
       <div class="actions">
-        <a [href]="note.filepath" target="_blank">📄 Άνοιγμα αρχείου</a>
-      </div>
+        <a [href]="note.filepath" target="_blank" class="file-link">
+          📄 Άνοιγμα αρχείου
+        </a>
+        <ion-button
+          size="small"
+          fill="clear"
+          color="danger"
+          class="remove-btn"
+          (click)="removeFromFavorites(note.id)"
+        >
+          ❌ Αφαίρεση από Αγαπημένα
+        </ion-button>
+      </div>       
     </ion-card-content>
   </ion-card>
 

@@ -9,12 +9,29 @@
   }
   
   .actions {
-    margin-top: 12px;
-    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
   
-    a {
-      color: #8C1310;
-      text-decoration: none;
-    }
+  .file-link {
+    text-decoration: none;
+    color: #8C1310;
+    font-weight: 600;
+    font-size: 14px;
+  
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .remove-btn {
+    margin-left: auto;
+    color: #8C1310;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
   }
   

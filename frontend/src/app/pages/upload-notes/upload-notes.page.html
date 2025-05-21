@@ -29,29 +29,35 @@
 </ion-select>
 
     
+<!-- 🔍 Αναζήτηση Μαθήματος -->
 <label class="form-label">Αναζήτηση Μαθήματος</label>
-<div class="search-wrapper">
+
+<div class="search-wrapper" (click)="onSearchWrapperClick($event)">
   <ion-searchbar
     [(ngModel)]="searchTerm"
     [ngModelOptions]="{ standalone: true }"
     (ionInput)="filterCourses()"
+    (ionFocus)="showDropdown = true"
     placeholder="Πληκτρολόγησε όνομα μαθήματος..."
     class="custom-search"
   ></ion-searchbar>
 </div>
 
+<!-- 📋 Dropdown Λίστα Μαθημάτων -->
+<div class="dropdown-container" *ngIf="showDropdown && filteredCourses.length > 0">
+  <ion-list class="custom-dropdown">
+    <ion-item
+      *ngFor="let course of filteredCourses"
+      (click)="selectCourse(course)"
+      lines="full"
+      class="custom-option"
+    >
+      {{ course.name }} ({{ course.semester }}ο • {{ course.type }})
+    </ion-item>
+  </ion-list>
+</div>
 
 
-<ion-list *ngIf="searchTerm && filteredCourses.length > 0" class="custom-dropdown">
-  <ion-item
-    *ngFor="let course of filteredCourses"
-    (click)="selectCourse(course)"
-    lines="full"
-    class="custom-option"
-  >
-    {{ course.name }} ({{ course.semester }}ο • {{ course.type }})
-  </ion-item>
-</ion-list>
 
 <div class="selected-courses" *ngIf="selectedCourseName">
   <ion-chip>
