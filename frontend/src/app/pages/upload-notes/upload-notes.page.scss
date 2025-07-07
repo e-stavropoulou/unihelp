@@ -1,60 +1,45 @@
-ion-alert.custom-alert {
-    --ion-color-primary: #8C1310;
-    --ion-color-primary-contrast: #fff;
-  
-    --ion-color-light: #8C1310;
-    --ion-color-light-contrast: #fff;
-  
-    --background: #fff;
-    --color: #000;
-  }
-  
-  .alert-button {
-    color: #8C1310 !important;
-    font-weight: 600;
-  }
-  
-  .selected-courses {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 12px;
-  }
-  
-  ion-chip {
-    background-color: #FDF2F2;
-    color: #8C1310;
-    border: 1px solid #8C1310;
-    border-radius: 16px;
-  }
-  
-  .remove-icon {
-    margin-left: 6px;
-    cursor: pointer;
-    color: #8C1310;
-  }
-  
-  .course-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .course-name {
-    font-weight: 600;
-    margin-right: 8px;
-  }
-  
-  .course-semester {
-    font-size: 14px;
-    color: #666;
-    white-space: nowrap;
-  }
-  
-  /* γενική εμφάνιση */
+.form-box {
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e0e0e0;
+  margin: 16px 0;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}
+
+.custom-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #8C1310;
+  border-radius: 10px;
+  font-size: 15px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #000;
+  margin-bottom: 18px;
+}
+
+.custom-input::placeholder {
+  color: #888;
+}
+
+textarea.custom-input {
+  resize: vertical;
+}
+
+/* -------- Searchbar styles (κρατάμε όπως είχες) -------- */
+
 .custom-search {
   --background: #fff;
-  --border-color: #8C1310;   /* μπορντό */
+  --border-color: #8C1310;   
   --border-width: 1px;
   --border-radius: 8px;
   --box-shadow: none;
@@ -63,7 +48,6 @@ ion-alert.custom-alert {
   --placeholder-color: #999;
 }
 
-/* λίγο padding στο εσωτερικό input */
 .custom-search .searchbar-input-container {
   padding: 0 8px;
 }
@@ -73,12 +57,11 @@ ion-alert.custom-alert {
 }
 
 .search-wrapper {
-  border: 1px solid #8C1310;
+  border: 2px solid #8C1310;
   border-radius: 8px;
   margin-bottom: 12px;
   overflow: hidden;
 }
-
 
 .dropdown-container {
   background: #fff;
@@ -99,3 +82,73 @@ ion-alert.custom-alert {
   font-size: 15px;
   color: #333;
 }
+
+/* -------- Chips & selected courses -------- */
+
+.selected-courses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+ion-chip {
+  background-color: #FDF2F2;
+  color: #8C1310;
+  border: 1px solid #8C1310;
+  border-radius: 16px;
+}
+
+.remove-icon {
+  margin-left: 6px;
+  cursor: pointer;
+  color: #8C1310;
+}
+
+.course-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.course-name {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.course-semester {
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
+}
+
+/* -------- Alert custom -------- */
+
+ion-alert.custom-alert {
+  --ion-color-primary: #8C1310;
+  --ion-color-primary-contrast: #fff;
+  --ion-color-light: #8C1310;
+  --ion-color-light-contrast: #fff;
+  --background: #fff;
+  --color: #000;
+}
+
+.alert-button {
+  color: #8C1310 !important;
+  font-weight: 600;
+}
+
+/* -------- Upload button -------- */
+
+.custom-red-btn {
+  --background: #8C1310;
+  --background-hover: #a2211f;
+  --background-activated: #7a100d;
+  --color: #fff;
+  border-radius: 14px;
+  font-weight: bold;
+  margin-top: 16px;
+  font-size: 16px;
+  text-transform: none;
+}
+

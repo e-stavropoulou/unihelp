@@ -2,7 +2,7 @@ import pymysql
 pymysql.install_as_MySQLdb()
 
 
-from flask import Flask
+from flask import Flask, request, current_app
 from flask_cors import CORS
 from flask_migrate import Migrate
 from models.shared import db
@@ -28,12 +28,20 @@ def create_app():
 
     app.config["BASE_URL"] = BASE_URL
 
+
+
     # Σύνδεση extensions
     db.init_app(app)
     migrate = Migrate(app, db)
+    CORS(app)
 
-    
-    CORS(app, resources={r"/*": {"origins": ["http://localhost:8100", "http://192.168.1.2:8100", "http://127.0.0.1:8100"]}}, supports_credentials=True)
+    @app.before_request
+    def log_request_info():
+        print("🟡 Method:", request.method)
+        print("🟡 Path:", request.path)
+        print("🟡 Full URL:", request.url)
+        print("🟡 Headers:", dict(request.headers))
+
 
 
     # Imports μοντέλων για να "τα βλέπει" η migrate
@@ -47,6 +55,8 @@ def create_app():
     app.register_blueprint(profile_bp)
     app.register_blueprint(search_users_bp)
     app.register_blueprint(user_profile_bp)
+
+
 
     return app
 

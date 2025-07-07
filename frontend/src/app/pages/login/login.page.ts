@@ -34,44 +34,67 @@ export class LoginPage {
   ) {}
 
   login() {
+    console.log('👉 Login clicked!', this.email, this.password);
+  
     if (!this.email || !this.password) {
+      console.log('⚠️ Fields missing, θα εμφανίσω toast');
       this.toastService.present('Συμπλήρωσε όλα τα πεδία!', 'error');
+      console.log('🟢 Κλήθηκε toast για empty fields');
       return;
     }
-
-    this.http.post<{ message: string; token: string; email: string }>(`${environment.API_URL}/login`, {
-      email: this.email,
-      password: this.password
-    }).subscribe({
+  
+    console.log('✅ Sending HTTP request to:', `${environment.API_URL}/login`);
+  
+    this.http.post<{ message: string; token: string; email: string }>(
+      `${environment.API_URL}/login`,
+      {
+        email: this.email,
+        password: this.password,
+      }
+    ).subscribe({
       next: (res) => {
+        console.log('✅ Login success response', res);
         this.authService.setToken(res.token, res.email);
         this.showResend = false;
         this.router.navigateByUrl('/profile', { replaceUrl: true });
       },
       error: (err) => {
+        console.log('❌ Login error response', err);
         const errorMessage = err.error?.message || 'Σφάλμα σύνδεσης';
-      
-        this.toastService.present(errorMessage);
-      
+        console.log('🟡 Θα εμφανίσω toast με μήνυμα:', errorMessage);
+        this.toastService.present(errorMessage, 'error')
+          .then(() => {
+            console.log('🟢 Τελείωσε το await του toast');
+          });
+  
         if (err.error?.error === 'not_verified') {
+          console.log('⚠️ User not verified - showResend TRUE');
           this.showResend = true;
         } else {
           this.showResend = false;
         }
-      }      
+      },
     });
   }
 
   resendVerification() {
+    console.log('🔁 Κλήθηκε resendVerification');
     if (!this.email.trim()) {
-      this.toastService.present('Συμπλήρωσε πρώτα το email σου!', 'warning');
+      console.log('⚠️ Empty email, θα εμφανίσω toast');
+      this.toastService.present('Συμπλήρωσε πρώτα το email σου!', 'warning')
+        .then(() => {
+          console.log('🟢 Τελείωσε το await του toast για warning');
+        });
       return;
     }
   
     this.authService.resendVerificationEmail(this.email).subscribe({
       next: (res: any) => {
-        // Αν όλα πήγαν καλά και δεν ήρθε error (status 200)
-        this.toastService.present(res.message || 'Το email επιβεβαίωσης εστάλη ξανά.', 'success');
+        console.log('🔁 resendVerification: success', res);
+        this.toastService.present(res.message || 'Το email επιβεβαίωσης εστάλη ξανά.', 'success')
+          .then(() => {
+            console.log('🟢 Τελείωσε το await του toast για success');
+          });
       },
       error: (err) => {
         console.log('FULL ERROR', err);
@@ -80,6 +103,7 @@ export class LoginPage {
         const code = err.status;
         const errCode = err.error?.error;
         const msg = err.error?.message || 'Αποτυχία αποστολής email επιβεβαίωσης.';
+        console.log('🔁 resendVerification: error', code, errCode, msg);
       
         if (code === 403 && errCode === 'already_verified') {
           this.toastService.present(msg, 'success');
@@ -94,5 +118,4 @@ export class LoginPage {
       }      
     });
    }
-  
 }

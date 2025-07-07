@@ -1,77 +1,61 @@
 ion-item {
-    --background: transparent;
-    margin-bottom: 12px;
-  }
-  
-  ion-label {
-    font-weight: bold;
-    color: #333;
-    font-size: 14px;
-  }
-  
-  ion-searchbar {
-    margin-bottom: 12px;
-  }
-  
-  .note-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-  }
-  
-  .upload-date {
-    font-size: 13px;
-    color: #555;
-    margin-top: 10px;
-  }
-  
-  .actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 12px;
-  }
-  
-  ion-button {
-    --border-radius: 12px;
-  }
-  
-  ion-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  ion-item ion-label {
-    margin-bottom: 6px;
-    font-weight: bold;
-    font-size: 14px;
-    color: #333;
-  }
-  
-  ion-select {
-    --highlight-color-focused: #8C1310;
-    --highlight-color: #8C1310;
-    --border-color: #ccc;
-    --background: #fff;
-    --padding-start: 6px;
-    --padding-end: 12px;
-    --min-height: 36px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-  }
-  
-  
-  ion-select:focus {
-    outline: none;
-    --box-shadow: none;
-  }
+  --background: transparent;
+  margin-bottom: 12px;
 
-  ion-select::part(text) {
-    display: flex;
-    align-items: center;
-    height: 100%;
-  }
-  
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+ion-label {
+  font-weight: bold;
+  color: #333;
+  font-size: 14px;
+  margin: 0;
+  flex: 1;
+}
+
+ion-searchbar {
+  margin-bottom: 12px;
+}
+
+.note-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+.upload-date {
+  font-size: 13px;
+  color: #555;
+  margin-top: 10px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+
+ion-button {
+  --border-radius: 12px;
+}
+
+select {
+  padding: 6px 10px;
+  border: 1px solid #8C1310;
+  border-radius: 8px;
+  font-size: 14px;
+  flex: 2;
+  max-width: 200px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #000;
+}
+
+select:focus {
+  outline: none;
+  border-color: #a2211f;
+}

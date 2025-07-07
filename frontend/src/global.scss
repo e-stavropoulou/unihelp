@@ -115,8 +115,8 @@ ion-textarea {
 
 /* Fix για caret και focus */
 ion-input::part(native),
-ion-textarea::part(native),
-ion-select::part(native) {
+ion-textarea::part(native)
+{
   padding: 10px 12px;
   font-size: 14px;
   border: 1px solid #8C1310;
@@ -129,36 +129,41 @@ ion-select::part(native) {
 
 
 /* ------------------------ Footer ------------------------ */
-ion-footer {
-  ion-toolbar {
-    --background: #fff !important;
-    --border-color: transparent !important;
-    --border-width: 0 !important;
-    border-top: none !important;
-    box-shadow: none !important;
-  }
-}
 
 .footer-toolbar {
   --background: #fafafa;
   --ion-color-base: #fafafa;
   --ion-color-contrast: #8C1310;
   box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
+
 }
 
 .footer-nav {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  padding: 8px 0;
+  padding: 20px 0;
   font-size: 22px;
   color: #8C1310;
 }
 
+.footer-nav ion-icon {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  transform: translateY(-10px); /* Σήκωσε τα icons π.χ. 4px πιο πάνω */
+}
+
+.footer-nav ion-icon:hover {
+  transform: translateY(-4px) scale(1.15); /* Σήκωσε και κάνε zoom όταν hover */
+}
+
+
+
 /* ------------------------ Toasts ------------------------ */
-ion-toast {
+/* ion-toast {
   --top: 60px !important;
   border-radius: 12px;
+  z-index: 99999 !important;   // <-- πρόσθεσέ το αυτό
 }
 
 .toast-top-adjust {
@@ -166,22 +171,27 @@ ion-toast {
   border-radius: 12px;
   color: #fff;
   font-weight: 500;
+  z-index: 99999 !important;   // <-- και εδώ!
 }
 
 ion-toast.toast-success {
   --background: #4CAF50;
   --color: #fff;
+  z-index: 99999 !important;   // <-- και εδώ για σιγουριά
 }
 
 ion-toast.toast-warning {
   --background: #8C1310;
   --color: #000;
+  z-index: 99999 !important;
 }
 
 ion-toast.toast-error {
   --background: #8C1310;
   --color: #fff;
-}
+  z-index: 99999 !important;
+} */
+
 
 /* ------------------------ Back button ------------------------ */
 ion-back-button {

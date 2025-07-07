@@ -12,33 +12,44 @@
     <form (submit)="handleUpdateClick()">
 
       <label class="form-label">Τίτλος</label>
-      <ion-input [(ngModel)]="title" name="title"></ion-input>
+      <input
+        [(ngModel)]="title"
+        name="title"
+        class="custom-input"
+        type="text"
+        placeholder="Π.χ. Σημειώσεις Μαθήματος"
+      />
+
 
       <label class="form-label">Κατηγορία</label>
-      <ion-select
+      <select
         [(ngModel)]="category"
-        interface="alert"
-        interfaceOptions="{ header: 'Επίλεξε Κατηγορία' }"
         name="category"
+        required
+        class="custom-input"
       >
-        <ion-select-option value="Σημειώσεις">Σημειώσεις</ion-select-option>
-        <ion-select-option value="Διαφάνειες">Διαφάνειες</ion-select-option>
-        <ion-select-option value="Ασκήσεις">Ασκήσεις</ion-select-option>
-        <ion-select-option value="Λυμένες Ασκήσεις">Λυμένες Ασκήσεις</ion-select-option>
-      </ion-select>
+        <option value="" disabled selected>Επίλεξε κατηγορία</option>
+        <option value="Σημειώσεις">Σημειώσεις</option>
+        <option value="Διαφάνειες">Διαφάνειες</option>
+        <option value="Ασκήσεις">Ασκήσεις</option>
+        <option value="Λυμένες Ασκήσεις">Λυμένες Ασκήσεις</option>
+      </select>
+      
 
       <div class="form-group">
         <label class="form-label">Μάθημα</label>
       
-        <ion-searchbar
-          [(ngModel)]="searchTerm"
-          [ngModelOptions]="{ standalone: true }"
-          (ionInput)="filterCourses()"
-          (ionFocus)="onFocus()"
-          (ionBlur)="onBlur()"
-          placeholder="Αναζήτηση μαθήματος"
-          class="custom-searchbar"
-        ></ion-searchbar>
+        <div class="search-wrapper">
+          <ion-searchbar
+            [(ngModel)]="searchTerm"
+            [ngModelOptions]="{ standalone: true }"
+            (ionInput)="filterCourses()"
+            (ionFocus)="onFocus()"
+            (ionBlur)="onBlur()"
+            placeholder="Αναζήτηση μαθήματος"
+            class="custom-search"
+          ></ion-searchbar>
+        </div>
       
         <div class="selected-courses" *ngIf="selectedCourse">
           <ion-chip>
@@ -72,9 +83,17 @@
         </ion-list>
       </div>
       
+      
 
       <label class="form-label">Περιγραφή (προαιρετικά)</label>
-      <ion-textarea [(ngModel)]="description" name="description"></ion-textarea>
+      <textarea
+        [(ngModel)]="description"
+        name="description"
+        class="custom-input"
+        rows="4"
+        placeholder="Προαιρετική περιγραφή..."
+      ></textarea>
+
 
       <label class="form-label">Αρχείο (θα αντικαταστήσει το παλιό)</label>
       <input type="file" (change)="onFileChange($event)" />
