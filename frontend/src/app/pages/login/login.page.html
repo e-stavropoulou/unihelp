@@ -10,22 +10,26 @@
   <div class="form-wrapper">
     <h1>Σύνδεση</h1>
 
-    <ion-input
+    <ion-item lines="none"    >
+    <input
       type="email"
       placeholder="π.χ. st1234567@ceid.upatras.gr"
       fill="solid"
       class="custom-input"
       [(ngModel)]="email"
-    ></ion-input> 
+      class="native-input" />
+    </ion-item>
     
 
-    <ion-input
-      type="password"
-      placeholder="*********"
-      fill="solid"
-      class="custom-input"
-      [(ngModel)]="password"
-    ></ion-input>
+    <ion-item lines="none">
+      <input
+        type="password"
+        placeholder="********"
+        class="native-input"
+        [(ngModel)]="password"
+      />
+    </ion-item>
+    
 
     <ion-button expand="block" class="login-btn" shape="round" (click)="login()">
       Σύνδεση

@@ -1,0 +1,1 @@
+import{b as o}from"./chunk-ZC6KFOI7.js";import{f as d}from"./chunk-RW4GY4BD.js";var a=class extends o{show(e){return d(this,null,function*(){if(typeof document<"u"){let n=2e3;e.duration&&(n=e.duration==="long"?3500:2e3);let t=document.createElement("pwa-toast");t.duration=n,t.message=e.text,document.body.appendChild(t)}})}};export{a as ToastWeb};

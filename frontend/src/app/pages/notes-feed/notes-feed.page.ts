@@ -50,6 +50,7 @@ export class NotesFeedPage implements OnInit {
         next: (data) => {
           this.notes = data;
           this.allCourses = [...new Set(data.map(note => note.course))];
+          console.log('✅ allCourses AFTER LOAD:', this.allCourses);
           this.applyFilters();
         },
         error: (err) => {

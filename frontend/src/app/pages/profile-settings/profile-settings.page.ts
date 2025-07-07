@@ -6,6 +6,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
+import { ToastService } from 'src/app/services/toast.service';
+import { NgZone } from '@angular/core';
+
 
 interface Course {
   id: number;
@@ -45,6 +48,8 @@ export class ProfileSettingsPage implements OnInit {
     private http: HttpClient,
     private authService: AuthService,
     private toastCtrl: ToastController,
+    private toastService: ToastService,
+    private zone: NgZone,
     private router: Router
   ) {}
 
@@ -123,6 +128,10 @@ export class ProfileSettingsPage implements OnInit {
     }, 200);
   }
 
+  goBackToProfile() {
+    this.router.navigate(['/profile']);
+  }
+
   changesMade(): boolean {
     const currentIds = [...this.selectedCourseIds].sort();
     const originalIds = [...this.originalCourseIds].sort();
@@ -138,19 +147,16 @@ export class ProfileSettingsPage implements OnInit {
   
 
   async saveChanges() {
+
     const token = this.authService.getToken();
     if (!token) return;
 
     // 🛑 Αν δεν έχει τουλάχιστον ένα μάθημα
-  if (this.selectedCourseIds.length === 0) {
-    const toast = await this.toastCtrl.create({
-      message: 'Πρέπει να επιλέξεις τουλάχιστον ένα μάθημα στο πεδίο "Μπορώ να βοηθήσω".',
-      duration: 2000,
-      color: 'warning'
-    });
-    await toast.present();
-    return;
-  }
+    if (this.selectedCourseIds.length === 0) {
+      await this.toastService.present('Πρέπει να επιλέξεις τουλάχιστον ένα μάθημα στο πεδίο "Μπορώ να βοηθήσω".', 'warning');
+      return;
+    }
+    
 
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
 
@@ -192,22 +198,32 @@ export class ProfileSettingsPage implements OnInit {
 
       await Promise.all(updateRequests);
 
-      const toast = await this.toastCtrl.create({
-        message: 'Το προφίλ ενημερώθηκε!',
-        duration: 1500,
-        color: 'success'
+      // Καλούμε το δικό σου service
+      this.zone.run(async () => {
+        const toast = await this.toastCtrl.create({
+          message: 'Το προφίλ ενημερώθηκε!',
+          duration: 2000,
+          position: 'bottom'
+        });
+        await toast.present();
       });
-      await toast.present();
+      
+      
 
-      this.router.navigateByUrl('/profile', { replaceUrl: true });
+      await this.goBackToProfile();
+      
+      console.log("✅ Toast dismissed, πάμε redirect...");  
+
+      console.log("🚀 Calling navigate to /profile...");
+      this.goBackToProfile();
+
 
     } catch (error) {
-      const toast = await this.toastCtrl.create({
-        message: 'Σφάλμα κατά την αποθήκευση.',
-        duration: 1500,
-        color: 'danger'
+      this.zone.run(async () => {
+        await this.toastService.present('Σφάλμα κατά την αποθήκευση.', 'error');
       });
-      await toast.present();
+      
+
     }
   }
 }

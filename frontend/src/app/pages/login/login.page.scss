@@ -1,3 +1,4 @@
+
 .login-container {
   --background: #ffffff;
 
@@ -77,3 +78,26 @@
   --highlight-color: #8C1310;
 }
 
+
+ion-item {
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --inner-padding-start: 0;
+  --highlight-color-focused: transparent;
+  --min-height: 50px;
+  border: 1px solid #8C1310;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.native-input {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: transparent;  
+  border: none;             
+  outline: none;
+  color: #000;
+  caret-color: #8C1310;
+}

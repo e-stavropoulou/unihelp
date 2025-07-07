@@ -13,44 +13,51 @@
     <!-- Προσωπικά στοιχεία -->
     <div class="form-group">
       <label class="form-label">Ονοματεπώνυμο</label>
-      <ion-input
+      <input
         [(ngModel)]="userData.full_name"
         name="full_name"
         required
-        class="custom-input">
-      </ion-input>
+        class="custom-input"
+        type="text"
+        placeholder="Π.χ. Νίκος Παπαδόπουλος"
+      />
     </div>
-
+    
     <div class="form-group">
       <label class="form-label">Username</label>
-      <ion-input
+      <input
         [(ngModel)]="userData.username"
         name="username"
         required
-        class="custom-input">
-      </ion-input>
+        class="custom-input"
+        type="text"
+        placeholder="Π.χ. nikos123"
+      />
     </div>
-
+    
     <div class="form-group">
       <label class="form-label">Email</label>
-      <ion-input
+      <input
         [(ngModel)]="userData.email"
         name="email"
         type="email"
         required
-        class="custom-input">
-      </ion-input>
+        class="custom-input"
+        placeholder="Π.χ. stXXXXX@upatras.gr"
+      />
     </div>
-
+    
     <div class="form-group">
       <label class="form-label">Νέος Κωδικός</label>
-      <ion-input
+      <input
         [(ngModel)]="newPassword"
         name="newPassword"
         type="password"
-        class="custom-input">
-      </ion-input>
+        class="custom-input"
+        placeholder="••••••••"
+      />
     </div>
+    
 
     <!-- Αυτοαξιολόγηση -->
     <div class="form-group">

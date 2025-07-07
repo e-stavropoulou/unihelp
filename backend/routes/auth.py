@@ -28,6 +28,9 @@ os.makedirs(NOTES_UPLOAD_FOLDER, exist_ok=True)
 
 JWT_EXPIRATION_MINUTES = 60
 
+
+
+
 # ----------------------------- REGISTER -----------------------------
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -114,25 +117,34 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.json
+    print("🟢 /login called with data:", data)
+    
     email = data.get('email')
     password = data.get('password')
+    print(f"🟢 Email: {email}, Password: {'*' * len(password) if password else None}")
+    
     user = User.query.filter_by(email=email).first()
-
     if not user:
+        print("🔴 User not found")
         return jsonify({'message': 'Ο χρήστης δεν βρέθηκε'}), 404
+    
     if not check_password_hash(user.password, password):
+        print("🔴 Wrong password")
         return jsonify({'message': 'Λανθασμένος κωδικός'}), 401
+    
     if not user.is_verified:
+        print("🔴 User not verified")
         return jsonify({'message': 'Ο λογαριασμός σου δεν έχει ενεργοποιηθεί. Έλεγξε το email σου.', 'error': 'not_verified'}), 403
 
-
     token = create_access_token(identity=user.email)
-
+    print("🟢 Login success, token created")
+    
     return jsonify({
         'message': 'Επιτυχής σύνδεση',
         'email': user.email,
         'token': token
     }), 200
+
 
 # ----------------------------- CHECK CREDENTIALS -----------------------------
 @auth_bp.route('/check-credentials', methods=['POST'])
