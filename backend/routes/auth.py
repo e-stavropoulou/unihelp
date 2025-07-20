@@ -184,7 +184,7 @@ def upload_note():
     description = request.form.get('description')
     category = request.form.get('category')
 
-    if not files or not course_id or not title or not category:
+    if not files or not course_id or not title or not category or not description:
         return jsonify({'error': 'Λείπουν απαιτούμενα πεδία'}), 400
 
     uploaded_files = []
@@ -253,6 +253,7 @@ def get_all_notes():
             'id': note.id,
             'title': note.title,
             'description': note.description,
+            'downloads': note.downloads,
             'category': note.category,
             'upload_date': note.upload_date.strftime('%d/%m/%Y'),
             'filepath': f'{BASE_URL}/static/notes/{note.filename}',

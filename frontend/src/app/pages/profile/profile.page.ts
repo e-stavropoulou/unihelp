@@ -78,7 +78,19 @@ export class ProfilePage implements OnInit {
 
         this.avatarVisible = false; // για fade-in
         setTimeout(() => {
-          this.avatarUrl = data.avatar_url || 'assets/img/placeholder-avatar.png';
+          const backendBase = environment.API_URL;
+
+          const rawAvatar = data.avatar_url;
+
+          if (rawAvatar?.startsWith('http')) {
+            this.avatarUrl = `${rawAvatar}?v=${new Date().getTime()}`;
+          } else if (rawAvatar) {
+            this.avatarUrl = `${backendBase}${rawAvatar}?v=${new Date().getTime()}`;
+          } else {
+            this.avatarUrl = 'assets/img/placeholder-avatar.png';
+          }
+          
+
           this.avatarVisible = true;
         }, 100); // λίγο delay για να ενεργοποιηθεί το animation
       },

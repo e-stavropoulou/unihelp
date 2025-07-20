@@ -70,6 +70,8 @@ export class ProfileSettingsPage implements OnInit {
           email: data.email || ''
         };
         this.avatarUrl = data.avatar_url || null;
+        console.log('✅ avatar_url από backend:', data.avatar_url);
+
 
         this.selectedCourseIds = data.can_help_courses_ids || [];
         this.originalCourseIds = [...this.selectedCourseIds];
@@ -178,8 +180,13 @@ export class ProfileSettingsPage implements OnInit {
       if (this.avatarFile) {
         const formData = new FormData();
         formData.append('avatar', this.avatarFile);
-        await this.http.post(`${environment.API_URL}/upload-avatar`, formData, { headers }).toPromise();
+      
+        console.log('📸 Ανεβάζουμε avatar...', this.avatarFile);
+      
+        const res = await this.http.post(`${environment.API_URL}/upload-avatar`, formData, { headers }).toPromise();
+        console.log('✅ Απάντηση από το backend μετά το upload:', res);
       }
+      
 
       // Υπολογισμός διαφορών can_help και αποστολή
       const updates = this.allCourses.filter(course => {
@@ -199,7 +206,7 @@ export class ProfileSettingsPage implements OnInit {
       await Promise.all(updateRequests);
 
       // Καλούμε το δικό σου service
-      this.zone.run(async () => {
+      /* this.zone.run(async () => {
         const toast = await this.toastCtrl.create({
           message: 'Το προφίλ ενημερώθηκε!',
           duration: 2000,
@@ -211,12 +218,17 @@ export class ProfileSettingsPage implements OnInit {
       
 
       await this.goBackToProfile();
-      
       console.log("✅ Toast dismissed, πάμε redirect...");  
-
       console.log("🚀 Calling navigate to /profile...");
-      this.goBackToProfile();
+      */
 
+      this.zone.run(async () => {
+        await this.toastService.present('Το προφίλ ενημερώθηκε!', 'success');
+      
+        console.log("✅ Toast done, πάμε redirect...");
+        this.goBackToProfile();
+      });
+      
 
     } catch (error) {
       this.zone.run(async () => {

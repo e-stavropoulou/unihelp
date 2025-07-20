@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../node_modules/@capacitor/toast/dist/esm/web.js"],
+  "sourcesContent": ["import { WebPlugin } from '@capacitor/core';\nexport class ToastWeb extends WebPlugin {\n  async show(options) {\n    if (typeof document !== 'undefined') {\n      let duration = 2000;\n      if (options.duration) {\n        duration = options.duration === 'long' ? 3500 : 2000;\n      }\n      const toast = document.createElement('pwa-toast');\n      toast.duration = duration;\n      toast.message = options.text;\n      document.body.appendChild(toast);\n    }\n  }\n}\n"],
+  "mappings": ";;;;;;;;AACO,IAAM,WAAN,cAAuB,UAAU;AAAA,EAChC,KAAK,SAAS;AAAA;AAClB,UAAI,OAAO,aAAa,aAAa;AACnC,YAAI,WAAW;AACf,YAAI,QAAQ,UAAU;AACpB,qBAAW,QAAQ,aAAa,SAAS,OAAO;AAAA,QAClD;AACA,cAAM,QAAQ,SAAS,cAAc,WAAW;AAChD,cAAM,WAAW;AACjB,cAAM,UAAU,QAAQ;AACxB,iBAAS,KAAK,YAAY,KAAK;AAAA,MACjC;AAAA,IACF;AAAA;AACF;",
+  "names": []
+}

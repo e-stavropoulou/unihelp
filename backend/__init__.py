@@ -10,6 +10,7 @@ from routes.auth import auth_bp
 from routes.profile import profile_bp
 from routes.search_users import search_users_bp
 from routes.user_profile import user_profile_bp
+from routes.download_notes import download_notes_bp
 from config import ( SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, JWT_SECRET, EMAIL_USER, EMAIL_PASS, BASE_URL )
 from flask_jwt_extended import JWTManager
 
@@ -55,7 +56,7 @@ def create_app():
     app.register_blueprint(profile_bp)
     app.register_blueprint(search_users_bp)
     app.register_blueprint(user_profile_bp)
-
+    app.register_blueprint(download_notes_bp)
 
 
     return app

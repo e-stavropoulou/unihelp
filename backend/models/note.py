@@ -12,3 +12,4 @@ class Note(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
     filepath = db.Column(db.String(255), nullable=False)
+    downloads = db.Column(db.Integer, default=0, nullable=False) 

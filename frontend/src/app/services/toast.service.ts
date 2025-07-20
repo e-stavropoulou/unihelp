@@ -48,20 +48,48 @@ export class ToastService {
   */
 
 import { Injectable } from '@angular/core';
+import { ToastController, Platform } from '@ionic/angular';
 import { Toast } from '@capacitor/toast';
+import { Capacitor } from '@capacitor/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ToastService {
-  constructor() {}
+  constructor(private toastController: ToastController, private platform: Platform) {}
 
-  async present(message: string, type: 'success' | 'error' | 'warning' = 'success') {
-    console.log('🚨 Native Toast CALLED!', message, type);
+  async present(
+    message: string,
+    type: 'success' | 'error' | 'warning' = 'success',
+    duration: number = 2000  // default σε ms
+  ) {
+    console.log('🚨 Toast CALLED!', message, type);
+  
+    if (Capacitor.isNativePlatform()) {
+      // Capacitor μόνο υποστηρίζει 'short' | 'long'
+      await Toast.show({
+        text: message,
+        duration: duration < 2500 ? 'short' : 'long',
+        position: 'center'
+      });
+    } else {
+      const toast = await this.toastController.create({
+        message,
+        duration, // ms
+        color: this.getColor(type),
+        position: 'top'
+      });
+      await toast.present();
+    }
+  }
+  
 
-    await Toast.show({
-      text: message,
-      duration: 'long'
-    });
+  private getColor(type: 'success' | 'error' | 'warning'): string {
+    switch (type) {
+      case 'success': return 'success';
+      case 'error': return 'danger';
+      case 'warning': return 'warning';
+      default: return 'primary';
+    }
   }
 }

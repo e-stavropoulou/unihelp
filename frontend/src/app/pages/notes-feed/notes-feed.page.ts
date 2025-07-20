@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { FooterNavComponent } from '../../components/footer-nav/footer-nav.component';
 import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
+import { NgZone } from '@angular/core';
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   selector: 'app-notes-feed',
@@ -25,12 +27,11 @@ export class NotesFeedPage implements OnInit {
   selectedType: string = '';
   semesters: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
 
-
-
   constructor(
     private http: HttpClient,
-    private toastCtrl: ToastController,
-    private authService: AuthService
+    private authService: AuthService,
+    private zone: NgZone,
+    private toastService: ToastService
   ) {}
 
   ngOnInit() {
@@ -64,7 +65,7 @@ export class NotesFeedPage implements OnInit {
       const matchesSearch = note.title.toLowerCase().includes(this.searchTerm.toLowerCase());
       const matchesCategory = this.selectedCategory ? note.category === this.selectedCategory : true;
       const matchesCourse = this.selectedCourse ? note.course === this.selectedCourse : true;
-      const matchesSemester = this.selectedSemester ? note.semester === this.selectedSemester : true;
+      const matchesSemester = this.selectedSemester ? note.semester === Number(this.selectedSemester) : true;
       const matchesType = this.selectedType ? note.type === this.selectedType : true;
     
       return matchesSearch && matchesCategory && matchesCourse && matchesSemester && matchesType;
@@ -83,16 +84,31 @@ export class NotesFeedPage implements OnInit {
     this.applyFilters();
   }
 
+  downloadNote(note: any) {
+    const token = this.authService.getToken();
+    const downloadUrl = `${environment.API_URL}/download/${note.id}`;
+  
+    // Δημιουργία anchor tag με το JWT
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('target', '_blank');
+    link.setAttribute('rel', 'noopener');
+  
+    // ✅ Τοπική αύξηση των downloads
+    this.zone.run(() => {
+      note.downloads += 1;
+    });
+  
+    link.click();
+  }
+  
+  
+
   async addToFavorites(note: any) {
     const token = this.authService.getToken();
 
     if (!token) {
-      const toast = await this.toastCtrl.create({
-        message: 'Πρέπει να είσαι συνδεδεμένος για να προσθέσεις αγαπημένα.',
-        duration: 1500,
-        color: 'danger'
-      });
-      await toast.present();
+      await this.toastService.present('Πρέπει να είσαι συνδεδεμένος για να προσθέσεις αγαπημένα.', 'error');
       return;
     }
 
@@ -105,24 +121,18 @@ export class NotesFeedPage implements OnInit {
     }, { headers })
     .subscribe({
       next: async (res: any) => {
-        const toast = await this.toastCtrl.create({
-          message: res.message,
-          duration: 1200,
-          color: 'success'
+        console.log('✅ Success res:', res);
+
+        await this.toastService.present(res.message || 'Επιτυχία!', 'success');
+
+        this.zone.run(() => {
+          note.isFavorite = !note.isFavorite;
         });
-        await toast.present();
-        this.loadAllNotes();
       },
       error: async (err) => {
-        const toast = await this.toastCtrl.create({
-          message: 'Σφάλμα κατά την αποθήκευση στα αγαπημένα.',
-          duration: 1500,
-          color: 'danger'
-        });
-        await toast.present();
+        await this.toastService.present('Σφάλμα κατά την αποθήκευση στα αγαπημένα.', 'error');
         console.error(err);
       }
     });
   }
 }
-

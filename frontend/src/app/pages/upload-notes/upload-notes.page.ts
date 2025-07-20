@@ -62,6 +62,7 @@ export class UploadNotesPage implements OnInit {
   isFormValid(): boolean {
     return (
       this.title.trim() !== '' &&
+      this.description.trim() !== '' &&
       this.category !== '' &&
       this.courseId !== null &&
       this.files.length > 0

@@ -56,7 +56,7 @@
   <ng-container *ngIf="filteredNotes.length > 0; else noNotes">
     <ion-card *ngFor="let note of filteredNotes" class="note-card">
       <ion-card-header>
-        <ion-card-title>{{ note.title }}</ion-card-title>
+        <ion-card-title> •  {{ note.title }} • </ion-card-title>
         <ion-card-subtitle>{{ note.course }} • {{ note.category }} • από {{ note.uploader }}</ion-card-subtitle>
       </ion-card-header>
       <ion-card-content>
@@ -65,12 +65,15 @@
           <p>{{ note.description || 'Χωρίς περιγραφή.' }}</p>
         </div>        
         <div class="upload-date">📅 Ανέβηκε στις: {{ note.upload_date }}</div>
+
+        <div class="download-count">📥 Λήψεις: {{ note.downloads }}</div>
+
         <div class="note-meta">
           <p><strong>Εξάμηνο:</strong> {{ note.semester }}ο</p>
           <p><strong>Τύπος:</strong> {{ note.type }}</p>
         </div>        
         <div class="actions">
-          <a [href]="note.filepath" target="_blank">📄 Άνοιγμα αρχείου</a>
+          <a (click)="downloadNote(note)">📄 Άνοιγμα αρχείου</a>
           <ion-button
             class="favorite-btn"
             size="small"
