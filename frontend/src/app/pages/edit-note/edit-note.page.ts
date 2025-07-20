@@ -122,6 +122,12 @@ export class EditNotePage implements OnInit {
       this.toastService.present('Ο τίτλος είναι υποχρεωτικός.', 'warning');
       return;
     }
+
+    if (this.description.trim() === '') {
+      this.toastService.present('Η περιγραφή είναι υποχρεωτική.', 'warning');
+      return;
+    }
+    
   
     if (this.category.trim() === '') {
       this.toastService.present('Η κατηγορία είναι υποχρεωτική.', 'warning');

@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
-
-
+import { ToastService } from 'src/app/services/toast.service';
 
 @Component({
   selector: 'app-footer-nav',
@@ -14,17 +13,18 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./footer-nav.component.scss'],
 })
 export class FooterNavComponent {
-  constructor(private router: Router, private toastController: ToastController, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private toastService: ToastService
+  ) {}
 
   async logout() {
     this.authService.clearToken();
-    const toast = await this.toastController.create({
-      message: 'Αποσυνδεθήκατε.',
-      duration: 2000,
-      position: 'top',
-      cssClass: 'toast-error'
-    });
-    await toast.present();
+
+    // ✅ Εμφάνιση toast από το ToastService
+    await this.toastService.present('Αποσυνδεθήκατε.', 'error', 400);
+
     this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 }
