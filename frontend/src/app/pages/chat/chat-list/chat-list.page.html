@@ -1,0 +1,24 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Συνομιλίες</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list *ngIf="chats.length > 0; else noChats">
+    <ion-item *ngFor="let chat of chats" (click)="goToChat(chat.chat_id)">
+      <ion-avatar slot="start">
+        <img [src]="chat.other_avatar || 'assets/img/placeholder-avatar.png'">
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ chat.other_username }}</h2>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #noChats>
+    <ion-text color="medium">Δεν υπάρχουν ενεργές συνομιλίες.</ion-text>
+  </ng-template>
+</ion-content>
+
+<app-footer-nav></app-footer-nav>

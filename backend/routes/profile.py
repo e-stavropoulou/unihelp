@@ -16,8 +16,8 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 @profile_bp.route('/profile', methods=['GET'])
 @jwt_required()
 def get_profile():
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -29,7 +29,8 @@ def get_profile():
     'can_help_courses': [uc.course.name for uc in user.user_courses if uc.can_help],
     'can_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.can_help],
     'needs_help_courses': [uc.course.name for uc in user.user_courses if uc.needs_help],
-    'needs_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.needs_help]
+    'needs_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.needs_help],
+    'upoints': user.upoints
 })
 
 
@@ -41,8 +42,8 @@ def upload_avatar():
     if not file:
         return jsonify({'error': 'Missing file'}), 400
 
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -64,8 +65,8 @@ def serve_avatar(filename):
 @jwt_required()
 def update_profile():
     data = request.get_json()
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -98,8 +99,8 @@ def update_needs_help():
     if course_id is None or needs_help is None:
         return jsonify({'error': 'Missing course_id or needs_help'}), 400
 
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
@@ -128,8 +129,8 @@ def update_can_help():
     if course_id is None or can_help is None:
         return jsonify({'error': 'Missing course_id or can_help'}), 400
 
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
     if not user:
         return jsonify({'error': 'User not found'}), 404
 

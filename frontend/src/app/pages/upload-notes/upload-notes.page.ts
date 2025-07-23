@@ -6,6 +6,8 @@ import { HttpClient } from '@angular/common/http';
 import { ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
+import { NotificationsService } from 'src/app/services/notifications.service';
+
 
 @Component({
   selector: 'app-upload-notes',
@@ -34,7 +36,8 @@ export class UploadNotesPage implements OnInit {
     private http: HttpClient,
     private navCtrl: NavController,
     private toastService: ToastService,
-    private authService: AuthService
+    private authService: AuthService,
+    private notificationService: NotificationsService
   ) {}
 
   ngOnInit() {
@@ -142,6 +145,7 @@ export class UploadNotesPage implements OnInit {
     }).subscribe({
       next: async res => {
         this.toastService.present('Οι σημειώσεις ανέβηκαν με επιτυχία!', 'success');
+        this.notificationService.refreshUnreadCount();
         this.navCtrl.back();
       },
       error: async err => {

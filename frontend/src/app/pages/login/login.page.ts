@@ -45,7 +45,7 @@ export class LoginPage {
   
     console.log('✅ Sending HTTP request to:', `${environment.API_URL}/login`);
   
-    this.http.post<{ message: string; token: string; email: string }>(
+    this.http.post<{ message: string; token: string; email: string; user_id: number; role: string }>(
       `${environment.API_URL}/login`,
       {
         email: this.email,
@@ -54,12 +54,16 @@ export class LoginPage {
     ).subscribe({
       next: (res) => {
         console.log('✅ Login success response', res);
-        this.authService.setToken(res.token, res.email);
+        this.authService.setToken(res.token, res.user_id, res.email, res.role);
         this.showResend = false;
         this.router.navigateByUrl('/profile', { replaceUrl: true });
       },
       error: (err) => {
-        console.log('❌ Login error response', err);
+        console.log('❌ FULL ERROR OBJECT:', err);
+        console.log('❌ err.status:', err.status);
+        console.log('❌ err.error:', err.error);
+        console.log('❌ err.message:', err.message);
+        console.log('❌ err.name:', err.name);
         const errorMessage = err.error?.message || 'Σφάλμα σύνδεσης';
         console.log('🟡 Θα εμφανίσω toast με μήνυμα:', errorMessage);
         this.toastService.present(errorMessage, 'error')

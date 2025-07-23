@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
@@ -26,15 +26,18 @@ export class UserProfilePage implements OnInit {
   } | null = null;
 
   avatarUrl: string = 'assets/img/placeholder-avatar.png';
-  avatarVisible = false;  // για animation fade-in (αν το θέλεις)
+  avatarVisible = false;
+  currentUserId: number | null = null;
 
   constructor(
     private route: ActivatedRoute, 
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
+    this.currentUserId = this.authService.getUserId(); // ✅ πάρε user ID από AuthService
     this.loadUserProfile();
   }
 
@@ -53,7 +56,7 @@ export class UserProfilePage implements OnInit {
     this.http.get<any>(`${environment.API_URL}/user-profile/${userId}`, { headers }).subscribe({
       next: (res) => {
         this.user = res;
-    
+
         this.avatarVisible = false;
         setTimeout(() => {
           this.avatarUrl = res.avatar_url 
@@ -67,5 +70,24 @@ export class UserProfilePage implements OnInit {
         this.user = null;
       }
     });    
+  }
+
+  startChatWithUser() {
+    if (!this.user || this.currentUserId === this.user.id) return;
+
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    this.http.post(`${environment.API_URL}/chats/${this.user.id}`, {}, { headers }).subscribe({
+      next: (res: any) => {
+        const chatId = res.chat_id;
+        this.router.navigate(['/chat', chatId]);
+      },
+      error: (err) => {
+        console.error('🚫 Αποτυχία δημιουργίας chat:', err);
+      }
+    });
   }
 }

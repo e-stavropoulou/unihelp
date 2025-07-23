@@ -5,7 +5,17 @@
       <ion-icon name="search-outline" [routerLink]="['/search-users']"></ion-icon>
       <ion-icon name="chatbubble-ellipses-outline" [routerLink]="['/chat']"></ion-icon>
       <ion-icon name="person-outline" [routerLink]="['/profile']"></ion-icon>
-      <ion-icon name="notifications-outline" [routerLink]="['/notifications']"></ion-icon>
+
+      <!-- 🔔 Εικονίδιο ειδοποιήσεων με badge -->
+      <div class="icon-with-badge" [routerLink]="['/notifications']">
+        <ion-icon name="notifications-outline" class="notification-icon"></ion-icon>
+        <ng-container *ngIf="unreadCount$ | async as count">
+          <ion-badge *ngIf="count > 0" class="notif-badge">
+            {{ count }}
+          </ion-badge>
+        </ng-container>
+      </div>
+
       <ion-icon name="log-out-outline" (click)="logout()"></ion-icon>
     </div>
   </ion-toolbar>

@@ -8,41 +8,69 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
   private readonly TOKEN_KEY = 'token';
+  private readonly USER_ID_KEY = 'user_id';
   private readonly EMAIL_KEY = 'email';
+  private readonly ROLE_KEY = 'role';
+  
 
   constructor(private http: HttpClient) {}
 
-  setToken(token: string, email: string) {
+  // ✔️ Καταγραφή μετά το login
+  setToken(token: string, user_id: number, email: string, role: string) {
     localStorage.setItem(this.TOKEN_KEY, token);
-    if (email) {
-      localStorage.setItem(this.EMAIL_KEY, email);
-    }
+    localStorage.setItem(this.USER_ID_KEY, user_id.toString());
+    localStorage.setItem(this.EMAIL_KEY, email);
+    localStorage.setItem(this.ROLE_KEY, role);
   }
+  
 
+  // ✔️ Χρήσιμα getters
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  getEmail(): string | null {
-    return localStorage.getItem(this.EMAIL_KEY);
+  getUserId(): number | null {
+    const id = localStorage.getItem(this.USER_ID_KEY);
+    return id ? parseInt(id, 10) : null;
   }
 
-  clearToken() {
-    localStorage.removeItem(this.TOKEN_KEY);
-    localStorage.removeItem(this.EMAIL_KEY);
+  getRole(): string | null {
+    return localStorage.getItem(this.ROLE_KEY);
+  }
+
+  isAdmin(): boolean {
+    return this.getRole() === 'admin';
   }
 
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
 
-  //login
+  clearToken() {
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_ID_KEY);
+    localStorage.removeItem(this.ROLE_KEY);
+  }
+
+  // ✔️ Login
   loginUser(credentials: { email: string; password: string }): Observable<any> {
     return this.http.post(`${environment.API_URL}/login`, credentials);
   }
 
-  //resend verification
+  // ✔️ Resend email
   resendVerificationEmail(email: string): Observable<any> {
     return this.http.post(`${environment.API_URL}/resend-verification`, { email });
+  }
+
+  // ✔️ FCM update
+  updateFcmToken(fcm_token: string): Observable<any> {
+    return this.http.post(`${environment.API_URL}/update-fcm-token`, 
+      { fcm_token },
+      {
+        headers: {
+          Authorization: `Bearer ${this.getToken()}`
+        }
+      }
+    );
   }
 }
