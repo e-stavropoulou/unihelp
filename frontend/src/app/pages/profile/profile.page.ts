@@ -48,6 +48,8 @@ export class ProfilePage implements OnInit {
   needsHelpCourses: string[] = [];
   avatarUrl: string | null = null;
   avatarVisible = false; // για animation
+  userPoints: number = 0;
+
 
   constructor(private router: Router, private http: HttpClient, private authService: AuthService) {}
 
@@ -62,26 +64,31 @@ export class ProfilePage implements OnInit {
   loadUserData() {
     const token = this.authService.getToken();
     if (!token) {
+      console.warn('[DEBUG] No JWT token found, redirecting to login');
       this.router.navigate(['/login']);
       return;
     }
-
+  
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`
     });
-
+  
     this.http.get<any>(`${environment.API_URL}/profile`, { headers }).subscribe({
       next: (data) => {
+        console.log('[DEBUG] /profile response data:', data);
+        console.log('[DEBUG] /profile full data:', data);
+        console.log('[DEBUG] upoints received:', data.upoints);
         this.userData = data;
         this.canHelpCourses = data.can_help_courses || [];
         this.needsHelpCourses = data.needs_help_courses || [];
+        this.userPoints = data.upoints || 0;
 
+  
         this.avatarVisible = false; // για fade-in
         setTimeout(() => {
           const backendBase = environment.API_URL;
-
           const rawAvatar = data.avatar_url;
-
+  
           if (rawAvatar?.startsWith('http')) {
             this.avatarUrl = `${rawAvatar}?v=${new Date().getTime()}`;
           } else if (rawAvatar) {
@@ -89,16 +96,17 @@ export class ProfilePage implements OnInit {
           } else {
             this.avatarUrl = 'assets/img/placeholder-avatar.png';
           }
-          
-
+  
           this.avatarVisible = true;
-        }, 100); // λίγο delay για να ενεργοποιηθεί το animation
+        }, 100);
       },
-      error: () => {
+      error: (error) => {
+        console.error('[DEBUG] /profile load error:', error);
         this.router.navigate(['/login']);
       }
     });
   }
+  
 
   onAvatarChange(event: Event) {
     const input = event.target as HTMLInputElement;

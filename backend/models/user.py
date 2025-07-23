@@ -16,6 +16,10 @@ class User(db.Model):
     verification_token = db.Column(db.String(255), nullable=True)
     reset_token = db.Column(db.String(100), nullable=True)
     reset_token_expiry = db.Column(db.DateTime, nullable=True)
+    fcm_token = db.Column(db.String(255), nullable=True)
+    upoints = db.Column(db.Integer, default=0, nullable=False)
+
+    role = db.Column(db.String(20), default='user', nullable=False) 
 
     user_courses = db.relationship('UserCourse', back_populates='user')
 
@@ -29,5 +33,8 @@ class User(db.Model):
             "birthdate": self.birthdate,
             "department": self.department,
             "courses": [uc.course.name for uc in self.user_courses if uc.can_help],
-            "avatar_url": self.avatar_url 
+            "avatar_url": self.avatar_url,
+            "upoints": self.upoints,
+            "role": self.role
+
         }

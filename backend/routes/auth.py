@@ -3,7 +3,11 @@ from models.user import db, User
 from models.course import Course, UserCourse
 from models.note import Note
 from models.favorite import Favorite
+from utils.push_utils import send_push_notification
 from werkzeug.utils import secure_filename
+import requests
+import os
+from models.notification import Notification
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from config import BASE_URL
@@ -136,12 +140,14 @@ def login():
         print("🔴 User not verified")
         return jsonify({'message': 'Ο λογαριασμός σου δεν έχει ενεργοποιηθεί. Έλεγξε το email σου.', 'error': 'not_verified'}), 403
 
-    token = create_access_token(identity=user.email)
+    token = create_access_token(identity=str(user.id))
     print("🟢 Login success, token created")
     
     return jsonify({
         'message': 'Επιτυχής σύνδεση',
         'email': user.email,
+        'user_id': user.id,
+        'role': user.role,
         'token': token
     }), 200
 
@@ -175,8 +181,11 @@ def get_courses():
 @auth_bp.route('/upload-note', methods=['POST'])
 @jwt_required()
 def upload_note():
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    from models.course import UserCourse
+    from models.notification import Notification
+    
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
 
     files = request.files.getlist('files')
     course_id = request.form.get('course_id')
@@ -206,15 +215,53 @@ def upload_note():
         db.session.add(note)
         uploaded_files.append(filename)
 
+    # 🎯 Πρόσθεσε 10 πόντους στον χρήστη
+    user.upoints += 10
+
+    # 🎉 Δημιουργία ειδοποίησης για τον ίδιο τον χρήστη
+    reward_notification = Notification(
+    user_id=user.id,
+    message="Μπράβο! 🎉 Κέρδισες 10 πόντους για την ανάρτηση της σημείωσης."
+    )
+    db.session.add(reward_notification)
+
+
     db.session.commit()
+
+    # 🔔 Δημιουργία ειδοποιήσεων για άλλους χρήστες που ενδιαφέρονται
+    course = Course.query.get(course_id)
+    if course:
+        interested_users = UserCourse.query.filter(
+            UserCourse.course_id == course.id,
+            (UserCourse.needs_help == True) | (UserCourse.can_help == True)
+        ).all()
+
+        notifications = []
+        for uc in interested_users:
+            if uc.user_id == user.id:
+                continue  # αγνόησε τον εαυτό του
+
+            notif = Notification(
+                user_id=uc.user_id,
+                message=f"Ανέβηκε νέα σημείωση στο μάθημα {course.name}!"
+            )
+            notifications.append(notif)
+
+        db.session.add_all(notifications)
+        db.session.commit()
+
     return jsonify({'message': 'Οι σημειώσεις ανέβηκαν επιτυχώς', 'files': uploaded_files}), 200
+
+
 
 # ----------------------------- MY NOTES -----------------------------
 @auth_bp.route('/my-notes', methods=['GET'])
 @jwt_required()
 def get_my_notes():
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+
+
     notes = Note.query.filter_by(user_id=user.id).order_by(Note.upload_date.desc()).all()
     result = []
 
@@ -239,8 +286,10 @@ def get_my_notes():
 @auth_bp.route('/all-notes', methods=['GET'])
 @jwt_required()
 def get_all_notes():
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+
+
     fav_ids = [fav.note_id for fav in Favorite.query.filter_by(user_id=user.id).all()]
     notes = Note.query.order_by(Note.upload_date.desc()).all()
 
@@ -271,8 +320,10 @@ def get_all_notes():
 @auth_bp.route('/edit-note/<int:note_id>', methods=['PUT'])
 @jwt_required()
 def edit_note(note_id):
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+
+
     note = Note.query.get(note_id)
 
     if not note or note.user_id != user.id:
@@ -311,8 +362,11 @@ def edit_note(note_id):
 @auth_bp.route('/delete-note/<int:note_id>', methods=['DELETE'])
 @jwt_required()
 def delete_note(note_id):
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+
+
+
     note = Note.query.get(note_id)
 
     if not note:
@@ -334,8 +388,10 @@ def delete_note(note_id):
 @auth_bp.route('/get-note/<int:note_id>', methods=['GET'])
 @jwt_required()
 def get_note(note_id):
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+
+
     note = Note.query.get(note_id)
 
     if not note or note.user_id != user.id:
@@ -361,8 +417,10 @@ def get_note(note_id):
 @auth_bp.route('/favorites', methods=['GET'])
 @jwt_required()
 def get_favorites():
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+
+
     favorites = Favorite.query.filter_by(user_id=user.id).all()
     note_ids = [fav.note_id for fav in favorites]
     notes = Note.query.filter(Note.id.in_(note_ids)).order_by(Note.upload_date.desc()).all()
@@ -392,8 +450,10 @@ def get_favorites():
 @auth_bp.route('/favorite', methods=['POST'])
 @jwt_required()
 def toggle_favorite():
-    email = get_jwt_identity()
-    user = User.query.filter_by(email=email).first()
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+
+
     data = request.json
     note_id = data.get('note_id')
 

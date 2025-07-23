@@ -38,5 +38,15 @@
         </ul>
       </div>
     </ion-card-content>
+
+    <ion-button
+      expand="block"
+      color="primary"
+      *ngIf="user?.id !== currentUserId"
+      (click)="startChatWithUser()"
+    >
+      💬 Στείλε Μήνυμα
+    </ion-button>
+
   </ion-card>
 </ion-content>

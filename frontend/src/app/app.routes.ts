@@ -83,7 +83,22 @@ export const routes: Routes = [
   {
     path: 'edit-needs-help',
     loadComponent: () => import('./pages/edit-needs-help/edit-needs-help.page').then( m => m.EditNeedsHelpPage)
+  },
+  {
+    path: 'notifications',
+    loadComponent: () => import('./pages/notifications/notifications.page').then( m => m.NotificationsPage)
+  },
+  {
+    path: 'chat',
+    loadComponent: () =>
+      import('./pages/chat/chat-list/chat-list.page').then((m) => m.ChatListPage),
+  },
+  {
+    path: 'chat/:chatId',
+    loadComponent: () =>
+      import('./pages/chat/chat-detail/chat-detail.page').then((m) => m.ChatDetailPage),
   }
+  
   
   
  

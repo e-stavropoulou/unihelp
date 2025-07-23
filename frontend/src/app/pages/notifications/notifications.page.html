@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Ειδοποιήσεις</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-list *ngIf="notifications.length > 0; else noNotifications">
+    <ion-item *ngFor="let note of notifications">
+      <ion-label>
+        <h3 [style.fontWeight]="note.is_read ? 'normal' : 'bold'">
+          🔔 {{ note.message }}
+        </h3>
+        <p>🕒 {{ note.timestamp | date: 'medium' }}</p>
+      </ion-label>
+
+      <ion-buttons slot="end">
+        <ion-button fill="clear" (click)="markAsRead(note.id)" [disabled]="note.is_read">
+          <ion-icon name="checkmark-done-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button fill="clear" color="danger" (click)="deleteNotification(note.id)">
+          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #noNotifications>
+    <ion-text color="medium">
+      <p class="ion-text-center">Δεν υπάρχουν ειδοποιήσεις.</p>
+    </ion-text>
+  </ng-template>
+
+</ion-content>
+
+<app-footer-nav></app-footer-nav>

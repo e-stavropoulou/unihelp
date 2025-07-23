@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/chat"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Συνομιλία</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding chat-content">
+  <div *ngFor="let msg of messages" class="message-row" [ngClass]="{ 'me': msg.sender_id === userId, 'other': msg.sender_id !== userId }">
+    <div class="bubble">{{ msg.content }}</div>
+    <div class="timestamp">{{ msg.timestamp | date:'shortTime' }}</div>
+  </div>
+</ion-content>
+
+<ion-footer class="input-footer">
+  <ion-toolbar>
+    <ion-item lines="none" class="input-wrapper">
+      <input
+        type="text"
+        [(ngModel)]="newMessage"
+        class="message-input"
+        placeholder="Γράψε μήνυμα..."
+      />
+      <ion-button slot="end" fill="solid" color="danger" (click)="sendMessage()">
+        <ion-icon name="send" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>
