@@ -3,9 +3,15 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/chat"></ion-back-button>
     </ion-buttons>
-    <ion-title>Συνομιλία</ion-title>
+
+    <!-- ✅ Avatar + Όνομα χρήστη -->
+    <div class="chat-header-user">
+      <img [src]="chatPartnerAvatarUrl || 'assets/img/placeholder-avatar.png'" class="avatar-img" />
+      <span class="chat-partner-name">{{ chatPartnerName || 'Συνομιλία' }}</span>
+    </div>
   </ion-toolbar>
 </ion-header>
+
 
 <ion-content class="ion-padding chat-content">
   <div *ngFor="let msg of messages" class="message-row" [ngClass]="{ 'me': msg.sender_id === userId, 'other': msg.sender_id !== userId }">

@@ -3,8 +3,21 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.shared import db
 from models.user import User
 from models.notification import Notification
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 
 notifications_bp = Blueprint('notifications_bp', __name__)
+
+ATHENS_TZ = ZoneInfo("Europe/Athens")
+
+def to_athens_iso(dt: datetime) -> str:
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+    return dt.astimezone(ATHENS_TZ).isoformat()
+
 
 # 🔔 Επιστροφή όλων των ειδοποιήσεων για τον χρήστη
 @notifications_bp.route('/notifications', methods=['GET', 'OPTIONS'])
@@ -36,7 +49,7 @@ def get_notifications():
             {
                 "id": n.id,
                 "message": n.message,
-                "timestamp": n.timestamp.isoformat(),
+                "timestamp": to_athens_iso(n.timestamp),
                 "is_read": n.is_read
             } for n in notifications
         ]), 200

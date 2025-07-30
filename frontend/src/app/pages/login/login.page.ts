@@ -7,6 +7,9 @@ import { ToastService } from 'src/app/services/toast.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { FormsModule } from '@angular/forms';
+import { ChatService } from 'src/app/services/chat.service';
+import { NotificationsService } from 'src/app/services/notifications.service'; // αν θες και για notif badge
+
 
 @Component({
   selector: 'app-login',
@@ -30,7 +33,9 @@ export class LoginPage {
     private router: Router,
     private http: HttpClient,
     private toastService: ToastService,
-    private authService: AuthService
+    private authService: AuthService,
+    private chatService: ChatService,
+    private notificationsService: NotificationsService
   ) {}
 
   login() {
@@ -56,6 +61,10 @@ export class LoginPage {
         console.log('✅ Login success response', res);
         this.authService.setToken(res.token, res.user_id, res.email, res.role);
         this.showResend = false;
+
+        this.chatService.refreshUnreadMessages();        // ✅ ενημερώνει τα μηνύματα
+        this.notificationsService.refreshUnreadCount();  // ✅ ενημερώνει τις ειδοποιήσεις
+
         this.router.navigateByUrl('/profile', { replaceUrl: true });
       },
       error: (err) => {

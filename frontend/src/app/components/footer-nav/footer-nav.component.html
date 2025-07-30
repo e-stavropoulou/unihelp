@@ -3,7 +3,17 @@
     <div class="footer-nav">
       <ion-icon name="book-outline" [routerLink]="['/notes-feed']"></ion-icon>
       <ion-icon name="search-outline" [routerLink]="['/search-users']"></ion-icon>
-      <ion-icon name="chatbubble-ellipses-outline" [routerLink]="['/chat']"></ion-icon>
+
+      <!-- 💬 Εικονίδιο chat με badge -->
+      <div class="icon-with-badge" [routerLink]="['/chat']">
+        <ion-icon name="chatbubble-ellipses-outline" class="notification-icon"></ion-icon>
+        <ng-container *ngIf="unreadMessages$ | async as msgCount">
+          <ion-badge *ngIf="msgCount > 0" class="notif-badge">
+            {{ msgCount }}
+          </ion-badge>
+        </ng-container>
+      </div>
+
       <ion-icon name="person-outline" [routerLink]="['/profile']"></ion-icon>
 
       <!-- 🔔 Εικονίδιο ειδοποιήσεων με badge -->

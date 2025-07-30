@@ -11,8 +11,14 @@
         <img [src]="chat.other_avatar || 'assets/img/placeholder-avatar.png'">
       </ion-avatar>
       <ion-label>
-        <h2>{{ chat.other_username }}</h2>
+        <h2 [ngClass]="{ 'bold-chat': chat.unread_count > 0 }">
+          {{ chat.other_username }}
+          <ion-badge *ngIf="chat.unread_count > 0" color="danger" class="chat-badge">
+            {{ chat.unread_count }}
+          </ion-badge>
+        </h2>
       </ion-label>
+      
     </ion-item>
   </ion-list>
 

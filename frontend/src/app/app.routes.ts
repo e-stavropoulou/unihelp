@@ -97,8 +97,11 @@ export const routes: Routes = [
     path: 'chat/:chatId',
     loadComponent: () =>
       import('./pages/chat/chat-detail/chat-detail.page').then((m) => m.ChatDetailPage),
+  },
+  {
+    path: 'my-reports',
+    loadComponent: () => import('./pages/my-reports/my-reports.page').then( m => m.MyReportsPage)
   }
-  
   
   
  

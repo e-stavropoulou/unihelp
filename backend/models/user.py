@@ -18,6 +18,8 @@ class User(db.Model):
     reset_token_expiry = db.Column(db.DateTime, nullable=True)
     fcm_token = db.Column(db.String(255), nullable=True)
     upoints = db.Column(db.Integer, default=0, nullable=False)
+    is_blocked = db.Column(db.Boolean, default=False, nullable=False)
+
 
     role = db.Column(db.String(20), default='user', nullable=False) 
 

@@ -1,31 +1,52 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { RouterModule } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { ToastService } from 'src/app/services/toast.service';
 import { NotificationsService } from 'src/app/services/notifications.service';
-import { CommonModule } from '@angular/common'; 
+import { ChatService } from 'src/app/services/chat.service';
+import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-footer-nav',
   standalone: true,
-  imports: [IonicModule, RouterModule, CommonModule],
   templateUrl: './footer-nav.component.html',
   styleUrls: ['./footer-nav.component.scss'],
+  imports: [IonicModule, RouterModule, CommonModule],
 })
 export class FooterNavComponent implements OnInit {
-  unreadCount$ = this.notificationsService.unreadCount$;
+  unreadCount$!: Observable<number>;
+  unreadMessages$!: Observable<number>;
+  
 
   constructor(
     private router: Router,
     private authService: AuthService,
     private toastService: ToastService,
-    private notificationsService: NotificationsService
+    private notificationsService: NotificationsService,
+    private chatService: ChatService,
+    private cdRef: ChangeDetectorRef   // ✅ Αναγκάζει re-render
   ) {}
 
   ngOnInit(): void {
-    this.notificationsService.refreshUnreadCount(); // ✅ αρχική φόρτωση badge
+    // 🎯 Παίρνεις μόνο το .asObservable() μέρος
+    this.unreadCount$ = this.notificationsService.unreadCount$.asObservable();
+    this.unreadMessages$ = this.chatService.unreadMessages$.asObservable();
+
+    // ✅ Αρχική φόρτωση
+    this.notificationsService.refreshUnreadCount();
+    this.chatService.refreshUnreadMessages();
+
+    // ✅ Force UI update όταν αλλάζει κάποιο badge
+    this.notificationsService.unreadCount$.subscribe(() => {
+      this.cdRef.detectChanges();
+    });
+
+    this.chatService.unreadMessages$.subscribe(() => {
+      this.cdRef.detectChanges();
+    });
   }
 
   async logout() {

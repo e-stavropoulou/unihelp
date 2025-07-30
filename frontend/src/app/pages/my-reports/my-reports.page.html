@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/profile"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Οι Αναφορές μου</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list *ngIf="reports.length > 0; else noReports">
+    <ion-item *ngFor="let r of reports">
+      <ion-label>
+        <h2>{{ r.category }}</h2>
+        <p>{{ r.description || 'Χωρίς περιγραφή' }}</p>
+        <p><strong>Κατάσταση:</strong> {{ r.status }}</p>
+        <p><strong>Ημ/νία:</strong> {{ r.timestamp | date:'short' }}</p>
+
+        <div *ngIf="r.note_title">
+          <p><strong>Αφορά Σημείωση:</strong> {{ r.note_title }}</p>
+        </div>
+        <div *ngIf="r.reported_user">
+          <p><strong>Αφορά Χρήστη:</strong> {{ r.reported_user }}</p>
+        </div>
+        
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ng-template #noReports>
+    <p style="text-align:center; color:#888; margin-top:20px;">
+      Δεν έχεις υποβάλει αναφορές ακόμα.
+    </p>
+  </ng-template>
+</ion-content>

@@ -8,6 +8,9 @@ import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { NgZone } from '@angular/core';
 import { ToastService } from 'src/app/services/toast.service';
+import { ModalController } from '@ionic/angular';
+import { ReportModalComponent } from 'src/app/components/report-modal/report-modal.component';
+
 
 @Component({
   selector: 'app-notes-feed',
@@ -26,15 +29,20 @@ export class NotesFeedPage implements OnInit {
   selectedSemester: number | '' = '';
   selectedType: string = '';
   semesters: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
+  currentUserId: number = 0;
+
+
 
   constructor(
     private http: HttpClient,
     private authService: AuthService,
     private zone: NgZone,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private modalCtrl: ModalController
   ) {}
 
   ngOnInit() {
+    this.currentUserId = this.authService.getUserId() || 0;
     this.loadAllNotes();
   }
 
@@ -101,6 +109,82 @@ export class NotesFeedPage implements OnInit {
   
     link.click();
   }
+
+  toggleComments(note: any) {
+    note.showComments = !note.showComments;
+    if (note.showComments && !note.commentsLoaded) {
+      const token = this.authService.getToken();
+      const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+  
+      this.http.get(`${environment.API_URL}/notes/${note.id}/comments`, { headers })
+        .subscribe((data: any) => {
+          note.comments = data;
+          note.commentsLoaded = true;
+        });
+    }
+  }
+  
+  toggleCommentBox(note: any) {
+    note.showCommentBox = !note.showCommentBox;
+  }
+  
+  submitComment(note: any) {
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+  
+    const payload = { text: note.newComment };
+  
+    this.http.post(`${environment.API_URL}/notes/${note.id}/comments`, payload, { headers })
+      .subscribe({
+        next: async (res: any) => {
+          if (!note.comments) note.comments = [];
+          note.comments.push(res);
+          note.newComment = '';
+          note.showCommentBox = false;
+  
+          // ✅ Λίστα με τυχαία μηνύματα επιτυχίας
+          const messages = [
+            'Το σχόλιο ανέβηκε!',
+            'Επιτυχής προσθήκη σχολίου!',
+            'Το σχόλιό σου καταχωρήθηκε!',
+            'Ευχαριστούμε για το σχόλιό σου!',
+            'Το σχόλιο προστέθηκε με επιτυχία!'
+          ];
+          const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+  
+          // Εμφάνιση toast
+          await this.toastService.present(randomMsg, 'success');
+        },
+        error: async (err) => {
+          console.error('Error submitting comment:', err);
+          await this.toastService.present('Σφάλμα κατά την ανάρτηση σχολίου.', 'error');
+        }
+      });
+  }
+  
+  deleteComment(note: any, comment: any) {
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+  
+    this.http.delete(`${environment.API_URL}/comments/${comment.id}`, { headers })
+      .subscribe(() => {
+        note.comments = note.comments.filter((c: any) => c.id !== comment.id);
+      });
+  }
+  
+  editComment(note: any, comment: any) {
+    const newText = prompt('Επεξεργασία σχολίου:', comment.text);
+    if (newText && newText.trim() !== '') {
+      const token = this.authService.getToken();
+      const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+  
+      this.http.put(`${environment.API_URL}/comments/${comment.id}`, { text: newText }, { headers })
+        .subscribe((res: any) => {
+          comment.text = res.text;
+        });
+    }
+  }
+  
   
   
 
@@ -135,4 +219,26 @@ export class NotesFeedPage implements OnInit {
       }
     });
   }
+
+  async openReport(noteId?: number, reportedUserId?: number) {
+    console.log('STEP 1: openReport CALLED with', noteId, reportedUserId);
+  
+    try {
+      console.log('STEP 2: calling modalCtrl.create...');
+      const modal = await this.modalCtrl.create({
+        component: ReportModalComponent,
+        componentProps: { noteId, reportedUserId },
+        animated: false
+      });
+      console.log('STEP 3: modal created', modal);
+  
+      await modal.present();
+      console.log('STEP 4: modal presented');
+    } catch (err) {
+      console.error('❌ ERROR during modal create/present:', err);
+    }
+  }
+  
+  
+  
 }
