@@ -15,7 +15,6 @@
     </div>
     <div class="avatar-settings">
       <img [src]="avatarUrl" alt="avatar" class="avatar-img" [class.visible]="avatarVisible"/>
-
     </div>
   </div>
 
@@ -39,6 +38,7 @@
       </div>
     </ion-card-content>
 
+    <!-- Κουμπί chat -->
     <ion-button
       expand="block"
       color="primary"
@@ -48,5 +48,14 @@
       💬 Στείλε Μήνυμα
     </ion-button>
 
+    <!-- Κουμπί αναφοράς -->
+    <ion-button
+      expand="block"
+      color="medium"
+      *ngIf="user?.id !== currentUserId"
+      (click)="openReportUser()"
+    >
+      ⚠️ Αναφορά χρήστη
+    </ion-button>
   </ion-card>
 </ion-content>

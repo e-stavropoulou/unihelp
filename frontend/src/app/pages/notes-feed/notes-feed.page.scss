@@ -20,11 +20,21 @@ ion-searchbar {
   margin-bottom: 12px;
 }
 
+/* Κάρτα σημείωσης */
 .note-card {
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
 }
+
+/* Το κουμπί αναφοράς στη γωνία */
+.report-btn {
+  position: absolute;
+  top: -80px;
+  right: 8px;
+  z-index: 10;
+}
+
 
 .upload-date {
   font-size: 13px;
@@ -32,17 +42,31 @@ ion-searchbar {
   margin-top: 10px;
 }
 
+/* Περιοχή με τα βασικά κουμπιά */
 .actions {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* ξεκινούν όλα αριστερά */
   align-items: center;
+  gap: 20px;
   margin-top: 12px;
+}
+
+.left-actions {
+  display: flex;
+  align-items: center;
+  gap: 70px; /* απόσταση μεταξύ κουμπιών */
+}
+
+.right-actions {
+  display: flex;
+  align-items: center;
 }
 
 ion-button {
   --border-radius: 12px;
 }
 
+/* Select φίλτρων */
 select {
   padding: 6px 10px;
   border: 1px solid #8C1310;
@@ -59,3 +83,77 @@ select:focus {
   outline: none;
   border-color: #a2211f;
 }
+
+/* Σχόλια */
+.comments-list {
+  margin-top: 10px;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comment-item {
+  background: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comment-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* κενό μεταξύ κουμπιών */
+}
+
+.comment-actions {
+  display: flex;
+  justify-content: flex-start; /* ίδιο με τα actions */
+  align-items: center;
+  gap: 20px;
+  margin-top: 12px;
+}
+
+.comment-box {
+  margin-top: 20px;
+
+  .form-group {
+    margin-bottom: 16px;
+
+    .form-label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .custom-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #8C1310;
+      border-radius: 10px;
+      font-size: 15px;
+      box-sizing: border-box;
+      background: #fff;
+      color: #000;
+
+      &::placeholder {
+        color: #888;
+      }
+    }
+  }
+
+  ion-button {
+    --border-radius: 10px;
+    --background: #8C1310;
+    margin-top: 4px;
+  }
+}
+

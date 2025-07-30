@@ -30,7 +30,8 @@ def get_profile():
     'can_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.can_help],
     'needs_help_courses': [uc.course.name for uc in user.user_courses if uc.needs_help],
     'needs_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.needs_help],
-    'upoints': user.upoints
+    'upoints': user.upoints,
+    'role': user.role
 })
 
 

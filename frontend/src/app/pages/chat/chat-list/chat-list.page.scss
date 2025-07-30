@@ -1,0 +1,18 @@
+ion-avatar img {
+    border: 2px solid #8C1310; /* Μπορντό περίγραμμα */
+    border-radius: 50%;        /* Στρογγυλό */
+    object-fit: cover;
+  }
+  
+
+  .bold-chat {
+    font-weight: bold;
+  }
+  
+  .chat-badge {
+    margin-left: 6px;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 12px;
+  }
+  

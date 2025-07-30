@@ -1,4 +1,7 @@
 import {
+  openDB
+} from "./chunk-RWCVF6C4.js";
+import {
   EnvironmentInjector,
   Inject,
   Injectable,
@@ -37,9 +40,6 @@ import {
   timer
 } from "./chunk-HEDKW4S6.js";
 import "./chunk-7IZRYL2Z.js";
-import {
-  openDB
-} from "./chunk-RWCVF6C4.js";
 import {
   __async,
   __publicField

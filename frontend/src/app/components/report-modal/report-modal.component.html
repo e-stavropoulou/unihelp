@@ -1,0 +1,30 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-title>Αναφορά</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="dismiss()">Κλείσιμο</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content class="ion-padding">
+    <ion-item>
+      <ion-label position="stacked">Κατηγορία</ion-label>
+      <ion-select [(ngModel)]="category" placeholder="Επίλεξε κατηγορία">
+        <ion-select-option value="Spam">Spam</ion-select-option>
+        <ion-select-option value="Ακατάλληλο">Ακατάλληλο περιεχόμενο</ion-select-option>
+        <ion-select-option value="Παρενόχληση">Παρενόχληση</ion-select-option>
+        <ion-select-option value="Άλλο">Άλλο</ion-select-option>
+      </ion-select>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label position="stacked">Περιγραφή</ion-label>
+      <ion-textarea [(ngModel)]="description" placeholder="Προαιρετική περιγραφή"></ion-textarea>
+    </ion-item>
+  
+    <ion-button expand="block" (click)="submitReport()" [disabled]="!category">
+      Υποβολή
+    </ion-button>
+  </ion-content>
+  

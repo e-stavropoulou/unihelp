@@ -5,6 +5,9 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
+import { ModalController } from '@ionic/angular';
+import { ReportModalComponent } from 'src/app/components/report-modal/report-modal.component';
+
 
 @Component({
   selector: 'app-user-profile',
@@ -33,7 +36,8 @@ export class UserProfilePage implements OnInit {
     private route: ActivatedRoute, 
     private http: HttpClient,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private modalCtrl: ModalController
   ) {}
 
   ngOnInit() {
@@ -90,4 +94,14 @@ export class UserProfilePage implements OnInit {
       }
     });
   }
+
+  async openReportUser() {
+    if (!this.user) return;
+    const modal = await this.modalCtrl.create({
+      component: ReportModalComponent,
+      componentProps: { reportedUserId: this.user.id }
+    });
+    await modal.present();
+  }
+  
 }

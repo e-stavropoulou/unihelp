@@ -65,10 +65,25 @@
     <ion-button expand="block" class="custom-red-btn" routerLink="/my-notes">
       Οι Σημειώσεις μου
     </ion-button>         
-    <ion-button expand="block" fill="outline" class="custom-outline-btn" routerLink="/favorite-notes">
+    <ion-button expand="block" fill="outline" class="custom-red-btn" routerLink="/favorite-notes">
       <ion-icon name="heart-outline" slot="start"></ion-icon>
       Αγαπημένα
-    </ion-button>      
+    </ion-button>
+    
+    <ion-button expand="block" class="custom-red-btn" routerLink="/my-reports">
+      Οι Αναφορές μου
+    </ion-button>
+
+    <!-- ΜΟΝΟ για admins -->
+    <ion-button 
+    *ngIf="userData?.role === 'admin'"
+    expand="block" 
+    class="custom-red-btn"
+    (click)="openAdminDashboard()">
+    Πίνακας Διαχειριστή
+  </ion-button>
+  
+    
   </div>
 </ion-content> 
 

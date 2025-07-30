@@ -21,6 +21,8 @@ from config import ( SQLALCHEMY_DATABASE_URI, SQLALCHEMY_TRACK_MODIFICATIONS, JW
 from flask_jwt_extended import JWTManager
 from routes.admin import admin_bp
 from routes.chat import chat_bp
+from routes.comments import comments_bp
+from routes.reports import reports_bp
 
 def create_app():
     app = Flask(__name__)
@@ -75,6 +77,8 @@ def create_app():
     app.register_blueprint(notifications_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(chat_bp)
+    app.register_blueprint(comments_bp)
+    app.register_blueprint(reports_bp)
 
 
     return app

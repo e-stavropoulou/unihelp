@@ -5,6 +5,8 @@ import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http'
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
 import { FooterNavComponent } from '../../components/footer-nav/footer-nav.component';
+import { Browser } from '@capacitor/browser';
+
 import {
   IonHeader,
   IonFooter,
@@ -106,6 +108,27 @@ export class ProfilePage implements OnInit {
       }
     });
   }
+
+  async openAdminDashboard() {
+    const url = 'http://localhost:4201';
+  
+    // Έλεγχος αν τρέχει native (σε build Capacitor)
+    const isNative = (window as any).Capacitor?.isNativePlatform?.();
+  
+    if (isNative) {
+      // Native: Χρήση Capacitor Browser plugin
+      try {
+        await Browser.open({ url });
+      } catch (err) {
+        console.error('Failed to open browser:', err);
+      }
+    } else {
+      // Web (ionic serve): άνοιγμα νέας καρτέλας
+      window.open(url, '_blank');
+    }
+  }
+  
+  
   
 
   onAvatarChange(event: Event) {

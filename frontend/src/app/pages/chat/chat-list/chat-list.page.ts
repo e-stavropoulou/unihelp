@@ -14,6 +14,7 @@ import {
   IonList,
   IonItem,
   IonLabel,
+  IonBadge,
   IonAvatar,
   IonText
 } from '@ionic/angular/standalone';
@@ -36,6 +37,7 @@ import { CommonModule } from '@angular/common';
     IonItem,
     IonLabel,
     IonAvatar,
+    IonBadge,
     FooterNavComponent,
     IonText
   ]

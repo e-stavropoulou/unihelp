@@ -40,8 +40,12 @@ export class SearchUsersPage {
     this.http
       .get<any[]>(`${environment.API_URL}/search-users?query=${trimmedQuery}`, { headers })
       .subscribe({
-        next: (res) => this.users = res,
+        next: (res) => {
+          const currentUserId = this.authService.getUserId();
+          this.users = res.filter(user => user.id !== currentUserId);
+        },
         error: (err) => console.error('❌ Σφάλμα αναζήτησης χρηστών:', err)
       });
+       
   }
 }

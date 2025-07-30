@@ -10,6 +10,7 @@ import os
 from models.notification import Notification
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo  # Python 3.9+
 from config import BASE_URL
 from flask_jwt_extended import (
     create_access_token,
@@ -32,6 +33,18 @@ os.makedirs(NOTES_UPLOAD_FOLDER, exist_ok=True)
 
 JWT_EXPIRATION_MINUTES = 60
 
+ATHENS_TZ = ZoneInfo("Europe/Athens")
+
+def to_athens_iso(dt: datetime) -> str:
+    """
+    Μετατρέπει datetime (UTC ή naive) σε ISO string στη ζώνη ώρας Europe/Athens
+    """
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        # θεωρούμε ότι το dt που έρχεται από τη DB είναι UTC
+        dt = dt.replace(tzinfo=ZoneInfo("UTC"))
+    return dt.astimezone(ATHENS_TZ).isoformat()
 
 
 
@@ -272,7 +285,7 @@ def get_my_notes():
             'title': note.title,
             'description': note.description,
             'category': note.category,
-            'upload_date': note.upload_date.strftime('%d/%m/%Y'),
+            'upload_date': to_athens_iso(note.upload_date),
             'filepath': f'{BASE_URL}/static/notes/{note.filename}',
             'course': course.name if course else 'Άγνωστο',
             'semester': course.semester if course else None,
@@ -304,7 +317,7 @@ def get_all_notes():
             'description': note.description,
             'downloads': note.downloads,
             'category': note.category,
-            'upload_date': note.upload_date.strftime('%d/%m/%Y'),
+           'upload_date': to_athens_iso(note.upload_date),
             'filepath': f'{BASE_URL}/static/notes/{note.filename}',
             'course': course.name if course else 'Άγνωστο',
             'semester': course.semester if course else None,
@@ -435,7 +448,7 @@ def get_favorites():
             'title': note.title,
             'description': note.description,
             'category': note.category,
-            'upload_date': note.upload_date.strftime('%d/%m/%Y'),
+            'upload_date': to_athens_iso(note.upload_date),
             'filepath': f'{BASE_URL}/static/notes/{note.filename}',
             'course': course.name if course else 'Άγνωστο',
             'semester': course.semester if course else None,
