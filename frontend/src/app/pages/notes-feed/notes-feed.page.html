@@ -12,7 +12,7 @@
     placeholder="Αναζήτηση με τίτλο...">
   </ion-searchbar>
 
-  <!-- Filters -->
+  <!-- Φίλτρο: Κατηγορία -->
   <ion-item>
     <ion-label>Κατηγορία</ion-label>
     <select [(ngModel)]="selectedCategory" (change)="applyFilters()">
@@ -24,6 +24,7 @@
     </select>
   </ion-item>
 
+  <!-- Φίλτρο: Μάθημα -->
   <ion-item *ngIf="allCourses.length > 0">
     <ion-label>Μάθημα</ion-label>
     <select [(ngModel)]="selectedCourse" (change)="applyFilters()">
@@ -32,6 +33,7 @@
     </select>
   </ion-item>
 
+  <!-- Φίλτρο: Εξάμηνο -->
   <ion-item>
     <ion-label>Εξάμηνο</ion-label>
     <select [(ngModel)]="selectedSemester" (change)="applyFilters()">
@@ -40,6 +42,7 @@
     </select>
   </ion-item>
 
+  <!-- Φίλτρο: Τύπος -->
   <ion-item>
     <ion-label>Τύπος</ion-label>
     <select [(ngModel)]="selectedType" (change)="applyFilters()">
@@ -55,7 +58,7 @@
   <ng-container *ngIf="filteredNotes.length > 0; else noNotes">
     <ion-card *ngFor="let note of filteredNotes" class="note-card">
       <ion-card-header>
-        <ion-card-title> • {{ note.title }} • </ion-card-title>
+        <ion-card-title>• {{ note.title }} •</ion-card-title>
         <ion-card-subtitle>
           {{ note.course }} • {{ note.category }} • από {{ note.uploader }}
         </ion-card-subtitle>
@@ -65,7 +68,7 @@
 
         <!-- Κουμπί αναφοράς πάνω δεξιά -->
         <div class="report-btn">
-          <ion-button size="small" fill="clear" (click)="openReport(note.id)">
+          <ion-button size="small" fill="clear" (click)="goToReport(note.id)">
             <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
           </ion-button>
         </div>
@@ -111,43 +114,57 @@
           </ion-button>
         </div>
 
-      <!-- Πεδίο για προσθήκη νέου σχολίου -->
-      <div *ngIf="note.showCommentBox" class="comment-box">
-        <div class="form-group">
-          <label class="form-label">Σχόλιο</label>
-          <input
-            [(ngModel)]="note.newComment"
-            name="newComment{{note.id}}"
-            class="custom-input"
-            type="text"
-            placeholder="Γράψε το σχόλιό σου..."
-          />
+        <!-- Πεδίο για προσθήκη νέου σχολίου -->
+        <div *ngIf="note.showCommentBox" class="comment-box">
+          <div class="form-group">
+            <label class="form-label">Σχόλιο</label>
+            <input
+              [(ngModel)]="note.newComment"
+              name="newComment{{note.id}}"
+              class="custom-input"
+              type="text"
+              placeholder="Γράψε το σχόλιό σου..."
+            />
+          </div>
+
+          <ion-button expand="block" (click)="submitComment(note)">
+            Υποβολή
+          </ion-button>
         </div>
-
-        <ion-button expand="block" (click)="submitComment(note)">
-          Υποβολή
-        </ion-button>
-      </div>
-
 
         <!-- Λίστα σχολίων -->
-        <div *ngIf="note.showComments" class="comments-list">
-          <div *ngFor="let c of note.comments" class="comment-item">
-            <div>
-              <b>{{ c.username }}</b>: {{ c.text }}
-            </div>
-            <div class="comment-actions-inline">
-              <ng-container *ngIf="c.user_id === currentUserId">
-                <ion-button size="small" color="warning" (click)="editComment(note, c)">Edit</ion-button>
-                <ion-button size="small" color="danger" (click)="deleteComment(note, c)">Delete</ion-button>
-              </ng-container>
+<div *ngIf="note.showComments" class="comments-list">
 
-              <ion-button size="small" fill="clear" color="medium" (click)="openReport(undefined, c.user_id)">
-                <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
-              </ion-button>
-            </div>
+  <!-- Αν δεν υπάρχουν σχόλια -->
+  <ng-container *ngIf="note.comments.length === 0; else commentsExist">
+    <p style="text-align: center; color: #888; font-style: italic;">
+      Δεν υπάρχουν σχόλια ακόμη για αυτή τη σημείωση. Μπορείς να είσαι ο πρώτος που θα προσθέσει ένα σχόλιο!
+    </p>
+  </ng-container>
+
+      <!-- Αν υπάρχουν σχόλια -->
+      <ng-template #commentsExist>
+        <div *ngFor="let c of note.comments" class="comment-item">
+          <div>
+            <b>{{ c.username }}</b>: {{ c.text }}
+          </div>
+          <div class="comment-actions-inline">
+            <ng-container *ngIf="c.user_id === currentUserId">
+              <ion-button size="small" color="warning" (click)="editComment(note, c)">Edit</ion-button>
+              <ion-button size="small" color="danger" (click)="deleteComment(note, c)">Delete</ion-button>
+            </ng-container>
+
+            <ion-button size="small" fill="clear" color="medium"
+              (click)="goToReport(note.id, c.user_id)">
+              <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
+            </ion-button>
           </div>
         </div>
+      </ng-template>
+
+    </div>
+
+
       </ion-card-content>
     </ion-card>
   </ng-container>

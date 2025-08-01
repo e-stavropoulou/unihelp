@@ -110,23 +110,17 @@ export class ProfilePage implements OnInit {
   }
 
   async openAdminDashboard() {
-    const url = 'http://localhost:4201';
+    const url = 'http://192.168.2.7:4201';
   
-    // Έλεγχος αν τρέχει native (σε build Capacitor)
     const isNative = (window as any).Capacitor?.isNativePlatform?.();
   
     if (isNative) {
-      // Native: Χρήση Capacitor Browser plugin
-      try {
-        await Browser.open({ url });
-      } catch (err) {
-        console.error('Failed to open browser:', err);
-      }
+      await Browser.open({ url });
     } else {
-      // Web (ionic serve): άνοιγμα νέας καρτέλας
       window.open(url, '_blank');
     }
   }
+  
   
   
   

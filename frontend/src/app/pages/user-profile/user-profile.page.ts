@@ -5,9 +5,6 @@ import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
-import { ModalController } from '@ionic/angular';
-import { ReportModalComponent } from 'src/app/components/report-modal/report-modal.component';
-
 
 @Component({
   selector: 'app-user-profile',
@@ -33,15 +30,14 @@ export class UserProfilePage implements OnInit {
   currentUserId: number | null = null;
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private http: HttpClient,
     private authService: AuthService,
-    private router: Router,
-    private modalCtrl: ModalController
+    private router: Router
   ) {}
 
   ngOnInit() {
-    this.currentUserId = this.authService.getUserId(); // ✅ πάρε user ID από AuthService
+    this.currentUserId = this.authService.getUserId();
     this.loadUserProfile();
   }
 
@@ -63,8 +59,8 @@ export class UserProfilePage implements OnInit {
 
         this.avatarVisible = false;
         setTimeout(() => {
-          this.avatarUrl = res.avatar_url 
-            ? `${environment.API_URL}${res.avatar_url}` 
+          this.avatarUrl = res.avatar_url
+            ? `${environment.API_URL}${res.avatar_url}`
             : 'assets/img/placeholder-avatar.png';
           this.avatarVisible = true;
         }, 100);
@@ -73,7 +69,7 @@ export class UserProfilePage implements OnInit {
         console.error('❌ Σφάλμα:', err);
         this.user = null;
       }
-    });    
+    });
   }
 
   startChatWithUser() {
@@ -95,13 +91,11 @@ export class UserProfilePage implements OnInit {
     });
   }
 
-  async openReportUser() {
+  openReportUser() {
     if (!this.user) return;
-    const modal = await this.modalCtrl.create({
-      component: ReportModalComponent,
-      componentProps: { reportedUserId: this.user.id }
+    // Αντί για modal -> redirect στη σελίδα αναφορών
+    this.router.navigate(['/report'], {
+      queryParams: { reportedUserId: this.user.id }
     });
-    await modal.present();
   }
-  
 }

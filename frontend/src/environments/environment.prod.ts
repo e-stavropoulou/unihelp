@@ -1,6 +1,10 @@
 export const environment = {
   production: true,
   API_URL: 'http://192.168.2.7:5050',
+
+  // Πρέπει να υπάρχει και εδώ!
+  ADMIN_ORIGIN: 'http://192.168.2.7:4201',
+
   firebase: {
     apiKey: "AIzaSyB4jRTATu4V9_rEK1qzRKTuOU1sFtA8d1g",
     authDomain: "unihelp-notifications.firebaseapp.com",

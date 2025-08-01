@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -6,11 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { FooterNavComponent } from '../../components/footer-nav/footer-nav.component';
 import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
-import { NgZone } from '@angular/core';
 import { ToastService } from 'src/app/services/toast.service';
-import { ModalController } from '@ionic/angular';
-import { ReportModalComponent } from 'src/app/components/report-modal/report-modal.component';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-notes-feed',
@@ -31,14 +28,12 @@ export class NotesFeedPage implements OnInit {
   semesters: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
   currentUserId: number = 0;
 
-
-
   constructor(
     private http: HttpClient,
     private authService: AuthService,
     private zone: NgZone,
     private toastService: ToastService,
-    private modalCtrl: ModalController
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -95,18 +90,18 @@ export class NotesFeedPage implements OnInit {
   downloadNote(note: any) {
     const token = this.authService.getToken();
     const downloadUrl = `${environment.API_URL}/download/${note.id}`;
-  
-    // Δημιουργία anchor tag με το JWT
+
+    // Δημιουργία anchor tag
     const link = document.createElement('a');
     link.href = downloadUrl;
     link.setAttribute('target', '_blank');
     link.setAttribute('rel', 'noopener');
-  
-    // ✅ Τοπική αύξηση των downloads
+
+    // Τοπική αύξηση downloads
     this.zone.run(() => {
       note.downloads += 1;
     });
-  
+
     link.click();
   }
 
@@ -131,7 +126,6 @@ export class NotesFeedPage implements OnInit {
   submitComment(note: any) {
     const token = this.authService.getToken();
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-  
     const payload = { text: note.newComment };
   
     this.http.post(`${environment.API_URL}/notes/${note.id}/comments`, payload, { headers })
@@ -141,8 +135,8 @@ export class NotesFeedPage implements OnInit {
           note.comments.push(res);
           note.newComment = '';
           note.showCommentBox = false;
-  
-          // ✅ Λίστα με τυχαία μηνύματα επιτυχίας
+
+          // Μηνύματα επιτυχίας
           const messages = [
             'Το σχόλιο ανέβηκε!',
             'Επιτυχής προσθήκη σχολίου!',
@@ -152,7 +146,6 @@ export class NotesFeedPage implements OnInit {
           ];
           const randomMsg = messages[Math.floor(Math.random() * messages.length)];
   
-          // Εμφάνιση toast
           await this.toastService.present(randomMsg, 'success');
         },
         error: async (err) => {
@@ -184,13 +177,9 @@ export class NotesFeedPage implements OnInit {
         });
     }
   }
-  
-  
-  
 
   async addToFavorites(note: any) {
     const token = this.authService.getToken();
-
     if (!token) {
       await this.toastService.present('Πρέπει να είσαι συνδεδεμένος για να προσθέσεις αγαπημένα.', 'error');
       return;
@@ -200,45 +189,26 @@ export class NotesFeedPage implements OnInit {
       Authorization: `Bearer ${token}`
     });
 
-    this.http.post(`${environment.API_URL}/favorite`, {
-      note_id: note.id
-    }, { headers })
-    .subscribe({
-      next: async (res: any) => {
-        console.log('✅ Success res:', res);
+    this.http.post(`${environment.API_URL}/favorite`, { note_id: note.id }, { headers })
+      .subscribe({
+        next: async (res: any) => {
+          console.log('✅ Success res:', res);
+          await this.toastService.present(res.message || 'Επιτυχία!', 'success');
+          this.zone.run(() => {
+            note.isFavorite = !note.isFavorite;
+          });
+        },
+        error: async (err) => {
+          await this.toastService.present('Σφάλμα κατά την αποθήκευση στα αγαπημένα.', 'error');
+          console.error(err);
+        }
+      });
+  }
 
-        await this.toastService.present(res.message || 'Επιτυχία!', 'success');
-
-        this.zone.run(() => {
-          note.isFavorite = !note.isFavorite;
-        });
-      },
-      error: async (err) => {
-        await this.toastService.present('Σφάλμα κατά την αποθήκευση στα αγαπημένα.', 'error');
-        console.error(err);
-      }
+  goToReport(noteId?: number, reportedUserId?: number) {
+    this.router.navigate(['/report'], {
+      queryParams: { noteId, reportedUserId }
     });
   }
-
-  async openReport(noteId?: number, reportedUserId?: number) {
-    console.log('STEP 1: openReport CALLED with', noteId, reportedUserId);
-  
-    try {
-      console.log('STEP 2: calling modalCtrl.create...');
-      const modal = await this.modalCtrl.create({
-        component: ReportModalComponent,
-        componentProps: { noteId, reportedUserId },
-        animated: false
-      });
-      console.log('STEP 3: modal created', modal);
-  
-      await modal.present();
-      console.log('STEP 4: modal presented');
-    } catch (err) {
-      console.error('❌ ERROR during modal create/present:', err);
-    }
-  }
-  
-  
   
 }

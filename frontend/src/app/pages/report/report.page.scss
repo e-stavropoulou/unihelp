@@ -1,0 +1,66 @@
+ion-content {
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-top: 20px;
+}
+
+/* Κάθε στοιχείο φόρμας */
+ion-item {
+  --background: transparent;
+  margin-bottom: 20px;
+
+  display: flex;
+  flex-direction: column; /* κάθετα label + input */
+  align-items: flex-start;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Ετικέτες */
+ion-label {
+  font-weight: bold;
+  color: #333;
+  font-size: 15px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+/* Select dropdown */
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #8C1310;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #000;
+  appearance: none; /* καθαρό dropdown */
+}
+
+select:focus {
+  outline: none;
+  border-color: #a2211f;
+}
+
+/* Textarea */
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #8C1310;
+  border-radius: 8px;
+  font-size: 15px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #000;
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Κουμπί υποβολής */
+ion-button {
+  --border-radius: 10px;
+  --background: #8C1310;
+  margin-top: 24px;
+  font-weight: 600;
+}
