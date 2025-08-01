@@ -1,38 +1,42 @@
-import { Component, Input } from '@angular/core';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
 import { ToastService } from 'src/app/services/toast.service';
+import { Location } from '@angular/common';
 
 @Component({
-  selector: 'app-report-modal',
+  selector: 'app-report',
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule, HttpClientModule],
-  templateUrl: './report-modal.component.html',
-  styleUrls: ['./report-modal.component.scss']
+  templateUrl: './report.page.html',
+  styleUrls: ['./report.page.scss']
 })
-export class ReportModalComponent {
-  @Input() noteId?: number;
-  @Input() reportedUserId?: number;
+export class ReportPage implements OnInit {
+  noteId?: number;
+  reportedUserId?: number;
 
   category = '';
   description = '';
 
   constructor(
-    private modalCtrl: ModalController,
+    private route: ActivatedRoute,
+    private router: Router,
     private http: HttpClient,
     private authService: AuthService,
+    private location: Location,
     private toastService: ToastService
-  ) {
-    console.log('STEP 5: ReportModalComponent constructor CALLED');
-  }
-  
+  ) {}
 
-  dismiss() {
-    this.modalCtrl.dismiss();
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.noteId = params['noteId'] ? Number(params['noteId']) : undefined;
+      this.reportedUserId = params['reportedUserId'] ? Number(params['reportedUserId']) : undefined;
+    });
   }
 
   submitReport() {
@@ -42,6 +46,8 @@ export class ReportModalComponent {
       return;
     }
 
+    
+
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`
     });
@@ -50,7 +56,6 @@ export class ReportModalComponent {
       category: this.category,
       description: this.description
     };
-
     if (this.noteId) body.note_id = this.noteId;
     if (this.reportedUserId) body.reported_user_id = this.reportedUserId;
 
@@ -58,11 +63,27 @@ export class ReportModalComponent {
       .subscribe({
         next: async () => {
           await this.toastService.present('Η αναφορά υποβλήθηκε!', 'success');
-          this.modalCtrl.dismiss();
+
+          // --- Επιλογή redirect ---
+          if (this.noteId) {
+            // Αναφορά για σημείωση ή σχόλιο -> πίσω στις σημειώσεις
+            this.router.navigate(['/notes-feed']);
+          } else if (this.reportedUserId) {
+            // Αναφορά χρήστη (π.χ. από αναζήτηση) -> πίσω στη σελίδα αναζήτησης
+            this.router.navigate(['/search-users']);
+          } else {
+            // Default fallback
+            this.router.navigate(['/']);
+          }
         },
         error: async () => {
           await this.toastService.present('Αποτυχία υποβολής αναφοράς', 'error');
         }
       });
+  }
+
+  goBack(ev: Event) {
+    ev.preventDefault(); // για να μην εκτελέσει το defaultHref
+    this.location.back();
   }
 }

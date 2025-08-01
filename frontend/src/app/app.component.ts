@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Capacitor } from '@capacitor/core';
 import { getMessagingInstance, getToken } from 'src/app/firebase';
-import { initPushCapacitor } from './push-capacitor'; // ✅ import το αρχείο σου
+import { initPushCapacitor } from './push-capacitor';
 
 @Component({
   selector: 'app-root',
@@ -12,16 +12,46 @@ import { initPushCapacitor } from './push-capacitor'; // ✅ import το αρχ�
   standalone: true,
   imports: [IonApp, IonRouterOutlet],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+
   constructor(private http: HttpClient) {
-    this.initPush(); // ένα κοινό entry point
+    this.initPush();
+  }
+
+  ngOnInit() {
+    // Το origin του admin από το environment
+    const adminOrigin = environment.ADMIN_ORIGIN;
+
+    // Listener για μηνύματα μόνο όταν τρέχει η εφαρμογή σε web (όχι native)
+    if (Capacitor.getPlatform() === 'web') {
+      window.addEventListener('message', (event) => {
+        console.log('📥 [UniHelp] Λάβαμε μήνυμα:', event);
+
+        // Δέχεται μόνο από το admin origin
+        if (event.origin !== adminOrigin) {
+          console.warn('❌ [UniHelp] Αγνοείται μήνυμα από:', event.origin);
+          return;
+        }
+
+        // Αν ζητηθεί το token, το στέλνουμε πίσω
+        if (event.data === 'REQUEST_TOKEN') {
+          const token = localStorage.getItem('token');
+          console.log('🔑 [UniHelp] Στέλνω token πίσω:', token);
+
+          (event.source as WindowProxy)?.postMessage(
+            { type: 'TOKEN_RESPONSE', token },
+            event.origin
+          );
+        }
+      });
+    }
   }
 
   async initPush() {
     if (Capacitor.getPlatform() === 'web') {
-      this.initWebPush(); // 🔔 Firebase push (browser)
+      this.initWebPush();
     } else {
-      await initPushCapacitor(); // 🔔 Native push (Capacitor iOS/Android)
+      await initPushCapacitor();
     }
   }
 
@@ -49,7 +79,7 @@ export class AppComponent {
   }
 
   saveTokenToBackend(token: string) {
-    const jwt = localStorage.getItem('access_token');
+    const jwt = localStorage.getItem('token');
     if (!jwt) {
       console.warn('⛔ No JWT token found. Skipping token upload.');
       return;

@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/notes-feed" (click)="goBack($event)"></ion-back-button>
+    </ion-buttons>    
+    <ion-title>Αναφορά</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="form-group">
+    <label class="form-label">Κατηγορία</label>
+    <select [(ngModel)]="category">
+      <option value="" disabled selected>Επίλεξε κατηγορία</option>
+      <option value="Spam">Spam</option>
+      <option value="Ακατάλληλο">Ακατάλληλο περιεχόμενο</option>
+      <option value="Παρενόχληση">Παρενόχληση</option>
+      <option value="Άλλο">Άλλο</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label class="form-label">Περιγραφή</label>
+    <textarea [(ngModel)]="description" placeholder="Προαιρετική περιγραφή"></textarea>
+  </div>
+
+  <ion-button expand="block" (click)="submitReport()" [disabled]="!category">
+    Υποβολή
+  </ion-button>
+</ion-content>
+
