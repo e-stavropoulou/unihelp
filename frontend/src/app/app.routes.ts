@@ -105,6 +105,10 @@ export const routes: Routes = [
   {
     path: 'report',
     loadComponent: () => import('./pages/report/report.page').then( m => m.ReportPage)
+  },
+  {
+    path: 'sso-redirect',
+    loadComponent: () => import('./pages/sso-redirect/sso-redirect.page').then( m => m.SsoRedirectPage)
   }
   
   

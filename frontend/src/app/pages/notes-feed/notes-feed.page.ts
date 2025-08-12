@@ -174,6 +174,8 @@ export class NotesFeedPage implements OnInit {
       this.http.put(`${environment.API_URL}/comments/${comment.id}`, { text: newText }, { headers })
         .subscribe((res: any) => {
           comment.text = res.text;
+          comment.is_edited = res.is_edited;          
+        comment.edited_at = res.edited_at;  
         });
     }
   }
