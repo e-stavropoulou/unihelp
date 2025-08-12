@@ -16,11 +16,18 @@ export class AuthService {
   constructor(private http: HttpClient) {}
 
   // ✔️ Καταγραφή μετά το login
-  setToken(token: string, user_id: number, email: string, role: string) {
+  setToken(token: string, user_id: number, email: string, role: string, refreshToken?: string) {
     localStorage.setItem(this.TOKEN_KEY, token);
     localStorage.setItem(this.USER_ID_KEY, user_id.toString());
     localStorage.setItem(this.EMAIL_KEY, email);
     localStorage.setItem(this.ROLE_KEY, role);
+    if (refreshToken) {
+      localStorage.setItem('refresh_token', refreshToken);
+    }
+  }
+  
+  getRefreshToken(): string | null {
+    return localStorage.getItem('refresh_token');
   }
   
 

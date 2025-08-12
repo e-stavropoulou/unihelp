@@ -5,26 +5,45 @@
 </ion-header>
 
 <ion-content class="ion-padding">
+
   <ion-list *ngIf="chats.length > 0; else noChats">
-    <ion-item *ngFor="let chat of chats" (click)="goToChat(chat.chat_id)">
-      <ion-avatar slot="start">
-        <img [src]="chat.other_avatar || 'assets/img/placeholder-avatar.png'">
-      </ion-avatar>
-      <ion-label>
-        <h2 [ngClass]="{ 'bold-chat': chat.unread_count > 0 }">
-          {{ chat.other_username }}
-          <ion-badge *ngIf="chat.unread_count > 0" color="danger" class="chat-badge">
-            {{ chat.unread_count }}
-          </ion-badge>
-        </h2>
-      </ion-label>
-      
-    </ion-item>
+    <ion-item-sliding *ngFor="let chat of chats; trackBy: trackByChatId" #sliding>
+      <ion-item (click)="goToChat(chat.chat_id)">
+        <ion-avatar slot="start">
+          <img [src]="chat.other_avatar || 'assets/img/placeholder-avatar.png'" alt="Avatar">
+        </ion-avatar>
+
+        <ion-label>
+          <h2 [ngClass]="{ 'bold-chat': ((chat?.unread_count ?? 0) > 0) }">
+            {{ chat.other_username }}
+            <ion-badge
+              *ngIf="(chat?.unread_count ?? 0) > 0"
+              color="danger"
+              class="chat-badge"
+            >
+              {{ chat.unread_count ?? 0 }}
+            </ion-badge>
+          </h2>
+          
+        </ion-label>
+      </ion-item>
+
+      <!-- Swipe αριστερά (side="end") για επιλογές -->
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="confirmDelete(chat, sliding, $event)">
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Διαγραφή
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
   </ion-list>
 
   <ng-template #noChats>
-    <ion-text color="medium">Δεν υπάρχουν ενεργές συνομιλίες.</ion-text>
+    <div class="ion-text-center ion-padding">
+      <ion-text color="medium">Δεν υπάρχουν ενεργές συνομιλίες.</ion-text>
+    </div>
   </ng-template>
+
 </ion-content>
 
 <app-footer-nav></app-footer-nav>

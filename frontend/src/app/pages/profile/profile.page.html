@@ -77,11 +77,14 @@
     <!-- ΜΟΝΟ για admins -->
     <ion-button 
     *ngIf="userData?.role === 'admin'"
-    expand="block" 
-    class="custom-red-btn"
+    expand="block"
+    class="custom-red-btn ion-margin-top"
     (click)="openAdminDashboard()">
+    <ion-icon name="construct-outline" slot="start"></ion-icon>
     Πίνακας Διαχειριστή
   </ion-button>
+  
+
   
     
   </div>

@@ -6,6 +6,7 @@ import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
 import { FooterNavComponent } from '../../components/footer-nav/footer-nav.component';
 import { Browser } from '@capacitor/browser';
+import { SsoService } from 'src/app/services/sso.service'; 
 
 import {
   IonHeader,
@@ -53,7 +54,7 @@ export class ProfilePage implements OnInit {
   userPoints: number = 0;
 
 
-  constructor(private router: Router, private http: HttpClient, private authService: AuthService) {}
+  constructor(private router: Router, private http: HttpClient, private authService: AuthService, private ssoService: SsoService ) {}
 
   ngOnInit() {
     this.loadUserData();
@@ -109,18 +110,9 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  async openAdminDashboard() {
-    const url = 'http://192.168.2.7:4201';
-  
-    const isNative = (window as any).Capacitor?.isNativePlatform?.();
-  
-    if (isNative) {
-      await Browser.open({ url });
-    } else {
-      window.open(url, '_blank');
-    }
+  openAdminDashboard(): void {
+    this.ssoService.openAdminDashboard();
   }
-  
   
   
   

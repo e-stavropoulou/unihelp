@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo  # Python 3.9+
 from config import BASE_URL
 from flask_jwt_extended import (
     create_access_token,
+    create_refresh_token,
     jwt_required,
     get_jwt_identity
 )
@@ -135,34 +136,49 @@ def register():
 def login():
     data = request.json
     print("🟢 /login called with data:", data)
-    
-    email = data.get('email')
-    password = data.get('password')
-    print(f"🟢 Email: {email}, Password: {'*' * len(password) if password else None}")
-    
+
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password') or ''
+
     user = User.query.filter_by(email=email).first()
     if not user:
         print("🔴 User not found")
         return jsonify({'message': 'Ο χρήστης δεν βρέθηκε'}), 404
-    
+
     if not check_password_hash(user.password, password):
         print("🔴 Wrong password")
         return jsonify({'message': 'Λανθασμένος κωδικός'}), 401
-    
+
     if not user.is_verified:
         print("🔴 User not verified")
-        return jsonify({'message': 'Ο λογαριασμός σου δεν έχει ενεργοποιηθεί. Έλεγξε το email σου.', 'error': 'not_verified'}), 403
+        return jsonify({
+            'message': 'Ο λογαριασμός σου δεν έχει ενεργοποιηθεί. Έλεγξε το email σου.',
+            'error': 'not_verified'
+        }), 403
 
-    token = create_access_token(identity=str(user.id))
-    print("🟢 Login success, token created")
-    
+    # ✅ Εκδίδουμε ΚΑΙ access ΚΑΙ refresh token
+    access_token  = create_access_token(identity=str(user.id))
+    refresh_token = create_refresh_token(identity=str(user.id))
+    print("🟢 Login success, tokens created")
+
     return jsonify({
         'message': 'Επιτυχής σύνδεση',
         'email': user.email,
         'user_id': user.id,
         'role': user.role,
-        'token': token
+        # ✅ Νέα ονόματα (για admin)
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+        # ✅ Backwards-compat με το main app που διαβάζει 'token'
+        'token': access_token
     }), 200
+
+    @auth_bp.route('/refresh', methods=['POST'])
+    @jwt_required(refresh=True)   # ✅ ΣΗΜΑΝΤΙΚΟ: απαιτεί refresh token
+    def refresh():
+        user_id = get_jwt_identity()
+        new_access = create_access_token(identity=str(user_id))
+        return jsonify({'access_token': new_access}), 200
 
 
 # ----------------------------- CHECK CREDENTIALS -----------------------------

@@ -10,6 +10,10 @@ class Comment(db.Model):
     text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # σχέσεις
+    # Νέα πεδία για edit
+    is_edited = db.Column(db.Boolean, default=False, nullable=False)
+    edited_at = db.Column(db.DateTime, nullable=True)
+
+    # Σχέσεις
     user = db.relationship('User', backref='comments')
     note = db.relationship('Note', backref='comments')

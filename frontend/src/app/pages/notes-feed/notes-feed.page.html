@@ -147,7 +147,10 @@
         <div *ngFor="let c of note.comments" class="comment-item">
           <div>
             <b>{{ c.username }}</b>: {{ c.text }}
-          </div>
+            <span *ngIf="c.is_edited" style="color:#888; font-size:12px; font-style:italic;">
+              (edited)
+            </span>
+          </div>        
           <div class="comment-actions-inline">
             <ng-container *ngIf="c.user_id === currentUserId">
               <ion-button size="small" color="warning" (click)="editComment(note, c)">Edit</ion-button>
