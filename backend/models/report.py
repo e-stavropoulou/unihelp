@@ -18,15 +18,15 @@ class Report(db.Model):
     reported_user = db.relationship("User", foreign_keys=[reported_user_id])
     note = db.relationship("Note", foreign_keys=[note_id])
 
-
-def to_dict(self):
-    return {
-        "id": self.id,
-        "reported_by": self.reported_by,
-        "reported_user_id": self.reported_user_id,
-        "note_id": self.note_id,
-        "category": self.category,
-        "description": self.description,
-        "status": self.status,
-        "timestamp": self.timestamp.isoformat()
-    }
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "reported_by": self.reported_by_user.username if self.reported_by_user else None,
+            "reported_user": self.reported_user.username if self.reported_user else None,
+            "note_id": self.note_id,
+            "note_title": self.note.title if self.note else None,
+            "category": self.category,
+            "description": self.description,
+            "status": self.status,
+            "timestamp": self.timestamp.isoformat()
+        }

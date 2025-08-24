@@ -1,11 +1,13 @@
-// src/app/app.component.ts (Simple SSO version)
 import { Component, OnInit } from '@angular/core';
 import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Capacitor } from '@capacitor/core';
-import { getMessagingInstance, getToken } from 'src/app/firebase';
+import { getMessagingInstance, getTokenWeb } from 'src/app/firebase';
 import { initPushCapacitor } from './push-capacitor';
+import { NotificationsService } from './services/notifications.service';
+import { ChatService } from './services/chat.service';
+
 
 interface SSOMessage {
   type: 'TOKEN_REQUEST' | 'TOKEN_RESPONSE' | 'LOGOUT_REQUEST';
@@ -25,19 +27,34 @@ interface SSOMessage {
 })
 export class AppComponent implements OnInit {
 
-  constructor(private http: HttpClient) {
-    this.initPush();
-  }
+  constructor(
+    private http: HttpClient,
+    private notificationsService: NotificationsService,
+    private chatService: ChatService
+  ) {}
+  
 
   ngOnInit() {
     console.log('🟢 [UniHelp] App initialized');
-    this.setupSSO(); // ✅ Κάλεσέ το πάντα
-
+    this.setupSSO();
+  
+    // ✅ Άμεσο update badge χωρίς call στο backend
+    window.addEventListener('new-chat-message', () => {
+      console.log('📬 Push: νέο μήνυμα! +1 στο badge');
+      this.chatService.increaseUnreadCount();  // 👈 εδώ το άμεσο update
+    });
+  
     setTimeout(() => {
       this.sendTokenToAdmin(window.parent);
-    }, 500); // ✅ στείλε token προληπτικά στο admin iframe
-    
+  
+      if (Capacitor.isNativePlatform()) {
+        this.initPush();
+      } else {
+        this.notificationsService.initPush();
+      }
+    }, 1000);
   }
+  
   
 
   /**
@@ -45,7 +62,6 @@ export class AppComponent implements OnInit {
    */
   private setupSSO() {
     window.addEventListener('message', (event) => {
-      // Security check - μόνο από το admin origin
       if (event.origin !== environment.ADMIN_ORIGIN) {
         console.warn('🚫 [SSO] Ignored message from untrusted origin:', event.origin);
         return;
@@ -62,6 +78,15 @@ export class AppComponent implements OnInit {
     console.log('✅ [SSO] Listener setup complete');
   }
 
+  enableWebPush() {
+    const userId = Number(localStorage.getItem('user_id'));
+    if (!userId) return;
+  
+    this.notificationsService.requestWebPushToken(userId);
+    this.notificationsService.initPush(userId);
+  }
+  
+
   /**
    * ✅ Στέλνει token στο Admin Dashboard
    */
@@ -73,37 +98,38 @@ export class AppComponent implements OnInit {
 
     console.log('📤 [SSO] Token request received, checking credentials...');
 
-    if (token && userIdStr && email && role) {
-      const response: SSOMessage = {
-        type: 'TOKEN_RESPONSE',
-        token: token,
-        userInfo: {
-          user_id: parseInt(userIdStr, 10),
-          email: email,
-          role: role
+    const response: SSOMessage = token && userIdStr && email && role
+      ? {
+          type: 'TOKEN_RESPONSE',
+          token: token,
+          userInfo: {
+            user_id: parseInt(userIdStr, 10),
+            email: email,
+            role: role
+          }
         }
-      };
+      : { type: 'TOKEN_RESPONSE' };
 
-      console.log('✅ [SSO] Sending token to admin dashboard');
-      adminWindow.postMessage(response, environment.ADMIN_ORIGIN);
-    } else {
-      console.warn('⚠️ [SSO] No valid credentials found');
-      const response: SSOMessage = {
-        type: 'TOKEN_RESPONSE'
-        // Χωρίς token/userInfo = not logged in
-      };
-      adminWindow.postMessage(response, environment.ADMIN_ORIGIN);
+    try {
+      const origin = new URL(document.referrer).origin;
+      console.log('📤 [SSO] Sending token to:', origin);
+      adminWindow.postMessage(response, origin);
+    } catch (e) {
+      console.warn('⚠️ [SSO] Fallback to * origin (unsafe):', e);
+      adminWindow.postMessage(response, '*');
     }
   }
 
-  // ✅ Υπόλοιπες μέθοδοι παραμένουν ίδιες
+  // ✅ Πλήρης υποστήριξη για Push
   async initPush() {
     if (Capacitor.getPlatform() === 'web') {
-      this.initWebPush();
+      console.log('🌐 Skipping auto-push on web – requires user gesture');
+      // Δεν κάνουμε τίποτα — περιμένουμε να πατήσει ο χρήστης κουμπί
     } else {
       await initPushCapacitor();
     }
   }
+  
 
   async initWebPush() {
     try {
@@ -113,12 +139,15 @@ export class AppComponent implements OnInit {
         return;
       }
 
-      const currentToken = await getToken(messaging, {
-        vapidKey: environment.firebase.vapidKey,
+      const currentToken = await getTokenWeb?.(messaging, {
+        vapidKey: environment.vapidKey
       });
+      
 
       if (currentToken) {
         console.log('📲 Web FCM Token:', currentToken);
+        localStorage.setItem('fcm_token', currentToken); 
+        console.log('✅ Token stored in localStorage:', localStorage.getItem('fcm_token'));
         this.saveTokenToBackend(currentToken);
       } else {
         console.warn('⚠️ No registration token available.');
@@ -130,8 +159,10 @@ export class AppComponent implements OnInit {
 
   saveTokenToBackend(token: string) {
     const jwt = localStorage.getItem('token');
+
     if (!jwt) {
-      console.warn('⛔ No JWT token found. Skipping FCM token upload.');
+      console.warn('⛔ No JWT token found. Retrying in 1 second...');
+      setTimeout(() => this.saveTokenToBackend(token), 1000);
       return;
     }
 

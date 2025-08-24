@@ -52,24 +52,41 @@ export class NotificationsPage implements OnInit {
     private notificationsService: NotificationsService
   ) {}
 
+  showEnableBtn = false;
+
   async ngOnInit() {
-    console.log('🚀 Notifications page loaded');
+  console.log('🚀 Notifications page loaded');
 
-    try {
-      await this.notificationsService.initPush();
-    } catch (err) {
-      console.warn('⚠️ Push init failed (ignored):', err);
-    }
-
-    const token = this.authService.getToken();
-    if (!token) {
-      console.warn('⛔️ JWT token not found, skipping fetch');
-      this.isLoading = false;
-      return;
-    }
-
-    this.fetchNotifications(token);
+  // ✅ Εμφάνισε κουμπί ενεργοποίησης μόνο αν δεν έχει token
+  if (!this.notificationsService.fcmToken) {
+    this.showEnableBtn = true;
   }
+
+  try {
+    await this.notificationsService.initPush();
+    this.showEnableBtn = false;
+  } catch (err) {
+    console.warn('⚠️ Push init failed (ignored):', err);
+  }
+
+  const token = this.authService.getToken();
+  if (!token) {
+    console.warn('⛔️ JWT token not found, skipping fetch');
+    this.isLoading = false;
+    return;
+  }
+
+  this.fetchNotifications(token);
+  this.notificationsService.currentMessage.subscribe((msg) => {
+    if (msg) {
+      console.log('📥 Λήφθηκε νέα push ειδοποίηση, φέρνω από backend...');
+      const token = this.authService.getToken();
+      if (token) this.fetchNotifications(token);
+    }
+  });
+  
+  
+}
 
   fetchNotifications(token: string) {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -119,4 +136,17 @@ export class NotificationsPage implements OnInit {
       error: err => console.error('❌ Delete failed:', err)
     });
   }  
+
+  enablePush() {
+    const userId = this.authService.getUserId();
+    if (userId !== null) {
+      this.notificationsService.initPush(userId).then(() => {
+        this.showEnableBtn = false;
+      });
+    } else {
+      console.warn('⛔️ Δεν βρέθηκε userId, δεν ενεργοποιήθηκαν οι ειδοποιήσεις');
+    }
+  }
+  
+  
 }

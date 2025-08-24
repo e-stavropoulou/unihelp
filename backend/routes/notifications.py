@@ -5,11 +5,13 @@ from models.user import User
 from models.notification import Notification
 from datetime import datetime
 from zoneinfo import ZoneInfo
-
+import requests
+import os
 
 notifications_bp = Blueprint('notifications_bp', __name__)
-
 ATHENS_TZ = ZoneInfo("Europe/Athens")
+
+FCM_SERVER_KEY = os.environ.get("FCM_SERVER_KEY")
 
 def to_athens_iso(dt: datetime) -> str:
     if dt is None:
@@ -18,33 +20,20 @@ def to_athens_iso(dt: datetime) -> str:
         dt = dt.replace(tzinfo=ZoneInfo("UTC"))
     return dt.astimezone(ATHENS_TZ).isoformat()
 
-
-# 🔔 Επιστροφή όλων των ειδοποιήσεων για τον χρήστη
+# 🔔 Επιστροφή όλων των ειδοποιήσεων
 @notifications_bp.route('/notifications', methods=['GET', 'OPTIONS'])
 @jwt_required(optional=True)
 def get_notifications():
-    print("🔔 Είσοδος στο /notifications")
-
     if request.method == 'OPTIONS':
         return jsonify({"message": "Preflight OK"}), 200
-
     try:
         user_id = get_jwt_identity()
         if not user_id:
-            print("🚫 Δεν βρέθηκε token – unauthorized")
             return jsonify({"error": "Unauthorized"}), 401
-
-        print(f"🧠 Χρήστης με ID: {user_id}")
         user = User.query.get(int(user_id))
-
-
         if not user:
-            print("❌ Χρήστης δεν βρέθηκε")
             return jsonify({"error": "User not found"}), 404
-
         notifications = Notification.query.filter_by(user_id=user.id).order_by(Notification.timestamp.desc()).all()
-        print(f"✅ Βρέθηκαν {len(notifications)} ειδοποιήσεις")
-
         return jsonify([
             {
                 "id": n.id,
@@ -53,11 +42,8 @@ def get_notifications():
                 "is_read": n.is_read
             } for n in notifications
         ]), 200
-
     except Exception as e:
-        print("🔥 Σφάλμα στο /notifications:", str(e))
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
-
 
 # ✔️ Αποθήκευση FCM Token
 @notifications_bp.route('/update-fcm-token', methods=['POST'])
@@ -65,41 +51,30 @@ def get_notifications():
 def update_fcm_token():
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
-
-
     if not user:
         return jsonify({"error": "User not found"}), 404
-
     data = request.get_json()
     fcm_token = data.get('fcm_token')
     if not fcm_token:
         return jsonify({"error": "Token is required"}), 400
-
     user.fcm_token = fcm_token
     db.session.commit()
-
     return jsonify({"message": "FCM token updated successfully"}), 200
 
-
-# ✔️ Σήμανση ειδοποίησης ως διαβασμένη
+# ✔️ Σήμανση ως διαβασμένη
 @notifications_bp.route('/notifications/<int:notification_id>/read', methods=['POST'])
 @jwt_required()
 def mark_notification_read(notification_id):
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
-
-
     if not user:
         return jsonify({"error": "User not found"}), 404
-
     notif = Notification.query.get(notification_id)
     if not notif or notif.user_id != user.id:
         return jsonify({"error": "Notification not found"}), 404
-
     notif.is_read = True
     db.session.commit()
     return jsonify({"message": "Notification marked as read"}), 200
-
 
 # ✔️ Διαγραφή ειδοποίησης
 @notifications_bp.route('/notifications/<int:notification_id>', methods=['DELETE'])
@@ -107,30 +82,87 @@ def mark_notification_read(notification_id):
 def delete_notification(notification_id):
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
-
-
     if not user:
         return jsonify({"error": "User not found"}), 404
-
     notif = Notification.query.get(notification_id)
     if not notif or notif.user_id != user.id:
         return jsonify({"error": "Not found"}), 404
-
     db.session.delete(notif)
     db.session.commit()
     return jsonify({"message": "Notification deleted"}), 200
 
-
-# 🔢 Επιστροφή αριθμού αδιάβαστων ειδοποιήσεων
+# 🔢 Unread count
 @notifications_bp.route('/notifications/unread-count', methods=['GET'])
 @jwt_required()
 def unread_notifications_count():
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
-
-
     if not user:
         return jsonify({"error": "User not found"}), 404
-
     unread_count = Notification.query.filter_by(user_id=user.id, is_read=False).count()
     return jsonify({"unread_count": unread_count}), 200
+
+# 🚀 Νέο: Αποστολή push notification
+@notifications_bp.route('/notifications/send-push', methods=['POST'])
+@jwt_required()
+def send_push_notification():
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        target_user_id = data.get('target_user_id')
+        message = data.get('message', 'Έχεις μια νέα ειδοποίηση')
+
+        user = User.query.get(int(target_user_id))
+        if not user or not user.fcm_token:
+            return jsonify({"error": "User not found or missing FCM token"}), 404
+
+        # 🔔 Αποθήκευση στη βάση
+        new_notification = Notification(
+            user_id=user.id,
+            message=message,
+            timestamp=datetime.utcnow(),
+            is_read=False
+        )
+        db.session.add(new_notification)
+        db.session.commit()
+
+        # 📲 Αποστολή push με νέο API
+        from utils.push_utils import send_push_notification as send_fcm_push
+        status, response_text = send_fcm_push(
+            token=user.fcm_token,
+            title="UniHelp",
+            body=message,
+            data={
+                "type": data.get("type", "generic")  
+            }
+        )
+
+        if status == 200:
+            return jsonify({"message": "Push notification sent"}), 200
+        else:
+            return jsonify({"error": "Push failed", "details": response_text}), 500
+
+    except Exception as e:
+        return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
+
+# 🚀 Γρήγορο test push στον logged-in χρήστη
+@notifications_bp.route('/notifications/test-push', methods=['POST'])
+@jwt_required()
+def test_push():
+    user_id = get_jwt_identity()
+    user = User.query.get(int(user_id))
+
+    if not user or not user.fcm_token:
+        return jsonify({"error": "No FCM token found"}), 404
+
+    from utils.push_utils import send_push_notification as send_fcm_push
+    status, response_text = send_fcm_push(
+        token=user.fcm_token,
+        title="📢 UniHelp Test",
+        body="Αν βλέπεις αυτό, το push δουλεύει σωστά!"
+    )
+
+    return jsonify({
+        "status": status,
+        "response": response_text
+    }), status

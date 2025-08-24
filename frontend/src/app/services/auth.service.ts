@@ -80,4 +80,22 @@ export class AuthService {
       }
     );
   }
+
+  logout(redirect = true): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_ID_KEY);
+    localStorage.removeItem(this.EMAIL_KEY);
+    localStorage.removeItem(this.ROLE_KEY);
+    localStorage.removeItem('refresh_token');
+    sessionStorage.clear();
+  
+    // ✅ Optional: ενημέρωση άλλων observers
+    // this.isAuthenticated$.next(false);
+  
+    if (redirect) {
+      window.location.replace('/login'); // πιο καθαρό redirect
+    }
+  }
+  
+  
 }

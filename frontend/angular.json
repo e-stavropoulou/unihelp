@@ -29,17 +29,11 @@
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "src/assets",
-                "output": "assets"
-              },
-              {
-                "glob": "firebase-messaging-sw.js",
-                "input": "src",
-                "output": "/"
-              }
-            ],
+            { "glob": "**/*", "input": "src/assets", "output": "assets" },
+            { "glob": "firebase-messaging-sw.js", "input": "src", "output": "/" },
+            "src/manifest.webmanifest"
+            ]
+            ,
             "styles": ["src/global.scss", "src/theme/variables.scss"],
             "scripts": [],
             "browser": "src/main.ts"
@@ -64,7 +58,10 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
+
+              
             },
             "development": {
               "optimization": false,

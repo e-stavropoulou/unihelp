@@ -28,6 +28,7 @@ export class LoginPage {
   email: string = '';
   password: string = '';
   showResend: boolean = false;
+  showPassword: boolean = false;
 
   constructor(
     private router: Router,
@@ -61,12 +62,16 @@ export class LoginPage {
         console.log('✅ Login success response', res);
         this.authService.setToken(res.token, res.user_id, res.email, res.role);
         this.showResend = false;
-
-        this.chatService.refreshUnreadMessages();        // ✅ ενημερώνει τα μηνύματα
-        this.notificationsService.refreshUnreadCount();  // ✅ ενημερώνει τις ειδοποιήσεις
-
+      
+        // ✅ Κάλεσμα FCM push registration
+        this.notificationsService.initPush(res.user_id);
+      
+        // Προαιρετικά:
+        this.chatService.refreshUnreadMessages();
+        this.notificationsService.refreshUnreadCount();
+      
         this.router.navigateByUrl('/profile', { replaceUrl: true });
-      },
+      },      
       error: (err) => {
         console.log('❌ FULL ERROR OBJECT:', err);
         console.log('❌ err.status:', err.status);
@@ -88,6 +93,10 @@ export class LoginPage {
         }
       },
     });
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
   }
 
   resendVerification() {

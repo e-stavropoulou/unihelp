@@ -1,8 +1,17 @@
 <ion-header>
   <ion-toolbar color="light">
     <ion-title>Το προφίλ μου</ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" size="small" [routerLink]="['/points-info']">
+        <ion-icon name="information-circle-outline" style="color: white;"></ion-icon>
+      </ion-button>
+      
+    </ion-buttons>
+    
   </ion-toolbar>
 </ion-header>
+
+
 
 <ion-content class="ion-padding profile-content">
   <div class="profile-header">
@@ -57,6 +66,29 @@
            
     </ion-card-content>
   </ion-card>
+
+    <!-- Αν δεν έχει απαντήσει ποτέ -->
+    <ion-card *ngIf="getPushPermissionState() === 'default' && !isNative">
+      <ion-card-content>
+        <ion-button expand="block" (click)="enableNotifications()">
+          Ενεργοποίηση ειδοποιήσεων
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Αν έχει αρνηθεί -->
+    <ion-card *ngIf="getPushPermissionState() === 'denied' && !isNative">
+      <ion-card-content>
+        <ion-button expand="block" fill="outline" color="warning" (click)="openNotificationSettings()">
+          Επανενεργοποίησε τις ειδοποιήσεις
+        </ion-button>
+        <p class="ion-text-center ion-margin-top">
+          Έχεις απορρίψει τις ειδοποιήσεις. Πήγαινε στις ρυθμίσεις του browser για να τις επιτρέψεις ξανά.
+        </p>
+      </ion-card-content>
+    </ion-card>
+
+
 
   <div class="button-row">
     <ion-button expand="block" class="custom-red-btn" routerLink="/upload-notes">

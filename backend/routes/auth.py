@@ -157,7 +157,7 @@ def login():
         }), 403
 
     # ✅ Εκδίδουμε ΚΑΙ access ΚΑΙ refresh token
-    access_token  = create_access_token(identity=str(user.id))
+    access_token = create_access_token(identity=str(user.id), additional_claims={"role": user.role})
     refresh_token = create_refresh_token(identity=str(user.id))
     print("🟢 Login success, tokens created")
 
@@ -212,9 +212,15 @@ def get_courses():
 def upload_note():
     from models.course import UserCourse
     from models.notification import Notification
-    
+    from utils.push_utils import send_push_notification
+
+    print("💣 ΕΚΤΕΛΕΣΗ ΤΟΥ ΠΡΑΓΜΑΤΙΚΟΥ /upload-note BACKEND 💣")
+
+    print("\n📥 [UPLOAD] Νέα αίτηση για ανέβασμα σημείωσης")
+
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
+    print(f"👤 Συνδεδεμένος χρήστης: {user.username} (ID: {user.id})")
 
     files = request.files.getlist('files')
     course_id = request.form.get('course_id')
@@ -222,16 +228,22 @@ def upload_note():
     description = request.form.get('description')
     category = request.form.get('category')
 
+    print(f"📎 Αρχεία: {len(files)}")
+    print(f"📚 course_id: {course_id} | 🏷️ Τίτλος: {title} | 🧾 Περιγραφή: {description} | 📂 Κατηγορία: {category}")
+
     if not files or not course_id or not title or not category or not description:
+        print("❌ Λείπουν απαιτούμενα πεδία!")
         return jsonify({'error': 'Λείπουν απαιτούμενα πεδία'}), 400
 
     uploaded_files = []
     for file in files:
         if file.filename == '':
+            print("⚠️ Αγνοήθηκε αρχείο χωρίς όνομα.")
             continue
         filename = secure_filename(file.filename)
         filepath = os.path.join(NOTES_UPLOAD_FOLDER, filename)
         file.save(filepath)
+        print(f"📤 Αποθηκεύτηκε αρχείο: {filename}")
         note = Note(
             user_id=user.id,
             course_id=course_id,
@@ -246,40 +258,80 @@ def upload_note():
 
     # 🎯 Πρόσθεσε 10 πόντους στον χρήστη
     user.upoints += 10
+    print("⭐ Προστέθηκαν 10 πόντοι στον χρήστη.")
 
     # 🎉 Δημιουργία ειδοποίησης για τον ίδιο τον χρήστη
     reward_notification = Notification(
-    user_id=user.id,
-    message="Μπράβο! 🎉 Κέρδισες 10 πόντους για την ανάρτηση της σημείωσης."
+        user_id=user.id,
+        message="Μπράβο! 🎉 Κέρδισες 10 πόντους για την ανάρτηση της σημείωσης."
     )
     db.session.add(reward_notification)
 
-
     db.session.commit()
+    print("✅ Αποθηκεύτηκαν οι σημειώσεις και η ειδοποίηση επιβράβευσης.")
 
     # 🔔 Δημιουργία ειδοποιήσεων για άλλους χρήστες που ενδιαφέρονται
     course = Course.query.get(course_id)
-    if course:
-        interested_users = UserCourse.query.filter(
-            UserCourse.course_id == course.id,
-            (UserCourse.needs_help == True) | (UserCourse.can_help == True)
-        ).all()
+    if not course:
+        print("❌ Δεν βρέθηκε το μάθημα.")
+        return jsonify({'error': 'Το μάθημα δεν υπάρχει'}), 404
 
-        notifications = []
-        for uc in interested_users:
-            if uc.user_id == user.id:
-                continue  # αγνόησε τον εαυτό του
+    print(f"📚 Μάθημα: {course.name} (ID: {course.id})")
 
-            notif = Notification(
-                user_id=uc.user_id,
-                message=f"Ανέβηκε νέα σημείωση στο μάθημα {course.name}!"
-            )
-            notifications.append(notif)
+    interested_users = UserCourse.query.filter(
+        UserCourse.course_id == course.id,
+        (UserCourse.needs_help == True) | (UserCourse.can_help == True)
+    ).all()
 
-        db.session.add_all(notifications)
-        db.session.commit()
+    print(f"🔍 Εντοπίστηκαν {len(interested_users)} χρήστες που ενδιαφέρονται για το μάθημα.")
+
+    notifications = []
+    for uc in interested_users:
+        if uc.user_id == user.id:
+            continue  # αγνόησε τον εαυτό του
+        notif = Notification(
+            user_id=uc.user_id,
+            message=f"Ανέβηκε νέα σημείωση στο μάθημα {course.name}!"
+        )
+        notifications.append(notif)
+
+    db.session.add_all(notifications)
+    db.session.commit()
+    print(f"📨 Δημιουργήθηκαν {len(notifications)} ειδοποιήσεις στη βάση.")
+
+    # 🔔 Αποστολή push ειδοποιήσεων
+    sent_count = 0
+    for uc in interested_users:
+        if uc.user_id == user.id:
+            continue
+
+        recipient = User.query.get(uc.user_id)
+        if recipient and recipient.fcm_token:
+            print(f"📲 Προσπάθεια push σε {recipient.username} | Token: {recipient.fcm_token[:20]}...")
+            try:
+                status, push_resp = send_push_notification(
+                    token=recipient.fcm_token,
+                    title="📚 Νέα Σημείωση",
+                    body=f"Ανέβηκε νέα σημείωση στο μάθημα {course.name}!",
+                    data={
+                        "type": "note",            
+                        "course_id": str(course.id),
+                        "note_title": title,
+                        "uploader": user.username
+                    }
+                )
+
+                print(f"✅ Push σε {recipient.username}: {status}")
+                sent_count += 1
+            except Exception as e:
+                print(f"❌ Αποτυχία push σε {recipient.email}: {e}")
+        else:
+            print(f"⚠️ Χρήστης {recipient.username if recipient else 'N/A'} δεν έχει fcm_token.")
+
+    print(f"🚀 Ολοκληρώθηκε αποστολή push σε {sent_count} χρήστες.")
 
     return jsonify({'message': 'Οι σημειώσεις ανέβηκαν επιτυχώς', 'files': uploaded_files}), 200
+
 
 
 

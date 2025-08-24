@@ -1,33 +1,36 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required
 from models.user import User
 from models.shared import db
 from models.note import Note
 from models.course import Course
 from models.report import Report
-from models.comment import Comment  # αν έχεις comments
+from models.comment import Comment
+from models.comment_history import CommentEditHistory
+from models.course import UserCourse
 from utils.decorators import admin_required
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
-
 # =========================================================
 # 1. ΔΙΑΧΕΙΡΙΣΗ ADMIN ΡΟΛΩΝ
 # =========================================================
-@admin_bp.route('/make-admin/<int:user_id>', methods=['POST'])
+@admin_bp.route('/users/<int:user_id>/role', methods=['PATCH'])
 @jwt_required()
 @admin_required
-def make_admin(user_id):
+def change_user_role(user_id):
     user = User.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    if user.role == 'admin':
-        return jsonify({'message': f'{user.username} is already an admin.'}), 200
+    data = request.get_json() or {}
+    new_role = data.get("role")
+    if new_role not in ("user", "admin"):
+        return jsonify({"error": "Invalid role"}), 400
 
-    user.role = 'admin'
+    user.role = new_role
     db.session.commit()
-    return jsonify({'message': f'{user.username} has been promoted to admin.'}), 200
+    return jsonify({"message": f"User role changed to {new_role}."}), 200
 
 
 @admin_bp.route('/admins', methods=['GET'])
@@ -41,20 +44,6 @@ def get_admins():
         'email': a.email,
         'full_name': a.full_name
     } for a in admins]), 200
-
-
-@admin_bp.route('/remove-admin/<int:user_id>', methods=['POST'])
-@jwt_required()
-@admin_required
-def remove_admin(user_id):
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
-    if user.role != 'admin':
-        return jsonify({'message': f'{user.username} is not an admin.'}), 400
-    user.role = 'user'
-    db.session.commit()
-    return jsonify({'message': f'{user.username} is no longer an admin.'}), 200
 
 
 @admin_bp.route('/dashboard-access', methods=['GET'])
@@ -74,10 +63,8 @@ def dashboard_stats():
     total_users = User.query.count()
     total_notes = Note.query.count()
 
-    # Top 10 χρήστες με πόντους
     top_users = User.query.order_by(User.upoints.desc()).limit(10).all()
 
-    # Μαθήματα με τα περισσότερα αρχεία
     course_stats = db.session.query(
         Course.name, db.func.count(Note.id)
     ).join(Note, Note.course_id == Course.id)\
@@ -85,16 +72,12 @@ def dashboard_stats():
      .order_by(db.func.count(Note.id).desc())\
      .limit(5).all()
 
-    # Σημείωση με τα περισσότερα σχόλια (αν υπάρχει Comment model)
-    top_commented = None
-    if 'Comment' in globals():
-        top_commented = db.session.query(
-            Note.id, Note.title, db.func.count(Comment.id)
-        ).join(Comment, Comment.note_id == Note.id)\
-         .group_by(Note.id)\
-         .order_by(db.func.count(Comment.id).desc()).first()
+    top_commented = db.session.query(
+        Note.id, Note.title, db.func.count(Comment.id)
+    ).join(Comment, Comment.note_id == Note.id)\
+     .group_by(Note.id)\
+     .order_by(db.func.count(Comment.id).desc()).first()
 
-    # Σημείωση με τις περισσότερες λήψεις
     top_downloaded = Note.query.order_by(Note.downloads.desc()).first()
 
     return jsonify({
@@ -152,41 +135,80 @@ def resolve_report(report_id):
 @admin_required
 def get_all_users():
     users = User.query.all()
+
+    def get_courses(uc_list, key):
+        return [uc.course.name for uc in uc_list if getattr(uc, key)]
+
     return jsonify([{
         "id": u.id,
         "username": u.username,
         "email": u.email,
         "upoints": u.upoints,
-        "blocked": getattr(u, "is_blocked", False)
-    } for u in users])
+        "role": u.role,
+        "blocked": u.is_blocked,
+        "can_help": get_courses(u.user_courses, "can_help"),
+        "needs_help": get_courses(u.user_courses, "needs_help")
+    } for u in users]), 200
 
 
-@admin_bp.route('/users/<int:user_id>/block', methods=['POST'])
+@admin_bp.route('/users/<int:user_id>/block', methods=['PATCH'])
 @jwt_required()
 @admin_required
-def block_user(user_id):
+def toggle_block_user(user_id):
     user = User.query.get(user_id)
     if not user:
         return jsonify({"error": "User not found"}), 404
-    user.is_blocked = True
+
+    data = request.get_json() or {}
+    is_blocked = data.get("is_blocked")
+    if type(is_blocked) is not bool:
+        return jsonify({"error": "Missing or invalid is_blocked"}), 400
+
+    user.is_blocked = is_blocked
     db.session.commit()
-    return jsonify({"message": "User blocked"})
+    return jsonify({"message": f"User {'blocked' if is_blocked else 'unblocked'}."})
 
 
 # =========================================================
-# 5. ΔΙΑΧΕΙΡΙΣΗ ΣΗΜΕΙΩΣΕΩΝ
+# 5. ΔΙΑΧΕΙΡΙΣΗ ΣΗΜΕΙΩΣΕΩΝ ΚΑΙ ΣΧΟΛΙΩΝ
 # =========================================================
 @admin_bp.route('/notes', methods=['GET'])
 @jwt_required()
 @admin_required
 def get_all_notes():
     notes = Note.query.all()
-    return jsonify([{
-        "id": n.id,
-        "title": n.title,
-        "uploader": n.user.username,
-        "downloads": n.downloads
-    } for n in notes])
+
+    result = []
+    for n in notes:
+        note_data = {
+            "id": n.id,
+            "title": n.title,
+            "uploader": n.user.username if n.user else None,
+            "downloads": n.downloads,
+            "comments": []
+        }
+
+        for c in n.comments:
+            comment_data = {
+                "id": c.id,
+                "text": c.text,
+                "edited": c.is_edited,
+                "author": c.user.username if c.user else None,
+                "created_at": c.timestamp.isoformat() if c.timestamp else None,
+                "updated_at": c.edited_at.isoformat() if c.edited_at else None,
+                "original_text": c.original_text,
+                "history": [
+                    {
+                        "previous_text": h.previous_text,
+                        "edited_at": h.edited_at.isoformat() if h.edited_at else None
+                    } for h in c.edit_history
+                ] if c.edit_history else []
+            }
+            note_data["comments"].append(comment_data)
+
+        result.append(note_data)
+
+    return jsonify(result), 200
 
 
 @admin_bp.route('/notes/<int:note_id>', methods=['DELETE'])
@@ -198,4 +220,102 @@ def delete_note(note_id):
         return jsonify({"error": "Note not found"}), 404
     db.session.delete(note)
     db.session.commit()
-    return jsonify({"message": "Note deleted"})
+    return jsonify({"message": "Note deleted"}), 200
+
+
+@admin_bp.route('/comments/<int:comment_id>', methods=['DELETE'])
+@jwt_required()
+@admin_required
+def delete_comment(comment_id):
+    comment = Comment.query.get(comment_id)
+    if not comment:
+        return jsonify({"error": "Comment not found"}), 404
+    db.session.delete(comment)
+    db.session.commit()
+    return jsonify({"message": "Comment deleted"}), 200
+
+
+# =========================================================
+# 6. ΠΡΟΣΘΗΚΗ ΝΕΟΥ ΜΑΘΗΜΑΤΟΣ
+# =========================================================
+@admin_bp.route('/add-course', methods=['POST'])
+@jwt_required()
+@admin_required
+def add_course():
+    data = request.get_json()
+    name = data.get('name')
+    semester = data.get('semester')
+    ctype = data.get('type')
+
+    if not name or not semester or not ctype:
+        return jsonify({'error': 'Λείπουν απαιτούμενα πεδία'}), 400
+
+    # Προαιρετικός καθαρισμός
+    name = name.strip()
+    ctype = ctype.strip()
+
+    # Έλεγχος αν υπάρχει ήδη μάθημα με το ίδιο όνομα
+    existing = Course.query.filter_by(name=name).first()
+    if existing:
+        return jsonify({'error': 'Το μάθημα υπάρχει ήδη'}), 409
+
+    # Δημιουργία νέου μαθήματος
+    new_course = Course(name=name, semester=semester, type=ctype)
+    db.session.add(new_course)
+    db.session.commit()
+
+    return jsonify({'message': 'Το μάθημα προστέθηκε επιτυχώς'}), 200
+
+@admin_bp.route('/courses/<int:course_id>', methods=['DELETE'])
+@jwt_required()
+@admin_required
+def delete_course(course_id):
+    course = Course.query.get(course_id)
+    if not course:
+        return jsonify({"error": "Course not found"}), 404
+
+    # Προαιρετικά: έλεγχος αν το μάθημα έχει σημειώσεις
+    notes_count = Note.query.filter_by(course_id=course.id).count()
+    if notes_count > 0:
+        return jsonify({
+            "error": "Δεν μπορεί να διαγραφεί. Υπάρχουν συνδεδεμένες σημειώσεις."
+        }), 409
+
+    db.session.delete(course)
+    db.session.commit()
+    return jsonify({"message": "Το μάθημα διαγράφηκε επιτυχώς"}), 200
+
+@admin_bp.route('/courses', methods=['GET'])
+@jwt_required()
+@admin_required
+def get_courses():
+    courses = Course.query.order_by(Course.semester.asc()).all()
+    return jsonify([
+        {
+            "id": c.id,
+            "name": c.name,
+            "semester": c.semester,
+            "type": c.type
+        }
+        for c in courses
+    ]), 200
+
+@admin_bp.route('/courses/<int:course_id>', methods=['PUT'])
+@jwt_required()
+@admin_required
+def update_course(course_id):
+    course = Course.query.get(course_id)
+    if not course:
+        return jsonify({"error": "Course not found"}), 404
+
+    data = request.get_json()
+    new_semester = data.get("semester")
+    new_type = data.get("type")
+
+    if new_semester is not None:
+        course.semester = new_semester
+    if new_type:
+        course.type = new_type.strip()
+
+    db.session.commit()
+    return jsonify({"message": "Το μάθημα ενημερώθηκε επιτυχώς"}), 200

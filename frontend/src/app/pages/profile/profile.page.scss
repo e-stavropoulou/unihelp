@@ -167,3 +167,15 @@ ion-footer {
 }
 
 
+::ng-deep .info-popover {
+  --width: 320px;
+  --max-height: 80vh;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: white;
+}
+
+/* ✅ μειώνει την αδιαφάνεια του backdrop */
+ion-popover {
+  --backdrop-opacity: 0.2;
+}

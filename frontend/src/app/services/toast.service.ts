@@ -65,22 +65,27 @@ export class ToastService {
   ) {
     console.log('🚨 Toast CALLED!', message, type);
   
-    if (Capacitor.isNativePlatform()) {
-      // Capacitor μόνο υποστηρίζει 'short' | 'long'
+    if (Capacitor.isNativePlatform() && this.platform.is('capacitor')) {
+      // Capacitor μόνο σε native
       await Toast.show({
         text: message,
         duration: duration < 2500 ? 'short' : 'long',
         position: 'center'
       });
     } else {
+      // Ionic toast στο web
       const toast = await this.toastController.create({
         message,
-        duration, // ms
+        duration,
         color: this.getColor(type),
-        position: 'top'
+        position: 'top',
+        cssClass: 'custom-toast',
+        animated: true,
+        mode: 'ios'
       });
       await toast.present();
     }
+    
   }
   
 

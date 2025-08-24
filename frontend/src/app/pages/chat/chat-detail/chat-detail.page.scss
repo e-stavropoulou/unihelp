@@ -57,10 +57,12 @@
 
 .message-row.me .timestamp {
   text-align: right;
+  opacity: 1;   
 }
 
 .message-row.other .timestamp {
   text-align: left;
+  opacity: 1;   
 }
 
 .input-wrapper {

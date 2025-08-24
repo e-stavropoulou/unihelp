@@ -2,11 +2,12 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.shared import db
 from models.comment import Comment
+from models.comment_history import CommentEditHistory
 from models.note import Note
 from models.user import User
 from datetime import datetime
 from zoneinfo import ZoneInfo
-
+from utils.points_utils import award_points  # ✅ ΝΕΟ
 
 comments_bp = Blueprint('comments_bp', __name__)
 
@@ -27,19 +28,19 @@ def to_athens_iso(dt: datetime) -> str:
 @jwt_required()
 def get_comments(note_id):
     comments = Comment.query.filter_by(note_id=note_id).order_by(Comment.timestamp).all()
-
     return jsonify([
-    {
-        "id": c.id,
-        "text": c.text,
-        "timestamp": to_athens_iso(c.timestamp),
-        "is_edited": c.is_edited,
-        "edited_at": to_athens_iso(c.edited_at) if c.edited_at else None,
-        "username": c.user.username,
-        "user_id": c.user_id
-    }
-    for c in comments
-]), 200
+        {
+            "id": c.id,
+            "text": c.text,
+            "original_text": c.original_text,
+            "timestamp": to_athens_iso(c.timestamp),
+            "is_edited": c.is_edited,
+            "edited_at": to_athens_iso(c.edited_at) if c.edited_at else None,
+            "username": c.user.username,
+            "user_id": c.user_id
+        }
+        for c in comments
+    ]), 200
 
 
 # -------------------------
@@ -48,7 +49,7 @@ def get_comments(note_id):
 @comments_bp.route('/notes/<int:note_id>/comments', methods=['POST'])
 @jwt_required()
 def add_comment(note_id):
-    user_id = int(get_jwt_identity())  # cast
+    user_id = int(get_jwt_identity())
     data = request.get_json()
 
     note = Note.query.get(note_id)
@@ -65,11 +66,14 @@ def add_comment(note_id):
         text=text,
         timestamp=datetime.utcnow()
     )
-
     db.session.add(new_comment)
-    db.session.commit()
 
+    # ✅ Πόντοι + επιβράβευση
     user = User.query.get(user_id)
+    award_points(user, 5, "🎯 Κέρδισες 5 πόντους για το σχόλιό σου!")
+
+    # ✅ Τελικό commit
+    db.session.commit()
 
     return jsonify({
         "id": new_comment.id,
@@ -78,6 +82,7 @@ def add_comment(note_id):
         "username": user.username,
         "user_id": user.id
     }), 201
+
 
 # -------------------------
 # PUT edit comment
@@ -95,15 +100,23 @@ def edit_comment(comment_id):
     if comment.user_id != user_id:
         return jsonify({"error": "Unauthorized"}), 403
 
-    text = data.get("text", "").strip()
-    if not text:
+    new_text = data.get("text", "").strip()
+    if not new_text:
         return jsonify({"error": "Comment text cannot be empty"}), 400
 
-    comment.text = text
-    comment.is_edited = True
-    comment.edited_at = datetime.utcnow()  # καταγραφή πότε έγινε το edit
+    if comment.text != new_text:
+        history_entry = CommentEditHistory(
+            comment_id=comment.id,
+            previous_text=comment.text,
+            edited_at=datetime.utcnow()
+        )
+        db.session.add(history_entry)
 
-    db.session.commit()
+        comment.text = new_text
+        comment.is_edited = True
+        comment.edited_at = datetime.utcnow()
+
+        db.session.commit()
 
     return jsonify({
         "id": comment.id,
@@ -122,7 +135,7 @@ def edit_comment(comment_id):
 @comments_bp.route('/comments/<int:comment_id>', methods=['DELETE'])
 @jwt_required()
 def delete_comment(comment_id):
-    user_id = int(get_jwt_identity())  # cast
+    user_id = int(get_jwt_identity())
 
     comment = Comment.query.get(comment_id)
     if not comment:

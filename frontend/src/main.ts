@@ -19,28 +19,33 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { environment } from './environments/environment';
 
-import { Capacitor } from '@capacitor/core';
+import { isDevMode } from '@angular/core';
+import { provideServiceWorker } from '@angular/service-worker';
 
-// ✅ Αν είμαστε σε browser, κάνε register τον Service Worker για Firebase Messaging
-if (!Capacitor.isNativePlatform() && 'serviceWorker' in navigator) {
-  navigator.serviceWorker
-    .register('firebase-messaging-sw.js')
-    .then((registration) => {
-      console.log('✅ Firebase service worker registered:', registration);
+// ✅ Δημιουργούμε providers array
+const providers: any[] = [
+  { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+  provideIonicAngular(),
+  provideRouter(routes, withPreloading(PreloadAllModules)),
+  provideHttpClient(),
+  provideFirebaseApp(() => initializeApp(environment.firebase)),
+  provideServiceWorker('ngsw-worker.js', {
+    enabled: !isDevMode(),
+    registrationStrategy: 'registerWhenStable:30000'
+  })
+];
+
+// ✅ Προσθέτουμε το firebase-messaging-sw.js ΜΟΝΟ αν είναι ενεργό στο environment
+if (environment.enableFirebaseMessagingSW) {
+  providers.push(
+    provideServiceWorker('firebase-messaging-sw.js', {
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
     })
-    .catch((err) => {
-      console.warn('❌ Firebase service worker registration failed:', err);
-    });
+  );
 }
 
-// ✅ Bootstrap app με Angular & Firebase app (μόνο το core)
+// ✅ Bootstrap Angular App
 bootstrapApplication(AppComponent, {
-  providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    provideIonicAngular(),
-    provideRouter(routes, withPreloading(PreloadAllModules)),
-    provideHttpClient(),
-    provideFirebaseApp(() => initializeApp(environment.firebase))
-    // ⛔ ΟΧΙ provideMessaging εδώ — το κάνεις μόνος σου στο firebase.ts
-  ]
+  providers
 });
