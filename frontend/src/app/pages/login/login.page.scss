@@ -101,3 +101,18 @@ ion-item {
   color: #000;
   caret-color: #8C1310;
 }
+
+.password-item {
+  position: relative;
+
+  ion-icon.toggle-password-icon {
+    position: absolute;
+    right: 12px;
+    top: 30%;
+    transform: translateY(-50%);
+    font-size: 22px;
+    color: #666;
+    z-index: 10;
+    cursor: pointer;
+  }
+}

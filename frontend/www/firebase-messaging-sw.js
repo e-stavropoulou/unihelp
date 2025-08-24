@@ -1,5 +1,17 @@
-// src/firebase-messaging-sw.js
 
+try {
+  // Αν τρέχει σε Capacitor WebView, service workers δεν παίζουν
+  if (!self || !self.registration) {
+    console.log("🚫 Service Worker not supported in this environment");
+    self.close();
+  }
+} catch (e) {
+  console.log("🚫 SW init blocked:", e);
+  self.close();
+}
+
+
+// Firebase setup (legacy compat mode)
 importScripts('https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.1/firebase-messaging-compat.js');
 
@@ -15,15 +27,3 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Optional: Customize background notification handling
-messaging.onBackgroundMessage(function (payload) {
-  console.log('[firebase-messaging-sw.js] Received background message ', payload);
-
-  const notificationTitle = payload.notification?.title || 'UniHelp';
-  const notificationOptions = {
-    body: payload.notification?.body || 'You have a new message!',
-    icon: '/assets/icon/favicon.png'
-  };
-
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});

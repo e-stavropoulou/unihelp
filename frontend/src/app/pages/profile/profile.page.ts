@@ -7,6 +7,11 @@ import { AuthService } from 'src/app/services/auth.service';
 import { FooterNavComponent } from '../../components/footer-nav/footer-nav.component';
 import { Browser } from '@capacitor/browser';
 import { SsoService } from 'src/app/services/sso.service'; 
+import { NotificationsService } from 'src/app/services/notifications.service';
+import { Capacitor } from '@capacitor/core';
+
+
+
 
 import {
   IonHeader,
@@ -18,10 +23,10 @@ import {
   IonList,
   IonItem,
   IonButton,
-  IonButtons,
   IonBackButton,
   IonCard,
   IonCardContent,
+  IonButtons,
   IonIcon
 } from '@ionic/angular/standalone';
 
@@ -39,6 +44,7 @@ import {
     IonContent,
     IonButton,
     IonCard,
+    IonButtons,
     IonCardContent,
     IonIcon
   ],
@@ -52,13 +58,38 @@ export class ProfilePage implements OnInit {
   avatarUrl: string | null = null;
   avatarVisible = false; // για animation
   userPoints: number = 0;
+  isNative = Capacitor.isNativePlatform();
 
 
-  constructor(private router: Router, private http: HttpClient, private authService: AuthService, private ssoService: SsoService ) {}
+
+  constructor(private router: Router, private http: HttpClient, private authService: AuthService, private ssoService: SsoService, private notificationsService: NotificationsService) {}
 
   ngOnInit() {
     this.loadUserData();
   }
+
+  getPushPermissionState(): 'default' | 'granted' | 'denied' {
+    return Notification.permission as 'default' | 'granted' | 'denied';
+  }
+  
+  openNotificationSettings() {
+    // Chrome-specific (για Safari/Firefox θα βάλεις οδηγίες)
+    window.open('chrome://settings/content/notifications', '_blank');
+  }
+  
+
+  enableNotifications() {
+    const userId = this.authService.getUserId();
+    if (!userId) return;
+  
+    this.notificationsService.requestWebPushToken(userId).then(() => {
+      // 👇 Δεν χρειάζεται πια flag – η HTML βασίζεται στο Notification.permission
+      console.log('✅ Άδεια push ζητήθηκε');
+    });
+  }
+  
+  
+  
 
   ionViewWillEnter() {
     this.loadUserData();
@@ -113,9 +144,7 @@ export class ProfilePage implements OnInit {
   openAdminDashboard(): void {
     this.ssoService.openAdminDashboard();
   }
-  
-  
-  
+
 
   onAvatarChange(event: Event) {
     const input = event.target as HTMLInputElement;

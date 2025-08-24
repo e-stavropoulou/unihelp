@@ -21,14 +21,22 @@
     </ion-item>
     
 
-    <ion-item lines="none">
+    <ion-item lines="none" class="password-item">
       <input
-        type="password"
+        [type]="showPassword ? 'text' : 'password'"
         placeholder="********"
-        class="native-input"
+        class="native-input custom-input"
         [(ngModel)]="password"
       />
+      <ion-icon
+        slot="end"
+        [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+        (click)="togglePasswordVisibility()"
+        class="toggle-password-icon"
+      ></ion-icon>
     </ion-item>
+    
+    
     
 
     <ion-button expand="block" class="login-btn" shape="round" (click)="login()">

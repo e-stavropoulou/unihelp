@@ -6,6 +6,14 @@
 
 <ion-content class="ion-padding">
 
+  <!-- 🟢 Κουμπί ενεργοποίησης ειδοποιήσεων -->
+  <div *ngIf="showEnableBtn" class="enable-push-wrapper ion-padding-bottom">
+    <ion-button expand="block" (click)="enablePush()">
+      Ενεργοποίηση Push Ειδοποιήσεων
+    </ion-button>
+  </div>
+
+  <!-- 🔔 Λίστα ειδοποιήσεων -->
   <ion-list *ngIf="notifications.length > 0; else noNotifications">
     <ion-item *ngFor="let note of notifications">
       <ion-label>
@@ -26,6 +34,7 @@
     </ion-item>
   </ion-list>
 
+  <!-- 🕸️ Empty state -->
   <ng-template #noNotifications>
     <ion-text color="medium">
       <p class="ion-text-center">Δεν υπάρχουν ειδοποιήσεις.</p>

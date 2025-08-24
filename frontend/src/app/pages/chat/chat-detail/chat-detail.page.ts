@@ -2,6 +2,10 @@ import { Component, OnInit, ViewChild  } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { Subscription, timestamp } from 'rxjs';
+import { NgZone } from '@angular/core';
+
+
 
 
 import { CommonModule } from '@angular/common';
@@ -48,12 +52,15 @@ export class ChatDetailPage implements OnInit {
   returnTo: string = '/chat';
   chatPartnerName: string = '';
   chatPartnerAvatarUrl: string = '';
+  private messageSub!: Subscription;
+
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private http: HttpClient,
-    private chatService: ChatService
+    private chatService: ChatService,
+    private ngZone: NgZone
   ) {}
 
   @ViewChild(IonContent) content!: IonContent;
@@ -64,14 +71,52 @@ export class ChatDetailPage implements OnInit {
     if (nav?.extras?.state?.['returnTo']) {
       this.returnTo = nav.extras.state['returnTo'];
     }
-
+  
     this.chatId = Number(this.route.snapshot.paramMap.get('chatId'));
+    this.chatService.setCurrentChatId(this.chatId);
+
+
     const storedUserId = localStorage.getItem('user_id');
     this.userId = storedUserId ? Number(storedUserId) : 0;
-
+  
     this.loadMessages();
     this.loadChatPartnerInfo();
+  
+    // ✅ Συνδρομή σε νέα μηνύματα από FCM
+    this.messageSub = this.chatService.newChatMessage$.subscribe((message) => {
+      if (!message) return;
+  
+      const incomingChatId = Number(message.chat_id);
+      const currentChatId = Number(this.chatId);
+  
+      if (incomingChatId === currentChatId) {
+        this.ngZone.run(() => {
+          const cleanedMessage = {
+            ...message,
+            sender_id: Number(message.sender_id),
+            timestamp: new Date(message.timestamp || message.created_at || Date.now()),
+            is_read: true
+          };
+  
+          this.messages = [...this.messages, cleanedMessage];
+          console.log('📩 Messages length after push:', this.messages.length);
+          this.scrollToBottom();
+        });
+      }
+    });
   }
+  
+
+  ngOnDestroy() {
+    this.chatService.setCurrentChatId(null); 
+
+    if (this.messageSub) {
+      this.messageSub.unsubscribe();
+    }
+  }
+  
+  
+  
 
   ionViewDidEnter() {
     this.scrollToBottom();
@@ -81,6 +126,7 @@ export class ChatDetailPage implements OnInit {
 
     this.markMessagesAsRead().then(() => {
       this.chatService.decreaseUnreadCount(unreadMsgs);
+      this.chatService.refreshUnreadMessages(); 
     });
 
     // ✅ Scroll στο τέλος αφού μπεις
@@ -137,22 +183,28 @@ export class ChatDetailPage implements OnInit {
   loadMessages() {
     const token = localStorage.getItem('token');
     if (!token) return;
-
+  
     const headers = {
       Authorization: `Bearer ${token}`
     };
-
+  
     this.http
-      .get(`${environment.API_URL}/chats/${this.chatId}/messages`, { headers })
+      .get<any[]>(`${environment.API_URL}/chats/${this.chatId}/messages`, { headers })
       .subscribe({
-        next: (res: any) => {
-          this.messages = res;
+        next: (res) => {
+          this.messages = res.map(m => ({
+            ...m,
+            sender_id: Number(m.sender_id),
+            timestamp: m.timestamp instanceof Date ? m.timestamp : new Date(m.timestamp),
+            is_read: !!m.is_read
+          }));
           this.scrollToBottom();
-
         },
         error: (err) => console.error('🚫 Failed to fetch messages:', err)
       });
   }
+  
+  
 
   sendMessage() {
     if (!this.newMessage.trim()) return;
@@ -169,17 +221,26 @@ export class ChatDetailPage implements OnInit {
     };
 
     this.http
-      .post(`${environment.API_URL}/chats/${this.chatId}/messages`, messagePayload, { headers })
-      .subscribe({
-        next: () => {
-          this.newMessage = '';
-          this.loadMessages();
+  .post(`${environment.API_URL}/chats/${this.chatId}/messages`, messagePayload, { headers })
+  .subscribe({
+    next: (res: any) => {
+      this.newMessage = '';
 
-          // ✅ Μετά την αποστολή scroll κάτω
-          setTimeout(() => this.scrollToBottom(), 300);
-        },
-        error: (err) => console.error('🚫 Failed to send message:', err)
-      });
+      const newMsg = {
+        id: res.id,
+        chat_id: this.chatId,
+        sender_id: this.userId,
+        content: messagePayload.content,
+        timestamp: new Date(),
+        is_read: true
+      };
+
+      this.messages = [...this.messages, newMsg];
+      this.scrollToBottom();
+    },
+    error: (err) => console.error('🚫 Failed to send message:', err)
+  });
+
   }
 
   scrollToBottom() {

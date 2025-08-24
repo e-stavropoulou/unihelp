@@ -16,7 +16,12 @@
 <ion-content class="ion-padding chat-content">
   <div *ngFor="let msg of messages" class="message-row" [ngClass]="{ 'me': msg.sender_id === userId, 'other': msg.sender_id !== userId }">
     <div class="bubble">{{ msg.content }}</div>
-    <div class="timestamp">{{ msg.timestamp | date:'shortTime' }}</div>
+    <div class="timestamp">
+      {{ msg.timestamp ? (msg.timestamp | date:'shortTime') : '⏳ no timestamp' }}
+    </div>
+    
+    
+    
   </div>
 </ion-content>
 

@@ -4,27 +4,26 @@
       <ion-icon name="book-outline" [routerLink]="['/notes-feed']"></ion-icon>
       <ion-icon name="search-outline" [routerLink]="['/search-users']"></ion-icon>
 
-      <!-- 💬 Εικονίδιο chat με badge -->
-      <div class="icon-with-badge" [routerLink]="['/chat']">
-        <ion-icon name="chatbubble-ellipses-outline" class="notification-icon"></ion-icon>
-        <ng-container *ngIf="unreadMessages$ | async as msgCount">
-          <ion-badge *ngIf="msgCount > 0" class="notif-badge">
-            {{ msgCount }}
-          </ion-badge>
-        </ng-container>
-      </div>
+<!-- Μηνύματα -->
+<div class="icon-with-badge" [routerLink]="['/chat']">
+  <ion-icon name="chatbubble-ellipses-outline" class="notification-icon"></ion-icon>
+  <ion-badge *ngIf="(unreadMessages$ | async) as msgs" class="notif-badge" [attr.data-count]="msgs ?? ''">
+    {{ msgs }}
+  </ion-badge>
+</div>
+      
 
-      <ion-icon name="person-outline" [routerLink]="['/profile']"></ion-icon>
+<ion-icon name="person-outline" [routerLink]="['/profile']"></ion-icon>
 
-      <!-- 🔔 Εικονίδιο ειδοποιήσεων με badge -->
-      <div class="icon-with-badge" [routerLink]="['/notifications']">
-        <ion-icon name="notifications-outline" class="notification-icon"></ion-icon>
-        <ng-container *ngIf="unreadCount$ | async as count">
-          <ion-badge *ngIf="count > 0" class="notif-badge">
-            {{ count }}
-          </ion-badge>
-        </ng-container>
-      </div>
+
+<!-- Ειδοποιήσεις -->
+<div class="icon-with-badge" [routerLink]="['/notifications']">
+  <ion-icon name="notifications-outline" class="notification-icon"></ion-icon>
+  <ion-badge *ngIf="(unreadCount$ | async) as count" class="notif-badge" [attr.data-count]="count ?? ''">
+    {{ count }}
+  </ion-badge>
+</div>
+
 
       <ion-icon name="log-out-outline" (click)="logout()"></ion-icon>
     </div>

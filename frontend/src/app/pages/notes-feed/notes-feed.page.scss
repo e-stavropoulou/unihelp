@@ -157,3 +157,31 @@ select:focus {
   }
 }
 
+/* Custom κουμπί που μοιάζει με select */
+.custom-select-button {
+  padding: 6px 10px;
+  border: 1px solid #8C1310;
+  border-radius: 8px;
+  font-size: 14px;
+  flex: 2;
+  max-width: 200px;
+  box-sizing: border-box;
+  background: #fff;
+  color: #000;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Hover + focus */
+.custom-select-button:focus,
+.custom-select-button:hover {
+  outline: none;
+  border-color: #a2211f;
+}
+
+/* Popover styling */
+::ng-deep .course-popover {
+  --width: min(420px, 90vw);
+  --height: 60vh;
+}

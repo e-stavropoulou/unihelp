@@ -10,7 +10,7 @@ import {
   isIndexedDBAvailable,
   registerVersion,
   validateIndexedDBOpenable
-} from "./chunk-RSAD4BFS.js";
+} from "./chunk-BKQSI2JY.js";
 import {
   deleteDB,
   openDB

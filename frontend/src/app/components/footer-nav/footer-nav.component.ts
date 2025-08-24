@@ -8,18 +8,27 @@ import { NotificationsService } from 'src/app/services/notifications.service';
 import { ChatService } from 'src/app/services/chat.service';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
+import { constructOutline } from 'ionicons/icons';
+import { distinctUntilChanged } from 'rxjs/operators';
+
+
+// Ionicons
+import { IonIcon } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
 
 @Component({
   selector: 'app-footer-nav',
   standalone: true,
   templateUrl: './footer-nav.component.html',
   styleUrls: ['./footer-nav.component.scss'],
-  imports: [IonicModule, RouterModule, CommonModule],
+  imports: [IonicModule, RouterModule, CommonModule, IonIcon],
 })
 export class FooterNavComponent implements OnInit {
-  unreadCount$!: Observable<number>;
-  unreadMessages$!: Observable<number>;
-  
+
+
+  // ✅ Δέσιμο απευθείας με BehaviorSubject
+  unreadCount$ = this.notificationsService.unreadCount$;
+  unreadMessages$ = this.chatService.unreadMessages$;
 
   constructor(
     private router: Router,
@@ -27,32 +36,19 @@ export class FooterNavComponent implements OnInit {
     private toastService: ToastService,
     private notificationsService: NotificationsService,
     private chatService: ChatService,
-    private cdRef: ChangeDetectorRef   // ✅ Αναγκάζει re-render
+    private cd: ChangeDetectorRef 
   ) {}
 
   ngOnInit(): void {
-    // 🎯 Παίρνεις μόνο το .asObservable() μέρος
-    this.unreadCount$ = this.notificationsService.unreadCount$.asObservable();
-    this.unreadMessages$ = this.chatService.unreadMessages$.asObservable();
-
-    // ✅ Αρχική φόρτωση
+    // Μόνο αρχικό sync
     this.notificationsService.refreshUnreadCount();
     this.chatService.refreshUnreadMessages();
-
-    // ✅ Force UI update όταν αλλάζει κάποιο badge
-    this.notificationsService.unreadCount$.subscribe(() => {
-      this.cdRef.detectChanges();
-    });
-
-    this.chatService.unreadMessages$.subscribe(() => {
-      this.cdRef.detectChanges();
-    });
   }
 
-  async logout() {
-    this.authService.clearToken();
-    await this.toastService.present('Αποσυνδεθήκατε.', 'error', 400);
-    this.router.navigateByUrl('/login', { replaceUrl: true });
+  logout() {
+    this.authService.logout(false);
+    this.toastService.present('Αποσυνδεθήκατε.', 'error', 400);
+    window.location.replace('/login');
   }
 
   enableNotifications() {

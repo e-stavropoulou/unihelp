@@ -18,7 +18,12 @@ export class SsoService {
   /** 📥 Listener για μηνύματα από admin */
   private setupMessageListener() {
     window.addEventListener('message', (event: MessageEvent) => {
-      if (event.origin !== environment.ADMIN_ORIGIN) return;
+      const allowedOrigins = [environment.ADMIN_ORIGIN, 'capacitor://localhost'];
+      if (!allowedOrigins.includes(event.origin)) {
+        console.warn('[SSO] 🔒 Blocked message from unexpected origin:', event.origin);
+        return;
+      }
+
 
       const msg = (event.data || {}) as { type?: IncomingType };
       if (!msg?.type) return;
@@ -29,9 +34,24 @@ export class SsoService {
         case 'READY':
           this.replyWithTokens(event.source as Window);
           break;
-        case 'LOGOUT_REQUEST':
-          this.authService.clearToken?.();
-          break;
+          case 'LOGOUT_REQUEST':
+            console.warn('[SSO] Λήφθηκε LOGOUT από το admin.');
+          
+            if (this.authService.logout) {
+              this.authService.logout();
+            } else {
+              localStorage.removeItem('token');
+              localStorage.removeItem('refresh_token');
+              localStorage.removeItem('email');
+              localStorage.removeItem('user_id');
+              localStorage.removeItem('role');
+              sessionStorage.clear();
+              this.router.navigateByUrl('/login');
+            }
+          
+            break;
+          
+          
       }
     });
   }
@@ -40,23 +60,38 @@ export class SsoService {
   private replyWithTokens(target: Window) {
     const token = this.authService.getToken?.() || localStorage.getItem('token');
     const refresh = localStorage.getItem('refresh_token');
-
+  
     const userInfo = {
       user_id: this.authService.getUserId?.() ?? null,
       email: localStorage.getItem('email'),
       role: this.authService.getRole?.() ?? null,
     };
-
-    target.postMessage(
-      {
-        type: 'UNIHELP_TOKEN',
-        token,
-        refresh,
-        userInfo,
-      },
-      environment.ADMIN_ORIGIN
-    );
+  
+    const targetOrigin = environment.ADMIN_ORIGIN;
+  
+    try {
+      if (target && target !== window) {
+        target.postMessage(
+          {
+            type: 'UNIHELP_TOKEN',
+            token,
+            refresh,
+            userInfo,
+          },
+          targetOrigin // ✅ Να είναι ξεκάθαρο και σίγουρο
+        );
+        console.log(`[SSO] ✅ Token sent to ${targetOrigin}`);
+      } else {
+        console.warn('[SSO] ❌ Not a valid target window – skipping postMessage');
+      }
+    } catch (err) {
+      console.error('[SSO] ❌ Failed to postMessage token:', err);
+    }
   }
+  
+  
+  
+  
 
   /** ✅ Ανοίγει admin dashboard σε νέο tab (ή redirect για mobile) */
   openAdminDashboard(): void {

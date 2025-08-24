@@ -22,13 +22,13 @@ import {
   onLog,
   registerVersion,
   setLogLevel
-} from "./chunk-RSAD4BFS.js";
+} from "./chunk-BKQSI2JY.js";
 import "./chunk-RWCVF6C4.js";
 import "./chunk-ZVATTXSA.js";
 
 // node_modules/firebase/app/dist/esm/index.esm.js
 var name = "firebase";
-var version = "12.0.0";
+var version = "12.1.0";
 registerVersion(name, version, "app");
 export {
   FirebaseError,

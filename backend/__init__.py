@@ -1,4 +1,8 @@
 # __init__.py
+
+import os
+from flask import Flask, request, jsonify, send_from_directory
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -13,6 +17,12 @@ from flask_jwt_extended import JWTManager
 
 from models.shared import db
 from models.notification import Notification
+from models.chat_history import ChatHistory
+
+
+# ✅ Firebase Admin SDK
+import firebase_admin
+from firebase_admin import credentials
 
 # Blueprints
 from routes.auth import auth_bp
@@ -47,16 +57,19 @@ def create_app():
     app.config['EMAIL_PASS'] = EMAIL_PASS
     app.config['BASE_URL']   = BASE_URL
 
+    # ✅ Firebase Admin init (μόνο μία φορά)
+    if not firebase_admin._apps:
+        cred = credentials.Certificate("firebase/service-account.json")
+        firebase_admin.initialize_app(cred)
+
     # -------------------- JWT Ρυθμίσεις --------------------
     app.config['JWT_SECRET_KEY'] = JWT_SECRET
     app.config['JWT_ACCESS_TOKEN_EXPIRES']  = timedelta(minutes=15)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=7)
-    # Μικρή ανοχή αν τα ρολόγια έχουν διαφορά (π.χ. simulator)
     app.config['JWT_DECODE_LEEWAY'] = 10
 
     jwt = JWTManager(app)
 
-    # Καθαρά μηνύματα για τα συχνά σενάρια
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
         return jsonify(msg='Token has expired'), 401
@@ -70,8 +83,6 @@ def create_app():
         return jsonify(msg='Missing Authorization Header'), 401
 
     # -------------------- CORS --------------------
-    # Χρησιμοποιείς Bearer tokens (όχι cookies), άρα supports_credentials δεν είναι απαραίτητο.
-    # Το αφήνω False (default). Αν έχεις κάτι που θέλει cookies, γύρισέ το σε True.
     CORS(
         app,
         resources={r"/*": {"origins": [
@@ -79,6 +90,13 @@ def create_app():
             "http://192.168.2.7:8100",
             "http://localhost:4201",
             "http://192.168.2.7:4201",
+            "http://192.168.2.26:8100",
+            "http://192.168.2.26:4201",
+            "http://localhost:8080",
+            "http://192.168.2.26:8080",
+            "http://192.168.2.6:8100",
+            "http://192.168.2.6:4201",
+            "http://192.168.2.6:8080",
             "capacitor://localhost"
         ]}}
     )
@@ -87,7 +105,6 @@ def create_app():
     db.init_app(app)
     Migrate(app, db)
 
-    # Προαιρετικό: πολύ χρήσιμο στο debug, αλλά βαρύ — άστο μόνο σε dev
     @app.before_request
     def log_request_info():
         print("🟡 METHOD:", request.method)
@@ -96,11 +113,11 @@ def create_app():
         print("🟡 COOKIES:", request.cookies)
         print("🟡 BODY (if POST):", request.get_data())
 
-    # Φόρτωσε τα models για να τα “βλέπει” η migrate
     from models.user import User
     from models.course import Course
     from models.note import Note
     from models.favorite import Favorite
+    from models.comment_history import CommentEditHistory
 
     # -------------------- Blueprints --------------------
     app.register_blueprint(auth_bp)
@@ -114,5 +131,24 @@ def create_app():
     app.register_blueprint(comments_bp)
     app.register_blueprint(reports_bp)
     app.register_blueprint(stats_bp)
+
+        # -------------------- Frontend Build --------------------
+    build_dir = os.path.join(os.path.dirname(__file__), "..", "frontend", "www")
+    app.static_folder = build_dir
+    app.static_url_path = ""
+
+    @app.route("/", defaults={"path": ""})
+    @app.route("/<path:path>")
+    def serve_spa(path):
+        full_path = os.path.join(build_dir, path)
+
+        # Αν ζητάει static αρχείο → στείλτο
+        if os.path.exists(full_path) and not os.path.isdir(full_path):
+            return send_from_directory(build_dir, path)
+
+        # Διαφορετικά γύρνα πάντα index.html
+        print("👉 SPA fallback triggered for:", path)
+        return send_from_directory(build_dir, "index.html")
+
 
     return app
