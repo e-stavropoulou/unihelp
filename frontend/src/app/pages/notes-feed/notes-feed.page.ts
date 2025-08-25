@@ -8,11 +8,14 @@ import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { ToastService } from 'src/app/services/toast.service';
 import { Router } from '@angular/router';
+import { ToastController } from '@ionic/angular';
+
 
 @Component({
   selector: 'app-notes-feed',
   standalone: true,
   imports: [CommonModule, IonicModule, FormsModule, FooterNavComponent],
+  providers: [ToastController], 
   templateUrl: './notes-feed.page.html',
   styleUrls: ['./notes-feed.page.scss']
 })

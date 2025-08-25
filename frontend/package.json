@@ -36,6 +36,7 @@
     "@capacitor/status-bar": "7.0.1",
     "@capacitor/toast": "^7.0.1",
     "@ionic/angular": "^8.0.0",
+    "@ionic/pwa-elements": "^3.3.0",
     "chart.js": "^4.5.0",
     "firebase": "^12.1.0",
     "ionicons": "^7.4.0",

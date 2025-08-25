@@ -1,4 +1,10 @@
 // src/main.ts
+
+import { defineCustomElements } from '@ionic/core/loader'; // 👈 1ο πράγμα που τρέχει
+
+defineCustomElements(window);  // 👈 ΠΡΙΝ το bootstrapApplication
+
+
 import { bootstrapApplication } from '@angular/platform-browser';
 import {
   RouteReuseStrategy,
@@ -21,6 +27,8 @@ import { environment } from './environments/environment';
 
 import { isDevMode } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
+
+
 
 // ✅ Δημιουργούμε providers array
 const providers: any[] = [
@@ -49,3 +57,4 @@ if (environment.enableFirebaseMessagingSW) {
 bootstrapApplication(AppComponent, {
   providers
 });
+
