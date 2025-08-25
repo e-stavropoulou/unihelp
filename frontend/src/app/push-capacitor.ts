@@ -14,53 +14,58 @@ export const initPushCapacitor = async () => {
     return;
   }
 
-  // 🔹 Ζήτα άδεια από τον χρήστη
-  const permStatus = await PushNotifications.requestPermissions();
-  if (permStatus.receive !== 'granted') {
-    throw new Error('❌ Permission not granted for push notifications');
-  }
-
-  // 🔹 Κάνε register στο APNS/FCM
-  await PushNotifications.register();
-
-  // 🔹 Token που έδωσε το APNS/FCM
-  PushNotifications.addListener('registration', async (token: Token) => {
-    console.log('📲 Push token (Capacitor):', token.value);
-
-    const jwt = localStorage.getItem('token'); // 👈 consistent με το app σου
-    if (!jwt) {
-      console.warn('⛔ No JWT token found. Skipping token upload.');
-      return;
+  try {
+    const permStatus = await PushNotifications.requestPermissions();
+    if (permStatus.receive !== 'granted') {
+      throw new Error('❌ Permission not granted for push notifications');
     }
 
-    try {
-      const res = await fetch(`${environment.API_URL}/update-fcm-token`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${jwt}`,
-        },
-        body: JSON.stringify({ fcm_token: token.value }),
-      });
+    await PushNotifications.register();
+    console.log('✅ Push registration requested');
 
-      if (res.ok) {
-        console.log('✅ Token saved to backend');
-      } else {
-        console.warn('⚠️ Failed to save token. Status:', res.status);
+    PushNotifications.addListener('registration', async (token: Token) => {
+      console.log('📲 Push token (Capacitor):', token.value);
+
+      const jwt = localStorage.getItem('token');
+      if (!jwt) {
+        console.warn('⛔ No JWT token found. Skipping token upload.');
+        return;
       }
-    } catch (err) {
-      console.error('❌ Error saving token:', err);
+
+      try {
+        const res = await fetch(`${environment.API_URL}/update-fcm-token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwt}`,
+          },
+          body: JSON.stringify({ fcm_token: token.value }),
+        });
+
+        if (res.ok) {
+          console.log('✅ Token saved to backend');
+        } else {
+          console.warn('⚠️ Failed to save token. Status:', res.status);
+        }
+      } catch (err) {
+        console.error('❌ Error saving token:', err);
+      }
+    });
+
+    PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
+      console.log('🔔 Received push notification:', notification);
+    });
+
+    PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
+      console.log('👆 User tapped push notification:', action);
+    });
+
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error('❌ Push setup failed:', err.message);
+    } else {
+      console.error('❌ Push setup failed (non-standard error):', err);
     }
-  });
-
-  // 🔹 Ειδοποίηση που ήρθε ενώ η εφαρμογή είναι ανοιχτή
-  PushNotifications.addListener('pushNotificationReceived', (notification: PushNotificationSchema) => {
-    console.log('🔔 Received push notification:', notification);
-  });
-
-  // 🔹 Ο χρήστης πάτησε πάνω στην ειδοποίηση
-  PushNotifications.addListener('pushNotificationActionPerformed', (action: ActionPerformed) => {
-    console.log('👆 User tapped push notification:', action);
-    // 👉 εδώ μπορείς να κάνεις redirect π.χ. σε συγκεκριμένο chat
-  });
+  }
+  
 };

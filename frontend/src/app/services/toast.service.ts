@@ -79,7 +79,7 @@ export class ToastService {
         duration,
         color: this.getColor(type),
         position: 'top',
-        cssClass: 'custom-toast',
+        //cssClass: 'custom-toast',
         animated: true,
         mode: 'ios'
       });

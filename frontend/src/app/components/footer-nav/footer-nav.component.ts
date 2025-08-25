@@ -45,11 +45,14 @@ export class FooterNavComponent implements OnInit {
     this.chatService.refreshUnreadMessages();
   }
 
-  logout() {
+  async logout() {
     this.authService.logout(false);
-    this.toastService.present('Αποσυνδεθήκατε.', 'error', 400);
-    window.location.replace('/login');
+    await this.toastService.present('Αποσυνδεθήκατε.', 'error', 1200);
+    setTimeout(() => {
+      window.location.replace('/login');
+    }, 1300);
   }
+  
 
   enableNotifications() {
     const userId = this.authService.getUserId();
