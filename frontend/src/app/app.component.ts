@@ -38,22 +38,36 @@ export class AppComponent implements OnInit {
     console.log('🟢 [UniHelp] App initialized');
     this.setupSSO();
   
+    // 🌍 Global error listeners
+    window.addEventListener('error', (event) => {
+      console.log('🌍 Global JS error:', event.error);
+      console.log('📌 Error source:', event.filename, 'line:', event.lineno, 'col:', event.colno);
+    });
+  
+    window.addEventListener('unhandledrejection', (event) => {
+      console.log('🌍 Unhandled promise rejection:', event.reason);
+    });
+  
     // ✅ Άμεσο update badge χωρίς call στο backend
     window.addEventListener('new-chat-message', () => {
       console.log('📬 Push: νέο μήνυμα! +1 στο badge');
-      this.chatService.increaseUnreadCount();  // 👈 εδώ το άμεσο update
+      this.chatService.increaseUnreadCount();
     });
   
     setTimeout(() => {
       this.sendTokenToAdmin(window.parent);
   
-      if (Capacitor.isNativePlatform()) {
-        this.initPush();
+      const platform = Capacitor.getPlatform();
+      console.log('📱 Detected platform:', platform);
+  
+      if (platform === 'web') {
+        this.notificationsService.initPush(); // ✅ Μόνο στο web
       } else {
-        this.notificationsService.initPush();
+        console.log('🚫 Push notifications skipped on native platform:', platform);
       }
     }, 1000);
   }
+  
   
   
 
@@ -117,16 +131,6 @@ export class AppComponent implements OnInit {
     } catch (e) {
       console.warn('⚠️ [SSO] Fallback to * origin (unsafe):', e);
       adminWindow.postMessage(response, '*');
-    }
-  }
-
-  // ✅ Πλήρης υποστήριξη για Push
-  async initPush() {
-    if (Capacitor.getPlatform() === 'web') {
-      console.log('🌐 Skipping auto-push on web – requires user gesture');
-      // Δεν κάνουμε τίποτα — περιμένουμε να πατήσει ο χρήστης κουμπί
-    } else {
-      await initPushCapacitor();
     }
   }
   

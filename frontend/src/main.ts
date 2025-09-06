@@ -4,6 +4,28 @@ import { defineCustomElements } from '@ionic/core/loader'; // 👈 1ο πράγ�
 
 defineCustomElements(window);  // 👈 ΠΡΙΝ το bootstrapApplication
 
+// ✅ Global override για να πιάσεις τα "ERROR {}"
+const originalError = console.error;
+console.error = (...args: any[]) => {
+  originalError('🔎 Intercepted console.error:', ...args);
+
+  try {
+    if (args[0] instanceof Error) {
+      originalError('🔎 Stacktrace:', args[0].stack);
+    } else {
+      // Πάντα trace όταν είναι object
+      try {
+        originalError('🔎 JSON error:', JSON.stringify(args[0]));
+      } catch {
+        originalError('🔎 Could not stringify arg[0]');
+      }
+      console.trace('🔎 Console.error trace (forced)');
+    }
+  } catch (e) {
+    originalError('🔎 Failed inside console.error override:', e);
+  }
+};
+
 
 import { bootstrapApplication } from '@angular/platform-browser';
 import {

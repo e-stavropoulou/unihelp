@@ -26,7 +26,7 @@ export class ChatService {
     private authService: AuthService,
     private ngZone: NgZone
   ) {
-    this.listenForNewMessages();  // ✅ Ενεργοποίηση listener
+    //this.listenForNewMessages();  // ✅ Ενεργοποίηση listener
   }
 
   async listenForNewMessages() {

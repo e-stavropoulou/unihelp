@@ -53,6 +53,7 @@ export class NotificationsPage implements OnInit {
   ) {}
 
   showEnableBtn = false;
+  
 
   async ngOnInit() {
   console.log('🚀 Notifications page loaded');

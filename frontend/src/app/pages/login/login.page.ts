@@ -8,7 +8,8 @@ import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
 import { FormsModule } from '@angular/forms';
 import { ChatService } from 'src/app/services/chat.service';
-import { NotificationsService } from 'src/app/services/notifications.service'; // αν θες και για notif badge
+import { NotificationsService } from 'src/app/services/notifications.service'; 
+import { Capacitor } from '@capacitor/core';
 
 
 @Component({
@@ -64,7 +65,12 @@ export class LoginPage {
         this.showResend = false;
       
         // ✅ Κάλεσμα FCM push registration
-        this.notificationsService.initPush(res.user_id);
+        if (Capacitor.getPlatform() === 'web') {
+          this.notificationsService.initPush(res.user_id);
+        } else {
+          console.log('🚫 Skipping push init after login on native platform');
+        }
+        
       
         // Προαιρετικά:
         this.chatService.refreshUnreadMessages();

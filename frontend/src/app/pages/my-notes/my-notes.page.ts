@@ -50,7 +50,17 @@ export class MyNotesPage implements OnInit {
     this.http.get<any[]>(`${environment.API_URL}/my-notes`, { headers })
       .subscribe({
         next: data => this.notes = data,
-        error: err => console.error('Error loading notes:', err)
+        error: err => {
+          console.error('❌ Error loading notes:', err);
+          if (err && typeof err === 'object') {
+            try {
+              console.log('🔍 Error JSON:', JSON.stringify(err));
+            } catch {
+              console.log('🔍 Raw error (non-serializable):', err);
+            }
+          }
+        }
+        
       });
   }
 
@@ -81,9 +91,22 @@ export class MyNotesPage implements OnInit {
                 this.loadNotes();
               },
               error: err => {
-                console.error(err);
+                console.error('❌ Delete note error:', err);
+              
+                // Εμφάνισε πιο αναλυτικά το περιεχόμενο
+                if (err && typeof err === 'object') {
+                  try {
+                    console.log('🔍 Error JSON:', JSON.stringify(err));
+                  } catch {
+                    console.log('🔍 Raw error (non-serializable):', err);
+                  }
+                } else {
+                  console.log('🔍 Error string:', err);
+                }
+              
                 this.toastService.present('Σφάλμα κατά τη διαγραφή.', 'error');
               }
+              
             });
           }
         }
