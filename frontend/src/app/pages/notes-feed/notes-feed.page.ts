@@ -9,6 +9,7 @@ import { environment } from 'src/environments/environment';
 import { ToastService } from 'src/app/services/toast.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
+import { Capacitor } from '@capacitor/core';
 
 
 @Component({
@@ -30,6 +31,8 @@ export class NotesFeedPage implements OnInit {
   selectedType: string = '';
   semesters: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
   currentUserId: number = 0;
+  isMobile = Capacitor.isNativePlatform();
+
 
 
   // 🔄 Γενικό popover για Κατηγορία, Εξάμηνο, Τύπος
@@ -242,7 +245,6 @@ export class NotesFeedPage implements OnInit {
     this.http.post(`${environment.API_URL}/favorite`, { note_id: note.id }, { headers })
       .subscribe({
         next: async (res: any) => {
-          await this.toastService.present(res.message || 'Επιτυχία!', 'success');
           this.zone.run(async () => {
             note.isFavorite = !note.isFavorite;
             await this.toastService.present(res.message || 'Επιτυχία!', 'success');

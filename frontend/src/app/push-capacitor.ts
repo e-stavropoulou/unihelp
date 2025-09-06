@@ -63,9 +63,12 @@ export const initPushCapacitor = async () => {
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error('❌ Push setup failed:', err.message);
+    } else if (typeof err === 'object' && err !== null) {
+      console.error('❌ Push setup failed:', JSON.stringify(err));
     } else {
-      console.error('❌ Push setup failed (non-standard error):', err);
+      console.error('❌ Push setup failed (non-object):', String(err));
     }
   }
+  
   
 };

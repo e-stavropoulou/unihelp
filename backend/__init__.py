@@ -36,6 +36,9 @@ from routes.chat import chat_bp
 from routes.comments import comments_bp
 from routes.reports import reports_bp
 from routes.stats import stats_bp
+from routes.rag import rag_bp
+from routes.bot import bot_bp
+
 
 from config import (
     SQLALCHEMY_DATABASE_URI,
@@ -118,6 +121,8 @@ def create_app():
     from models.note import Note
     from models.favorite import Favorite
     from models.comment_history import CommentEditHistory
+    from models.bot_message import BotMessage
+
 
     # -------------------- Blueprints --------------------
     app.register_blueprint(auth_bp)
@@ -131,6 +136,9 @@ def create_app():
     app.register_blueprint(comments_bp)
     app.register_blueprint(reports_bp)
     app.register_blueprint(stats_bp)
+    app.register_blueprint(rag_bp)
+    app.register_blueprint(bot_bp)
+
 
         # -------------------- Frontend Build --------------------
     build_dir = os.path.join(os.path.dirname(__file__), "..", "frontend", "www")

@@ -13,45 +13,46 @@
   </ion-searchbar>
 
   <!-- Φίλτρο: Κατηγορία -->
-  <ion-item>
+  <ion-item class="custom-ion-select">
     <ion-label>Κατηγορία</ion-label>
-    <select [(ngModel)]="selectedCategory" (change)="applyFilters()">
-      <option value="">Όλες</option>
-      <option value="Σημειώσεις">Σημειώσεις</option>
-      <option value="Διαφάνειες">Διαφάνειες</option>
-      <option value="Ασκήσεις">Ασκήσεις</option>
-      <option value="Λυμένες Ασκήσεις">Λυμένες Ασκήσεις</option>
-    </select>
+    <ion-select interface="alert"[(ngModel)]="selectedCategory" (ionChange)="applyFilters()">
+      <ion-select-option value="">Όλες</ion-select-option>
+      <ion-select-option value="Σημειώσεις">Σημειώσεις</ion-select-option>
+      <ion-select-option value="Διαφάνειες">Διαφάνειες</ion-select-option>
+      <ion-select-option value="Ασκήσεις">Ασκήσεις</ion-select-option>
+      <ion-select-option value="Λυμένες Ασκήσεις">Λυμένες Ασκήσεις</ion-select-option>
+    </ion-select>
   </ion-item>
+  
 
   <!-- Φίλτρο: Μάθημα -->
-  <ion-item *ngIf="allCourses.length > 0">
+  <ion-item class="custom-ion-select">
     <ion-label>Μάθημα</ion-label>
-    <select [(ngModel)]="selectedCourse" (change)="applyFilters()">
-      <option value="">Όλα</option>
-      <option *ngFor="let course of allCourses" [value]="course">{{ course }}</option>
-    </select>
+    <ion-select interface="alert"[(ngModel)]="selectedCourse" (ionChange)="applyFilters()">
+      <ion-select-option value="">Όλα</ion-select-option>
+      <ion-select-option *ngFor="let course of allCourses" [value]="course">{{ course }}</ion-select-option>
+    </ion-select>
   </ion-item>
 
   <!-- Φίλτρο: Εξάμηνο -->
-  <ion-item>
-    <ion-label>Εξάμηνο</ion-label>
-    <select [(ngModel)]="selectedSemester" (change)="applyFilters()">
-      <option value="">Όλα</option>
-      <option *ngFor="let sem of semesters" [value]="sem">{{ sem }}ο</option>
-    </select>
-  </ion-item>
+  <ion-item class="custom-ion-select">
+  <ion-label>Εξάμηνο</ion-label>
+  <ion-select interface="alert"[(ngModel)]="selectedSemester" (ionChange)="applyFilters()">
+    <ion-select-option value="">Όλα</ion-select-option>
+    <ion-select-option *ngFor="let sem of semesters" [value]="sem">{{ sem }}ο</ion-select-option>
+  </ion-select>
+</ion-item>
 
   <!-- Φίλτρο: Τύπος -->
-  <ion-item>
+  <ion-item class="custom-ion-select">
     <ion-label>Τύπος</ion-label>
-    <select [(ngModel)]="selectedType" (change)="applyFilters()">
-      <option value="">Όλοι</option>
-      <option value="υποχρεωτικό">Υποχρεωτικό</option>
-      <option value="επιλογής χειμερινού">Επιλογής χειμερινού</option>
-      <option value="επιλογής εαρινού">Επιλογής εαρινού</option>
-      <option value="επιλογής γενικής παιδείας">Επιλογής γενικής παιδείας</option>
-    </select>
+    <ion-select interface="alert"[(ngModel)]="selectedType" (ionChange)="applyFilters()">
+      <ion-select-option value="">Όλοι</ion-select-option>
+      <ion-select-option value="υποχρεωτικό">Υποχρεωτικό</ion-select-option>
+      <ion-select-option value="επιλογής χειμερινού">Επιλογής χειμερινού</ion-select-option>
+      <ion-select-option value="επιλογής εαρινού">Επιλογής εαρινού</ion-select-option>
+      <ion-select-option value="επιλογής γενικής παιδείας">Επιλογής γενικής παιδείας</ion-select-option>
+    </ion-select>
   </ion-item>
 
   <!-- Notes Feed -->
@@ -145,24 +146,27 @@
       <!-- Αν υπάρχουν σχόλια -->
       <ng-template #commentsExist>
         <div *ngFor="let c of note.comments" class="comment-item">
-          <div>
-            <b>{{ c.username }}</b>: {{ c.text }}
-            <span *ngIf="c.is_edited" style="color:#888; font-size:12px; font-style:italic;">
-              (edited)
-            </span>
-          </div>        
+          <div class="comment-header">
+            {{ c.username }}
+            <span *ngIf="c.is_edited" class="edited-label">(edited)</span>
+          </div>
+        
+          <div class="comment-body">
+            {{ c.text }}
+          </div>
+        
           <div class="comment-actions-inline">
             <ng-container *ngIf="c.user_id === currentUserId">
-              <ion-button size="small" color="warning" (click)="editComment(note, c)">Edit</ion-button>
-              <ion-button size="small" color="danger" (click)="deleteComment(note, c)">Delete</ion-button>
+              <ion-button size="small" class="edit-btn" (click)="editComment(note, c)">Edit</ion-button>
+              <ion-button size="small" class="delete-btn" (click)="deleteComment(note, c)">Delete</ion-button>
             </ng-container>
-
+        
             <ion-button size="small" fill="clear" color="medium"
               (click)="goToReport(note.id, c.user_id)">
               <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
             </ion-button>
           </div>
-        </div>
+        </div>        
       </ng-template>
 
     </div>

@@ -6,6 +6,9 @@ import { FooterNavComponent } from 'src/app/components/footer-nav/footer-nav.com
 import { NotificationsService } from 'src/app/services/notifications.service';
 import { ChatService } from 'src/app/services/chat.service';
 
+
+
+
 import {
   IonHeader,
   IonToolbar,
@@ -21,6 +24,8 @@ import {
   IonItemOptions,
   IonItemOption,
   IonIcon,
+  IonButtons,
+  IonButton
 } from '@ionic/angular/standalone';
 import { AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -37,7 +42,10 @@ interface ChatPreview {
   last_message_time?: string;
 }
 
+
+
 @Component({
+  
   selector: 'app-chat-list',
   templateUrl: './chat-list.page.html',
   styleUrls: ['./chat-list.page.scss'],
@@ -58,7 +66,9 @@ interface ChatPreview {
     IonItemOptions,
     IonItemOption,
     IonIcon,
-    FooterNavComponent,
+    IonButtons,
+    IonButton,
+    FooterNavComponent
   ],
 })
 export class ChatListPage implements OnInit {
@@ -147,6 +157,10 @@ export class ChatListPage implements OnInit {
     } else {
       this.fetchChats();
     }
+  }
+  
+  goToBot() {
+    this.router.navigate(['/bot']);
   }
   
   

@@ -113,6 +113,10 @@ export const routes: Routes = [
   {
     path: 'points-info',
     loadComponent: () => import('./pages/points-info/points-info.page').then( m => m.PointsInfoPage)
+  },
+  {
+    path: 'bot',
+    loadComponent: () => import('./pages/bot/bot.page').then( m => m.BotPage)
   }
   
   
