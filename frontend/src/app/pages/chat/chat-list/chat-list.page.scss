@@ -1,18 +1,56 @@
-ion-avatar img {
-    border: 2px solid #8C1310; /* Μπορντό περίγραμμα */
-    border-radius: 50%;        /* Στρογγυλό */
-    object-fit: cover;
-  }
-  
+/* 🔹 Ενιαίο background στη λίστα */
+ion-list {
+  background: transparent !important;
+  padding: 0; /* βγάζει τα extra κενά */
+  margin: 0;
+}
 
-  .bold-chat {
-    font-weight: bold;
-  }
-  
-  .chat-badge {
-    margin-left: 6px;
-    font-size: 12px;
-    padding: 2px 6px;
-    border-radius: 12px;
-  }
-  
+/* 🔹 Κάθε chat item */
+ion-item {
+  --background: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
+  --inner-border-width: 0; /* βγάζει τις default ionic γραμμές */
+  padding: 10px 0;
+  min-height: 60px;
+}
+
+/* 🔹 Avatar styling */
+ion-avatar img {
+  border: 2px solid #7B1E3B; /* μπορντό περίγραμμα */
+  border-radius: 50%; 
+  object-fit: cover;
+}
+
+/* 🔹 Label (username + badge) */
+ion-label h2 {
+  font-size: 15px;
+  font-weight: 500;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 🔹 Bold αν έχει αδιάβαστα */
+.bold-chat {
+  font-weight: bold;
+}
+
+/* 🔹 Badge για αδιάβαστα */
+.chat-badge {
+  margin-left: 6px;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 12px;
+}
+
+/* 🔹 Διαχωριστικό ανάμεσα στις συνομιλίες */
+ion-item::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: rgb(128, 3, 76); 
+  margin: 0 0 0 60px; /* αφήνει κενό για το avatar */
+}

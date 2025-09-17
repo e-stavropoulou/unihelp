@@ -12,7 +12,7 @@
     h1 {
       text-align: center;
       font-weight: bold;
-      color: #8C1310;
+      color: #7B1E3B;
       margin-bottom: 16px;
     }
 
@@ -22,12 +22,12 @@
       --border-radius: 10px;
       font-size: 15px;
 
-      --highlight-color-focused: #8C1310;
-      --highlight-color: #8C1310;
+      --highlight-color-focused: #7B1E3B;
+      --highlight-color: #7B1E3B;
     }
 
     .login-btn {
-      --background: #8C1310;
+      --background: #7B1E3B;
       --color: #ffffff;
       --border-radius: 12px;
       font-weight: 600;
@@ -41,7 +41,7 @@
       margin-top: 20px;
 
       a {
-        color: #8C1310;
+        color: #7B1E3B;
         font-weight: 500;
         text-decoration: none;
       }
@@ -50,7 +50,7 @@
 }
 
 .custom-back {
-  color: #8C1310; 
+  color: #7B1E3B; 
 }
 
 .password-wrapper {
@@ -74,8 +74,8 @@
     font-size: 12px;
   }
 
-  --highlight-color-focused: #8C1310;
-  --highlight-color: #8C1310;
+  --highlight-color-focused: #7B1E3B;
+  --highlight-color: #7B1E3B;
 }
 
 
@@ -86,7 +86,7 @@ ion-item {
   --inner-padding-start: 0;
   --highlight-color-focused: transparent;
   --min-height: 50px;
-  border: 1px solid #8C1310;
+  border: 1px solid #7B1E3B;
   border-radius: 10px;
   margin-bottom: 16px;
 }
@@ -99,7 +99,7 @@ ion-item {
   border: none;             
   outline: none;
   color: #000;
-  caret-color: #8C1310;
+  caret-color: #7B1E3B;
 }
 
 .password-item {

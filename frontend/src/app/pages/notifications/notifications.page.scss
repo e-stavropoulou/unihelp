@@ -1,0 +1,51 @@
+/* 📋 Ενιαίο background για τη λίστα */
+ion-list {
+    background: transparent !important;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* 🔔 Κάθε ειδοποίηση */
+  ion-item {
+    --background: transparent !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    --inner-border-width: 0;
+    padding: 12px 0;
+    align-items: flex-start;
+  }
+  
+  /* 🔹 Τίτλος + Μήνυμα */
+  ion-label h3 {
+    font-size: 15px;
+    margin: 0 0 4px 0;
+    color: #000;
+  }
+  
+  ion-label p {
+    font-size: 13px;
+    color: #555;
+    margin: 0;
+  }
+  
+  /* ✅ Διαχωριστικό ανάμεσα στις ειδοποιήσεις */
+  ion-item::after {
+    content: "";
+    display: block;
+    height: 1px;
+    background: rgb(128, 3, 76); 
+    margin: 8px 0 0 0; /* λίγο κενό πάνω από το divider */
+  }
+  
+  /* 🔹 Κουμπιά (read/delete) */
+  ion-buttons {
+    display: flex;
+    gap: 6px;
+  }
+  
+  ion-button {
+    --padding-start: 6px;
+    --padding-end: 6px;
+  }
+  

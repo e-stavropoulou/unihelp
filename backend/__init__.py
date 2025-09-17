@@ -47,6 +47,7 @@ from config import (
     EMAIL_USER,
     EMAIL_PASS,
     BASE_URL,
+    FRONTEND_URL,
 )
 
 def create_app():
@@ -59,6 +60,8 @@ def create_app():
     app.config['EMAIL_USER'] = EMAIL_USER
     app.config['EMAIL_PASS'] = EMAIL_PASS
     app.config['BASE_URL']   = BASE_URL
+    app.config['FRONTEND_URL'] = FRONTEND_URL     
+    
 
     # ✅ Firebase Admin init (μόνο μία φορά)
     if not firebase_admin._apps:
@@ -87,22 +90,15 @@ def create_app():
 
     # -------------------- CORS --------------------
     CORS(
-        app,
-        resources={r"/*": {"origins": [
-            "http://localhost:8100",
-            "http://192.168.2.7:8100",
-            "http://localhost:4201",
-            "http://192.168.2.7:4201",
-            "http://192.168.2.26:8100",
-            "http://192.168.2.26:4201",
-            "http://localhost:8080",
-            "http://192.168.2.26:8080",
-            "http://192.168.2.6:8100",
-            "http://192.168.2.6:4201",
-            "http://192.168.2.6:8080",
-            "capacitor://localhost"
-        ]}}
-    )
+    app,
+    resources={r"/*": {"origins": [
+        app.config['FRONTEND_URL'],
+        "http://localhost:4201",   # admin
+        "capacitor://localhost"
+    ]}},
+    supports_credentials=True
+)
+
 
     # -------------------- Extensions --------------------
     db.init_app(app)
@@ -140,7 +136,7 @@ def create_app():
     app.register_blueprint(bot_bp)
 
 
-        # -------------------- Frontend Build --------------------
+    # -------------------- Frontend Build --------------------
     build_dir = os.path.join(os.path.dirname(__file__), "..", "frontend", "www")
     app.static_folder = build_dir
     app.static_url_path = ""

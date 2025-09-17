@@ -28,16 +28,6 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
-Package: @firebase/installations
-License: "Apache-2.0"
-
-
---------------------------------------------------------------------------------
-Package: @firebase/messaging
-License: "Apache-2.0"
-
-
---------------------------------------------------------------------------------
 Package: @capacitor/toast
 License: "MIT"
 
@@ -254,6 +244,16 @@ License: "Apache-2.0"
 
 
 --------------------------------------------------------------------------------
+Package: @firebase/logger
+License: "Apache-2.0"
+
+
+--------------------------------------------------------------------------------
+Package: @firebase/app
+License: "Apache-2.0"
+
+
+--------------------------------------------------------------------------------
 Package: idb
 License: "ISC"
 
@@ -265,12 +265,12 @@ Permission to use, copy, modify, and/or distribute this software for any purpose
 THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 --------------------------------------------------------------------------------
-Package: @firebase/logger
+Package: @firebase/installations
 License: "Apache-2.0"
 
 
 --------------------------------------------------------------------------------
-Package: @firebase/app
+Package: @firebase/messaging
 License: "Apache-2.0"
 
 

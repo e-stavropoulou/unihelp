@@ -18,7 +18,7 @@ class Comment(db.Model):
 
     # 🔄 Συσχετίσεις
     user = db.relationship('User', backref='comments')
-    note = db.relationship('Note', backref='comments')
+    #note = db.relationship('Note', backref='comments')
     
     # 🔁 Ιστορικό επεξεργασιών
     edit_history = db.relationship(

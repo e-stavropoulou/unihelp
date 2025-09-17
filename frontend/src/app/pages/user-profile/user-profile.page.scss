@@ -27,7 +27,7 @@
     transition: opacity 0.5s ease-in-out;
     opacity: 0;
   
-    border: 2px solid #8C1310;
+    border: 2px solid #7B1E3B;
   }
   
   .avatar-img.visible {
@@ -55,12 +55,12 @@
     align-items: center;
     padding: 8px 0;
     font-size: 22px;
-    color: #8C1310;
+    color: #7B1E3B;
   }
   
   
   ion-button {
-    --background: #8C1310;
+    --background: #7B1E3B;
     --background-hover: #a2211f;
     --background-activated: #7a100d;
     --color: #fff;
@@ -69,12 +69,12 @@
   }
   
   ion-button[color="danger"][fill="outline"] {
-    --border-color: #8C1310;
-    --color: #8C1310;
+    --border-color: #7B1E3B;
+    --color: #7B1E3B;
   }
   
   .custom-red-btn {
-    --background: #8C1310;
+    --background: #7B1E3B;
     --background-hover: #a2211f;
     --color: white;
     --border-radius: 14px;
@@ -85,8 +85,8 @@
   
   
   .custom-outline-btn {
-    --color: #8C1310;
-    --border-color: #8C1310;
+    --color: #7B1E3B;
+    --border-color: #7B1E3B;
     --background: #fff;
     --border-width: 2px;
     --border-radius: 14px;
@@ -97,7 +97,7 @@
   
   
   .upoints-tag {
-    background-color: #8C1310;
+    background-color: #7B1E3B;
     color: white;
     font-size: 12px;
     padding: 4px 10px;
@@ -127,7 +127,7 @@
   .footer-toolbar {
     --background: #fafafa;
     --ion-color-base: #fafafa;
-    --ion-color-contrast: #8C1310;
+    --ion-color-contrast: #7B1E3B;
     box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
   }
   

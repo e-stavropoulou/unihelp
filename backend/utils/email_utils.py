@@ -48,7 +48,7 @@ def send_verification_email(to_email, token):
 
 
 def send_reset_email(to_email, token):
-    base_url = current_app.config['BASE_URL'].replace(':5050', ':8100')
+    base_url = current_app.config.get('BASE_URL', 'http://localhost:5050').rstrip('/')
     reset_url = f"{base_url}/reset-password/{token}"
     subject = "UniHelp | Επαναφορά Κωδικού"
 

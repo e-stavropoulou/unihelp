@@ -16,7 +16,7 @@ class Report(db.Model):
     # Σχέσεις
     reported_by_user = db.relationship("User", foreign_keys=[reported_by])
     reported_user = db.relationship("User", foreign_keys=[reported_user_id])
-    note = db.relationship("Note", foreign_keys=[note_id])
+    #note = db.relationship("Note", foreign_keys=[note_id])
 
     def to_dict(self):
         return {

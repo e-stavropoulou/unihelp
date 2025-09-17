@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.user import User
 from models.shared import db
 from models.note import Note
@@ -9,6 +9,9 @@ from models.comment import Comment
 from models.comment_history import CommentEditHistory
 from models.course import UserCourse
 from utils.decorators import admin_required
+from models.notification import Notification
+from utils.push_utils import send_push_notification
+from datetime import datetime
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
@@ -19,6 +22,10 @@ admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 @jwt_required()
 @admin_required
 def change_user_role(user_id):
+    current_admin_id = int(get_jwt_identity())
+    if user_id == current_admin_id:
+        return jsonify({"error": "Δεν μπορείς να αλλάξεις τον δικό σου ρόλο"}), 403
+
     user = User.query.get(user_id)
     if not user:
         return jsonify({'error': 'User not found'}), 404
@@ -151,23 +158,6 @@ def get_all_users():
     } for u in users]), 200
 
 
-@admin_bp.route('/users/<int:user_id>/block', methods=['PATCH'])
-@jwt_required()
-@admin_required
-def toggle_block_user(user_id):
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-
-    data = request.get_json() or {}
-    is_blocked = data.get("is_blocked")
-    if type(is_blocked) is not bool:
-        return jsonify({"error": "Missing or invalid is_blocked"}), 400
-
-    user.is_blocked = is_blocked
-    db.session.commit()
-    return jsonify({"message": f"User {'blocked' if is_blocked else 'unblocked'}."})
-
 
 # =========================================================
 # 5. ΔΙΑΧΕΙΡΙΣΗ ΣΗΜΕΙΩΣΕΩΝ ΚΑΙ ΣΧΟΛΙΩΝ
@@ -176,14 +166,24 @@ def toggle_block_user(user_id):
 @jwt_required()
 @admin_required
 def get_all_notes():
-    notes = Note.query.all()
+    notes = Note.query.order_by(Note.upload_date.desc()).all()
 
     result = []
     for n in notes:
+        course = Course.query.get(n.course_id)
+        uploader = User.query.get(n.user_id)
+
         note_data = {
             "id": n.id,
             "title": n.title,
-            "uploader": n.user.username if n.user else None,
+            "description": n.description,
+            "category": n.category,
+            "upload_date": n.upload_date.isoformat() if n.upload_date else None,
+            "filepath": f"/static/notes/{n.filename}" if n.filename else None,
+            "course": course.name if course else "Άγνωστο",
+            "semester": course.semester if course else None,
+            "type": course.type if course else None,
+            "uploader": uploader.username if uploader else "Άγνωστος",
             "downloads": n.downloads,
             "comments": []
         }
@@ -209,6 +209,7 @@ def get_all_notes():
         result.append(note_data)
 
     return jsonify(result), 200
+
 
 
 @admin_bp.route('/notes/<int:note_id>', methods=['DELETE'])
@@ -319,3 +320,50 @@ def update_course(course_id):
 
     db.session.commit()
     return jsonify({"message": "Το μάθημα ενημερώθηκε επιτυχώς"}), 200
+
+@admin_bp.route('/users/<int:user_id>/block', methods=['PATCH'])
+@jwt_required()
+@admin_required
+def toggle_block_user(user_id):
+    current_admin_id = int(get_jwt_identity())
+    if user_id == current_admin_id:
+        return jsonify({"error": "Δεν μπορείς να μπλοκάρεις τον εαυτό σου"}), 403
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    data = request.get_json() or {}
+    is_blocked = data.get("is_blocked")
+    if type(is_blocked) is not bool:
+        return jsonify({"error": "Missing or invalid is_blocked"}), 400
+
+    user.is_blocked = is_blocked
+    db.session.commit()
+
+    # 🔔 Δημιουργία ειδοποίησης
+    message = "Ο λογαριασμός σου έχει μπλοκαριστεί από τον διαχειριστή." if is_blocked \
+              else "Ο λογαριασμός σου έχει επανενεργοποιηθεί."
+    notif = Notification(
+        user_id=user.id,
+        message=message,
+        timestamp=datetime.utcnow(),
+        is_read=False
+    )
+    db.session.add(notif)
+    db.session.commit()
+
+    # 📲 Push notification
+    if user.fcm_token:
+        try:
+            status, resp = send_push_notification(
+                token=user.fcm_token,
+                title="⚠️ Ενημέρωση Λογαριασμού",
+                body=message,
+                data={"type": "account_block" if is_blocked else "account_unblock"}
+            )
+            print(f"✅ Push sent to {user.username}, status={status}")
+        except Exception as e:
+            print(f"❌ Failed to send push: {e}")
+
+    return jsonify({"message": f"User {'blocked' if is_blocked else 'unblocked'}."}), 200
