@@ -4,7 +4,7 @@
 
 
 :root {
-    --ion-color-primary: #8C1310;
+    --ion-color-primary: #7B1E3B;
     --ion-color-primary-rgb: 140, 19, 16;
     --ion-color-primary-contrast: #ffffff;
     --ion-color-primary-contrast-rgb: 255, 255, 255;
@@ -16,7 +16,7 @@
   
   @media (prefers-color-scheme: dark) {
     :root {
-      --ion-color-primary: #8C1310;
+      --ion-color-primary: #7B1E3B;
       --ion-color-primary-contrast: #ffffff;
       --ion-background-color: #121212;
       --ion-text-color: #ffffff;
@@ -48,7 +48,7 @@
     }
   
     ion-button {
-      --background: #8C1310;
+      --background: #7B1E3B;
       --color: #ffffff;
     }
   

@@ -1,7 +1,9 @@
 import { initializeApp } from 'firebase/app';
+import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
+import { getMessaging, deleteToken } from "firebase/messaging"
 
 // ✅ Firebase init
 export const firebaseApp = initializeApp(environment.firebase);
@@ -42,6 +44,7 @@ export async function registerFcmToken(): Promise<void> {
       if (currentToken) {
         console.log('🌐 Web FCM Token:', currentToken);
         localStorage.setItem('fcm_token', currentToken);
+        await sendTokenToBackend(currentToken);
       } else {
         console.warn('⚠️ Δεν δημιουργήθηκε Web FCM token.');
       }
@@ -60,6 +63,7 @@ export async function registerFcmToken(): Promise<void> {
       PushNotifications.addListener('registration', (token) => {
         console.log('📱 Native FCM Token:', token.value);
         localStorage.setItem('fcm_token', token.value);
+        sendTokenToBackend(token.value);
       });
 
       PushNotifications.addListener('pushNotificationReceived', (notification) => {
@@ -96,4 +100,45 @@ export async function onMessageWeb(messaging: any, callback: any) {
   if (!isWeb) return undefined;
   const { onMessage } = await import('firebase/messaging');
   return onMessage(messaging, callback);
+}
+
+async function sendTokenToBackend(token: string) {
+  const jwt = localStorage.getItem('token'); // ή από AuthService
+  if (!jwt) return;
+  await fetch(`${environment.API_URL}/update-fcm-token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${jwt}`
+    },
+    body: JSON.stringify({ fcm_token: token })
+  });
+}
+
+export async function clearFcmToken() {
+  const messaging = await getMessagingInstance();
+  if (!messaging) return;
+  try {
+    const currentToken = localStorage.getItem("fcm_token");
+    if (currentToken) {
+      await deleteToken(messaging);
+      localStorage.removeItem("fcm_token");
+      console.log("🗑️ FCM token deleted");
+
+      // 👇 ενημέρωσε και backend (προαιρετικό αλλά καλό να γίνει)
+      const jwt = localStorage.getItem("token");
+      if (jwt) {
+        await fetch(`${environment.API_URL}/update-fcm-token`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${jwt}`
+          },
+          body: JSON.stringify({ fcm_token: null })
+        });
+      }
+    }
+  } catch (err) {
+    console.error("❌ Failed to delete FCM token:", err);
+  }
 }

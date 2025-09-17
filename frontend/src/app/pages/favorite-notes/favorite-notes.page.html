@@ -22,7 +22,7 @@
       <div class="note-meta">
         <p><strong>Εξάμηνο:</strong> {{ note.semester }}ο</p>
         <p><strong>Τύπος:</strong> {{ note.type }}</p>
-        <p><strong>📅 Ανέβηκε:</strong> {{ note.upload_date }}</p>
+        <p><strong>📅 Ανέβηκε:</strong> {{ note.upload_date | date:'dd/MM/yyyy, HH:mm' }}</p>
       </div>
 
       <div class="actions">

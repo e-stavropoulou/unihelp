@@ -22,6 +22,9 @@ import os
 import re
 import secrets
 from utils.email_utils import send_verification_email, send_reset_email
+from models.comment import Comment
+from utils.decorators import block_check
+
 
 
 auth_bp = Blueprint('auth', __name__)
@@ -155,6 +158,14 @@ def login():
             'message': 'Ο λογαριασμός σου δεν έχει ενεργοποιηθεί. Έλεγξε το email σου.',
             'error': 'not_verified'
         }), 403
+    
+        # 🚫 Έλεγχος αν ο χρήστης είναι μπλοκαρισμένος
+    if user.is_blocked:
+        print("🔴 User is blocked")
+        return jsonify({
+            'message': 'Ο λογαριασμός σου έχει μπλοκαριστεί. Επικοινώνησε με τον διαχειριστή στέλνοντας email: st1067476@ceid.upatras.gr.',
+            'error': 'blocked'
+        }), 403
 
     # ✅ Εκδίδουμε ΚΑΙ access ΚΑΙ refresh token
     access_token = create_access_token(identity=str(user.id), additional_claims={"role": user.role})
@@ -173,12 +184,13 @@ def login():
         'token': access_token
     }), 200
 
-    @auth_bp.route('/refresh', methods=['POST'])
-    @jwt_required(refresh=True)   # ✅ ΣΗΜΑΝΤΙΚΟ: απαιτεί refresh token
-    def refresh():
-        user_id = get_jwt_identity()
-        new_access = create_access_token(identity=str(user_id))
-        return jsonify({'access_token': new_access}), 200
+
+@auth_bp.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)   # ✅ ΣΗΜΑΝΤΙΚΟ: απαιτεί refresh token
+def refresh():
+    user_id = get_jwt_identity()
+    new_access = create_access_token(identity=str(user_id))
+    return jsonify({'access_token': new_access}), 200
 
 
 # ----------------------------- CHECK CREDENTIALS -----------------------------
@@ -209,6 +221,7 @@ def get_courses():
 # ----------------------------- UPLOAD NOTE -----------------------------
 @auth_bp.route('/upload-note', methods=['POST'])
 @jwt_required()
+@block_check
 def upload_note():
     from models.course import UserCourse
     from models.notification import Notification
@@ -266,6 +279,22 @@ def upload_note():
         message="Μπράβο! 🎉 Κέρδισες 10 πόντους για την ανάρτηση της σημείωσης."
     )
     db.session.add(reward_notification)
+
+    # 📲 Στείλε push notification στον ίδιο τον χρήστη (αν έχει FCM token)
+    if user.fcm_token:
+        try:
+            status, resp = send_push_notification(
+                token=user.fcm_token,
+                title="🏆 Επιβράβευση",
+                body="Μπράβο! Κέρδισες 10 πόντους για την ανάρτηση της σημείωσης.",
+                data={"type": "points", "points_awarded": "10"}
+            )
+            print(f"✅ Push επιβράβευσης στάλθηκε στον {user.username}: {status}")
+        except Exception as e:
+            print(f"❌ Σφάλμα στο push επιβράβευσης: {e}")
+    else:
+        print("⚠️ Ο χρήστης δεν έχει FCM token, δεν εστάλη push.")
+
 
     db.session.commit()
     print("✅ Αποθηκεύτηκαν οι σημειώσεις και η ειδοποίηση επιβράβευσης.")
@@ -366,6 +395,7 @@ def get_my_notes():
 # ----------------------------- ALL NOTES -----------------------------
 @auth_bp.route('/all-notes', methods=['GET'])
 @jwt_required()
+@block_check
 def get_all_notes():
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
@@ -443,27 +473,44 @@ def edit_note(note_id):
 @auth_bp.route('/delete-note/<int:note_id>', methods=['DELETE'])
 @jwt_required()
 def delete_note(note_id):
+    import traceback
+
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
-
-
+    print(f"🟢 Διαγραφή σημείωσης: note_id={note_id}, user_id={user_id}")
 
     note = Note.query.get(note_id)
 
     if not note:
+        print("❌ Σημείωση δεν βρέθηκε στη βάση")
         return jsonify({'error': 'Η σημείωση δεν βρέθηκε.'}), 404
 
     if note.user_id != user.id:
+        print(f"❌ Ο χρήστης {user.id} προσπάθησε να διαγράψει σημείωση που ανήκει στον {note.user_id}")
         return jsonify({'error': 'Δεν έχεις δικαίωμα διαγραφής αυτής της σημείωσης.'}), 403
 
     try:
+        # 🗑️ Διαγραφή αρχείου αν υπάρχει
         if note.filepath and os.path.exists(note.filepath):
             os.remove(note.filepath)
+            print(f"🗑️ Αρχείο διαγράφηκε: {note.filepath}")
+        else:
+            print(f"⚠️ Το αρχείο δεν βρέθηκε στο filesystem: {note.filepath}")
+
+        # 🗑️ Διαγραφή σημείωσης (θα καθαρίσει αυτόματα favorites/comments/reports λόγω cascade)
         db.session.delete(note)
         db.session.commit()
+
+        print(f"✅ Η σημείωση {note.id} διαγράφηκε επιτυχώς από DB")
         return jsonify({'message': 'Η σημείωση διαγράφηκε επιτυχώς.'}), 200
+
     except Exception as e:
-        return jsonify({'error': 'Σφάλμα κατά τη διαγραφή της σημείωσης.'}), 500
+        print("❌ Σφάλμα κατά τη διαγραφή:", str(e))
+        traceback.print_exc()
+        db.session.rollback()
+        return jsonify({'error': f'Σφάλμα κατά τη διαγραφή: {str(e)}'}), 500
+
+
     
 # ----------------------------- GET NOTE -----------------------------    
 @auth_bp.route('/get-note/<int:note_id>', methods=['GET'])
@@ -560,17 +607,19 @@ def serve_note_file(filename):
 @auth_bp.route('/verify/<token>', methods=['GET'])
 def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
+    frontend = current_app.config.get('FRONTEND_URL', 'http://localhost:8080').rstrip('/')
 
     if not user:
         # Redirect σε σελίδα αποτυχίας
-        return redirect(f"{current_app.config['BASE_URL'].replace(':5050', ':8100')}/verify-invalid")
+        return redirect(f"{frontend}/verify-invalid")
 
     user.is_verified = True
     user.verification_token = None
     db.session.commit()
 
     # Redirect σε σελίδα επιτυχίας
-    return redirect(f"{current_app.config['BASE_URL'].replace(':5050', ':8100')}/email-verified")
+    return redirect(f"{frontend}/email-verified")
+
 
 
 

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
+import { clearFcmToken } from '../firebase';
 
 @Injectable({
   providedIn: 'root'
@@ -82,6 +83,9 @@ export class AuthService {
   }
 
   logout(redirect = true): void {
+
+    clearFcmToken();
+
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_ID_KEY);
     localStorage.removeItem(this.EMAIL_KEY);
@@ -89,8 +93,12 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
     sessionStorage.clear();
   
-    // ✅ Optional: ενημέρωση άλλων observers
-    // this.isAuthenticated$.next(false);
+  this.http.post(`${environment.API_URL}/logout`, {}, {
+    headers: { Authorization: `Bearer ${this.getToken()}` }
+  }).subscribe({
+    next: () => console.log('✅ Backend logout done'),
+    error: (err) => console.warn('⚠️ Backend logout failed:', err)
+  });
   
     if (redirect) {
       window.location.replace('/login'); // πιο καθαρό redirect

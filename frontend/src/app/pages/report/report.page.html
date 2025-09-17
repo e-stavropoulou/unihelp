@@ -8,24 +8,53 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div class="form-group">
-    <label class="form-label">Κατηγορία</label>
-    <select [(ngModel)]="category">
-      <option value="" disabled selected>Επίλεξε κατηγορία</option>
-      <option value="Spam">Spam</option>
-      <option value="Ακατάλληλο">Ακατάλληλο περιεχόμενο</option>
-      <option value="Παρενόχληση">Παρενόχληση</option>
-      <option value="Άλλο">Άλλο</option>
-    </select>
-  </div>
+  <div class="form-box">
+    <form (ngSubmit)="submitReport()">
 
-  <div class="form-group">
-    <label class="form-label">Περιγραφή</label>
-    <textarea [(ngModel)]="description" placeholder="Προαιρετική περιγραφή"></textarea>
-  </div>
+      <!-- 🔖 Κατηγορία -->
+      <label class="form-label">Κατηγορία</label>
+      <ion-item class="custom-ion-select">
+        <ion-select
+          interface="alert"
+          placeholder="Επίλεξε κατηγορία"
+          [(ngModel)]="category"
+          name="category"
+          required
+        >
+          <ion-select-option value="Spam">Spam</ion-select-option>
+          <ion-select-option value="Ακατάλληλο">Ακατάλληλο περιεχόμενο</ion-select-option>
+          <ion-select-option value="Παρενόχληση">Παρενόχληση</ion-select-option>
+          <ion-select-option value="Λάθος Μάθημα">Λάθος Μάθημα</ion-select-option>
+          <ion-select-option value="Διπλότυπο">Διπλότυπο</ion-select-option>
+          <ion-select-option value="Χαμηλής Ποιότητας">Χαμηλής Ποιότητας</ion-select-option>
+          <ion-select-option value="Παραπλανητικό Περιεχόμενο">Παραπλανητικό Περιεχόμενο</ion-select-option>
+          <ion-select-option value="Πνευματικά Δικαιώματα">Πνευματικά Δικαιώματα</ion-select-option>
+          <ion-select-option value="Ακατάλληλη Συμπεριφορά στα Σχόλια">Ακατάλληλη Συμπεριφορά στα Σχόλια</ion-select-option>
+          <ion-select-option value="Άλλο">Άλλο</ion-select-option>
+        </ion-select>
+      </ion-item>
+      
 
-  <ion-button expand="block" (click)="submitReport()" [disabled]="!category">
-    Υποβολή
-  </ion-button>
+      <!-- 📝 Περιγραφή -->
+      <label class="form-label">Περιγραφή</label>
+      <textarea
+        [(ngModel)]="description"
+        name="description"
+        class="custom-input"
+        rows="4"
+        placeholder="Προαιρετική περιγραφή"
+      ></textarea>
+
+      <!-- 📩 Κουμπί υποβολής -->
+      <ion-button
+        expand="block"
+        type="submit"
+        class="custom-red-btn"
+        [disabled]="!category"
+      >
+        Υποβολή
+      </ion-button>
+
+    </form>
+  </div>
 </ion-content>
-

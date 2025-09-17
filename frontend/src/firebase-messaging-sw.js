@@ -27,3 +27,10 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+messaging.onBackgroundMessage((payload) => {
+  console.log('📩 [SW] Background message:', payload);
+  self.registration.showNotification(payload.notification?.title || 'UniHelp', {
+    body: payload.notification?.body || '',
+    icon: '/assets/img/icons/icon-192x192.png'
+  });
+});

@@ -12,7 +12,7 @@
       h1 {
         text-align: center;
         font-weight: bold;
-        color: #8C1310;
+        color: #7B1E3B;
         margin-bottom: 16px;
       }
   
@@ -21,12 +21,12 @@
         --padding-start: 16px;
         --border-radius: 10px;
         font-size: 15px;
-        --highlight-color-focused: #8C1310;
-        --highlight-color: #8C1310;
+        --highlight-color-focused: #7B1E3B;
+        --highlight-color: #7B1E3B;
       }
   
       .next-btn {
-        --background: #8C1310;
+        --background: #7B1E3B;
         --color: #ffffff;
         --border-radius: 12px;
         font-weight: 600;
@@ -36,12 +36,12 @@
   }
   
   .custom-back {
-    color: #8C1310;
+    color: #7B1E3B;
   }
   
   .input-label {
     font-weight: bold;
-    color: #8C1310;
+    color: #7B1E3B;
     margin: 8px 0 4px 4px;
     display: block;
   }
@@ -55,7 +55,7 @@
     --inner-padding-start: 0;
     --highlight-color-focused: transparent;
     --min-height: 50px;
-    border: 1px solid #8C1310;
+    border: 1px solid #7B1E3B;
     border-radius: 10px;
     margin-bottom: 16px;
   }
@@ -68,6 +68,6 @@
     border: none;
     outline: none;
     color: #000;
-    caret-color: #8C1310;
+    caret-color: #7B1E3B;
   }
   

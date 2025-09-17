@@ -35,26 +35,13 @@ def start_or_get_chat(other_user_id):
     if existing_chat:
         return jsonify({"chat_id": existing_chat.id})
 
-    # 🔍 Δες αν υπάρχει ιστορικό παλαιότερης συνομιλίας
-    history_exists = ChatHistory.query.filter(
-        ((ChatHistory.user1_id == current_user_id) & (ChatHistory.user2_id == other_user_id)) |
-        ((ChatHistory.user1_id == other_user_id) & (ChatHistory.user2_id == current_user_id))
-    ).first()
-
-    # 🔧 Δημιουργία νέου ενεργού chat
+    # 🔧 Δημιουργία νέου ενεργού chat (χωρίς award points!)
     new_chat = ChatRoom(user1_id=current_user_id, user2_id=other_user_id)
     db.session.add(new_chat)
-
-    # ✅ Αν δεν υπάρχει ιστορικό, δώσε πόντους και καταχώρισε ιστορικό
-    if not history_exists:
-        user = User.query.get(current_user_id)
-        award_points(user, 5, "💬 Κέρδισες 5 πόντους για τη δημιουργία νέας συζήτησης!")
-
-        new_history = ChatHistory(user1_id=current_user_id, user2_id=other_user_id)
-        db.session.add(new_history)
-
     db.session.commit()
+
     return jsonify({"chat_id": new_chat.id})
+
 
 # 🔹 Λήψη όλων των συνομιλιών χρήστη
 @chat_bp.route('/chats', methods=['GET'])
@@ -148,6 +135,20 @@ def send_message(chat_id):
     sender = User.query.get(current_user_id)
     recipient = User.query.get(recipient_id)
 
+    # ➕ Έλεγχος αν υπάρχει ήδη ιστορικό συνομιλίας
+    history_exists = ChatHistory.query.filter(
+        ((ChatHistory.user1_id == current_user_id) & (ChatHistory.user2_id == recipient_id)) |
+        ((ChatHistory.user1_id == recipient_id) & (ChatHistory.user2_id == current_user_id))
+    ).first()
+
+    if not history_exists:
+        # Δημιουργία ιστορικού
+        new_history = ChatHistory(user1_id=current_user_id, user2_id=recipient_id)
+        db.session.add(new_history)
+
+        # Award πόντους ΜΟΝΟ την πρώτη φορά
+        award_points(sender, 5, "💬 Κέρδισες 5 πόντους για τη δημιουργία νέας συζήτησης!")
+
     # ✅ ΜΟΝΟ PUSH, ΟΧΙ Notification στο backend
     if recipient and recipient.fcm_token:
         try:
@@ -163,7 +164,6 @@ def send_message(chat_id):
                     "created_at": to_athens_iso(datetime.utcnow())
                 }
             )
-
             print(f"✅ Push σε {recipient.username}: {status}")
         except Exception as e:
             print(f"❌ Αποτυχία push σε {recipient.email}: {e}")
@@ -172,6 +172,7 @@ def send_message(chat_id):
 
     db.session.commit()
     return jsonify({"message": "Message sent", "id": message.id})
+
 
 
 

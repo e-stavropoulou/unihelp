@@ -125,9 +125,9 @@ export class AppComponent implements OnInit {
       : { type: 'TOKEN_RESPONSE' };
 
     try {
-      const origin = new URL(document.referrer).origin;
-      console.log('📤 [SSO] Sending token to:', origin);
-      adminWindow.postMessage(response, origin);
+      const targetOrigin = environment.ADMIN_ORIGIN;
+      console.log('📤 [SSO] Sending token to:', targetOrigin);
+      adminWindow.postMessage(response, targetOrigin);      
     } catch (e) {
       console.warn('⚠️ [SSO] Fallback to * origin (unsafe):', e);
       adminWindow.postMessage(response, '*');

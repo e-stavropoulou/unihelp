@@ -18,7 +18,7 @@
 .custom-input {
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid #8C1310;
+  border: 2px solid #7B1E3B;
   border-radius: 10px;
   font-size: 15px;
   box-sizing: border-box;
@@ -48,7 +48,7 @@ ion-note {
 }
 
 .custom-red-btn {
-  --background: #8C1310;
+  --background: #7B1E3B;
   --background-hover: #a2211f;
   --background-activated: #7a100d;
   --color: #fff;
@@ -71,12 +71,12 @@ form {
 
 .custom-search {
   --background: #fff;
-  --border-color: #8C1310;   
+  --border-color: #7B1E3B;   
   --border-width: 2px;
   --border-radius: 8px;
   --box-shadow: none;
-  --icon-color: #8C1310;
-  --cancel-button-color: #8C1310;
+  --icon-color: #7B1E3B;
+  --cancel-button-color: #7B1E3B;
   --placeholder-color: #999;
 }
 
@@ -89,7 +89,7 @@ form {
 }
 
 .search-wrapper {
-  border: 2px solid #8C1310; 
+  border: 2px solid #7B1E3B; 
   border-radius: 8px;
   margin-bottom: 12px;
   overflow: hidden;
@@ -105,19 +105,19 @@ form {
 
 ion-chip {
   background-color: #FDF2F2;
-  color: #8C1310;
-  border: 1px solid #8C1310;
+  color: #7B1E3B;
+  border: 1px solid #7B1E3B;
   border-radius: 16px;
 }
 
 .remove-icon {
   margin-left: 6px;
   cursor: pointer;
-  color: #8C1310;
+  color: #7B1E3B;
 }
 
 .course-list-box {
-  border: 1px solid #8C1310;
+  border: 1px solid #7B1E3B;
   border-radius: 12px;
   padding: 8px;
   margin-top: 8px;
@@ -125,4 +125,29 @@ ion-chip {
   max-height: 200px;
   overflow-y: auto;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.custom-ion-select {
+  --background: #fff;
+  --border-radius: 10px;
+  --padding-start: 12px;
+  --inner-padding-end: 8px;
+  --border-width: 2px;
+  --border-color: #7B1E3B;
+  --color: #000;
+  margin-bottom: 18px;
+  font-size: 15px;
+
+  --inner-border-width: 0;
+}
+
+.custom-ion-select ion-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.custom-ion-select ion-select {
+  font-size: 15px;
+  --placeholder-color: #888;
 }

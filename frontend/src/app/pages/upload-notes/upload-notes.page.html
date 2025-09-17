@@ -23,19 +23,21 @@
 
     
       <label class="form-label">Κατηγορία</label>
-<select
-  [(ngModel)]="category"
-  name="category"
-  required
-  class="custom-input"
->
-  <option value="" disabled selected>Επίλεξε κατηγορία</option>
-  <option value="Σημειώσεις">Σημειώσεις</option>
-  <option value="Διαφάνειες">Διαφάνειες</option>
-  <option value="Ασκήσεις">Ασκήσεις</option>
-  <option value="Λυμένες Ασκήσεις">Λυμένες Ασκήσεις</option>
-</select>
-
+      <ion-item class="custom-ion-select">
+        <ion-select
+          interface="alert"
+          placeholder="Επίλεξε κατηγορία"
+          [(ngModel)]="category"
+          name="category"
+          required
+        >
+          <ion-select-option value="Σημειώσεις">Σημειώσεις</ion-select-option>
+          <ion-select-option value="Διαφάνειες">Διαφάνειες</ion-select-option>
+          <ion-select-option value="Ασκήσεις">Ασκήσεις</ion-select-option>
+          <ion-select-option value="Λυμένες Ασκήσεις">Λυμένες Ασκήσεις</ion-select-option>
+        </ion-select>
+      </ion-item>
+      
 
     
 <!-- 🔍 Αναζήτηση Μαθήματος -->

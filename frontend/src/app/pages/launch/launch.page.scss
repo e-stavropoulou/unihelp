@@ -1,6 +1,6 @@
 
 .launch-container {
-    --background: #8C1310;
+    --background: #7B1E3B ;
   
     .content-wrapper {
       height: 100%;
@@ -33,8 +33,8 @@
   
     .start-button {
       --background: #FDF2F2;
-      --color: #8C1310;
-      --border-color: #8C1310;
+      --color: #7B1E3B ;
+      --border-color: #7B1E3B b;
       --border-radius: 32px;
       --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       font-size: 18px;
@@ -45,8 +45,12 @@
     }
   
     .start-button:hover {
-      --background: #5f0e0b;
+      --background: #7B1E3B ;
       --color: #FDF2F2;
     }
   }
   
+  /* 🎨 Πιο σκούρο μόνο στο launch screen */
+ion-content.launch-container {
+  --background: linear-gradient(180deg, #fff7f5 0%, #7B1E3B 100%) !important;
+}

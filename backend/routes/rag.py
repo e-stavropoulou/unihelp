@@ -11,7 +11,7 @@ rag_bp = Blueprint("rag_bp", __name__)
 
 # 🔍 Set up embeddings and vector store
 embedding = OpenAIEmbeddings(model="text-embedding-3-small")
-vectorstore = FAISS.load_local("faiss_all_notes_raw", embedding, allow_dangerous_deserialization=True)
+vectorstore = FAISS.load_local("faiss_index", embedding, allow_dangerous_deserialization=True)
 retriever = vectorstore.as_retriever(search_kwargs={"k": 30})
 
 # 🤖 Set up LLM

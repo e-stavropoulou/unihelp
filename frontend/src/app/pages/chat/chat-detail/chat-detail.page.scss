@@ -26,7 +26,7 @@
 }
 
 .bubble {
-  background-color: #8C1310;
+  background-color: #7B1E3B;
   color: white;
   padding: 10px 14px;
   border-radius: 16px;
@@ -39,7 +39,7 @@
 }
 
 .message-row.me .bubble {
-  background-color: #8C1310;
+  background-color: #7B1E3B;
   border-bottom-right-radius: 4px;
 }
 
@@ -92,11 +92,21 @@
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #8C1310;
+  border: 2px solid #7B1E3B;
 }
 
 .chat-partner-name {
   font-size: 17px;
   font-weight: 600;
   color: #000;
+}
+
+.custom-btn {
+  --background: #7B1E3B;      /* κύριο χρώμα */
+  --background-hover: #5a1029; /* πιο σκούρο στο hover */
+  --background-activated: #5a1029;
+  --color: #fff;              /* χρώμα εικονιδίου/κειμένου */
+  --border-radius: 50%;       /* κάνει το κουμπί κυκλικό αν είναι icon-only */
+  --padding-start: 8px;
+  --padding-end: 8px;
 }

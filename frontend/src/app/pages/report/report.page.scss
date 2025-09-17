@@ -29,7 +29,7 @@ ion-label {
 select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #8C1310;
+  border: 1px solid #7B1E3B;
   border-radius: 8px;
   font-size: 15px;
   box-sizing: border-box;
@@ -47,7 +47,7 @@ select:focus {
 textarea {
   width: 100%;
   padding: 12px;
-  border: 1px solid #8C1310;
+  border: 1px solid #7B1E3B;
   border-radius: 8px;
   font-size: 15px;
   box-sizing: border-box;
@@ -60,7 +60,33 @@ textarea {
 /* Κουμπί υποβολής */
 ion-button {
   --border-radius: 10px;
-  --background: #8C1310;
+  --background: #7B1E3B;
   margin-top: 24px;
   font-weight: 600;
+}
+
+
+.custom-ion-select {
+  --background: #fff;
+  --border-radius: 10px;
+  --padding-start: 12px;
+  --inner-padding-end: 8px;
+  --border-width: 2px;
+  --border-color: #7B1E3B;
+  --color: #000;
+  margin-bottom: 18px;
+  font-size: 15px;
+
+  --inner-border-width: 0;
+}
+
+.custom-ion-select ion-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.custom-ion-select ion-select {
+  font-size: 15px;
+  --placeholder-color: #888;
 }

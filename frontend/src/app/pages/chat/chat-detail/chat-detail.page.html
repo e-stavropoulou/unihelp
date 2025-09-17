@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="light">
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/chat"></ion-back-button>
     </ion-buttons>
@@ -34,9 +34,9 @@
         class="message-input"
         placeholder="Γράψε μήνυμα..."
       />
-      <ion-button slot="end" fill="solid" color="danger" (click)="sendMessage()">
+      <ion-button slot="end" fill="solid" class="custom-btn" (click)="sendMessage()">
         <ion-icon name="send" slot="icon-only"></ion-icon>
-      </ion-button>
+      </ion-button>      
     </ion-item>
   </ion-toolbar>
 </ion-footer>
