@@ -18,3 +18,5 @@ class Message(db.Model):
     is_read = db.Column(db.Boolean, default=False)
 
 
+# ✅ Σχέση με τον User
+    sender = db.relationship("User", backref="messages_sent", foreign_keys=[sender_id])

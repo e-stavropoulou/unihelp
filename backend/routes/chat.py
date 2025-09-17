@@ -96,16 +96,18 @@ def get_chat_messages(chat_id):
     if not chat or current_user_id not in [chat.user1_id, chat.user2_id]:
         return jsonify({"error": "Unauthorized"}), 403
 
-    messages = Message.query.filter_by(chat_id=chat_id).order_by(Message.timestamp).all()
+    messages = Message.query.filter_by(chat_id=chat_id).order_by(Message.timestamp.asc()).all()
     return jsonify([
         {
             "id": m.id,
             "sender_id": m.sender_id,
+            "username": m.sender.username if getattr(m, "sender", None) else "Unknown",
             "content": m.content,
-            "timestamp": to_athens_iso(m.timestamp)
+            "timestamp": to_athens_iso(m.timestamp) if m.timestamp else None
         }
         for m in messages
     ])
+
 
 
 # 🔹 Αποστολή μηνύματος
@@ -129,27 +131,16 @@ def send_message(chat_id):
     # 📩 Αποθήκευση μηνύματος
     message = Message(chat_id=chat_id, sender_id=current_user_id, content=content)
     db.session.add(message)
+    db.session.commit()   # ✅ commit πριν το push
 
     # 🔔 Push notification στον παραλήπτη
     recipient_id = chat.user2_id if chat.user1_id == current_user_id else chat.user1_id
     sender = User.query.get(current_user_id)
-    recipient = User.query.get(recipient_id)
 
-    # ➕ Έλεγχος αν υπάρχει ήδη ιστορικό συνομιλίας
-    history_exists = ChatHistory.query.filter(
-        ((ChatHistory.user1_id == current_user_id) & (ChatHistory.user2_id == recipient_id)) |
-        ((ChatHistory.user1_id == recipient_id) & (ChatHistory.user2_id == current_user_id))
-    ).first()
+    # ✅ force refresh recipient
+    recipient = db.session.query(User).filter_by(id=recipient_id).first()
+    db.session.refresh(recipient)
 
-    if not history_exists:
-        # Δημιουργία ιστορικού
-        new_history = ChatHistory(user1_id=current_user_id, user2_id=recipient_id)
-        db.session.add(new_history)
-
-        # Award πόντους ΜΟΝΟ την πρώτη φορά
-        award_points(sender, 5, "💬 Κέρδισες 5 πόντους για τη δημιουργία νέας συζήτησης!")
-
-    # ✅ ΜΟΝΟ PUSH, ΟΧΙ Notification στο backend
     if recipient and recipient.fcm_token:
         try:
             status, push_resp = send_push_notification(
@@ -170,34 +161,22 @@ def send_message(chat_id):
     else:
         print(f"⚠️ Ο {recipient.username if recipient else 'N/A'} δεν έχει fcm_token.")
 
+    # ➕ Έλεγχος αν υπάρχει ήδη ιστορικό συνομιλίας
+    history_exists = ChatHistory.query.filter(
+        ((ChatHistory.user1_id == current_user_id) & (ChatHistory.user2_id == recipient_id)) |
+        ((ChatHistory.user1_id == recipient_id) & (ChatHistory.user2_id == current_user_id))
+    ).first()
+
+    if not history_exists:
+        # Δημιουργία ιστορικού
+        new_history = ChatHistory(user1_id=current_user_id, user2_id=recipient_id)
+        db.session.add(new_history)
+
+        # Award πόντους ΜΟΝΟ την πρώτη φορά
+        award_points(sender, 5, "💬 Κέρδισες 5 πόντους για τη δημιουργία νέας συζήτησης!")
+
     db.session.commit()
     return jsonify({"message": "Message sent", "id": message.id})
-
-
-
-
-
-# 🔹 Λήψη στοιχείων συνομιλητή
-@chat_bp.route('/chats/<int:chat_id>/partner', methods=['GET'])
-@jwt_required()
-def get_chat_partner(chat_id):
-    current_user_id = int(get_jwt_identity())
-    chat = ChatRoom.query.get(chat_id)
-
-    if not chat or current_user_id not in [chat.user1_id, chat.user2_id]:
-        return jsonify({"error": "Unauthorized"}), 403
-
-    partner_id = chat.user2_id if chat.user1_id == current_user_id else chat.user1_id
-    partner = User.query.get(partner_id)
-
-    if not partner:
-        return jsonify({"error": "User not found"}), 404
-
-    return jsonify({
-        "other_user_id": partner.id,
-        "other_username": partner.username,
-        "other_avatar": partner.avatar_url
-    })
 
 
 # 🔹 Πλήθος αδιάβαστων μηνυμάτων
@@ -255,3 +234,26 @@ def delete_chat(chat_id):
 
     db.session.commit()
     return jsonify({"message": "Chat deleted"})
+
+# 🔹 Πληροφορίες συνομιλητή
+@chat_bp.route('/chats/<int:chat_id>/partner', methods=['GET'])
+@jwt_required()
+def get_chat_partner(chat_id):
+    current_user_id = int(get_jwt_identity())
+    chat = ChatRoom.query.get(chat_id)
+
+    if not chat or current_user_id not in [chat.user1_id, chat.user2_id]:
+        return jsonify({"error": "Unauthorized"}), 403
+
+    # Πάρε το άλλο άτομο του chat
+    other_user_id = chat.user2_id if chat.user1_id == current_user_id else chat.user1_id
+    other_user = User.query.get(other_user_id)
+
+    if not other_user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+        "other_user_id": other_user.id,
+        "other_username": other_user.username,
+        "other_avatar": other_user.avatar_url
+    })

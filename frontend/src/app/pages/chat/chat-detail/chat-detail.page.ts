@@ -90,6 +90,9 @@ export class ChatDetailPage implements OnInit {
       const currentChatId = Number(this.chatId);
   
       if (incomingChatId === currentChatId) {
+        // ✅ Αν το μήνυμα είναι από τον ίδιο τον χρήστη, αγνόησέ το
+        if (Number(message.sender_id) === this.userId) return;
+      
         this.ngZone.run(() => {
           const cleanedMessage = {
             ...message,
@@ -97,12 +100,12 @@ export class ChatDetailPage implements OnInit {
             timestamp: new Date(message.timestamp || message.created_at || Date.now()),
             is_read: true
           };
-  
+      
           this.messages = [...this.messages, cleanedMessage];
           console.log('📩 Messages length after push:', this.messages.length);
           this.scrollToBottom();
         });
-      }
+      }      
     });
   }
   
