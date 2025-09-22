@@ -127,28 +127,12 @@ def accept_report(report_id):
 
     reporter = User.query.get(report.reported_by)
     if reporter:
-        # ✅ Πόντοι
-        award_points(reporter, 3, "🚨 Η αναφορά σου έγινε δεκτή! Πήρες 3 πόντους.")
-
-        # ✅ Ειδοποίηση στη βάση
-        notif = Notification(
-            user_id=reporter.id,
-            title="✅ Η αναφορά σου έγινε δεκτή!",
-            body="Κέρδισες 3 πόντους για τη συμβολή σου.",
-            created_at=datetime.now(ZoneInfo("UTC"))
-        )
-        db.session.add(notif)
-
-        # ✅ Push ειδοποίηση
-        if reporter.fcm_token:
-            send_push_notification(
-                reporter.fcm_token,
-                "✅ Η αναφορά σου έγινε δεκτή!",
-                "Κέρδισες 3 πόντους για τη συμβολή σου."
-            )
+        # ✅ Μόνο award_points (κάνει και in-app + push)
+        award_points(reporter, 3, "🚨 Η αναφορά σου έγινε δεκτή! Κέρδισες 3 πόντους.")
 
     db.session.commit()
     return jsonify({"message": "Report accepted"}), 200
+
 
 # -----------------------
 # POST /admin/reports/<id>/reject
@@ -166,3 +150,39 @@ def reject_report(report_id):
     db.session.commit()
 
     return jsonify({"message": "Report rejected"}), 200
+
+# -----------------------
+# GET /admin/reports/history
+# -----------------------
+@reports_bp.route('/admin/reports/history', methods=['GET'])
+@jwt_required()
+def get_reports_history():
+    current_user_id = get_jwt_identity()
+    admin = User.query.get(current_user_id)
+
+    if not admin or admin.role != 'admin':
+        return jsonify({"error": "Unauthorized"}), 403
+
+    reports = Report.query.filter(Report.status.in_(["accepted", "rejected"]))\
+        .order_by(Report.timestamp.desc())\
+        .all()
+
+    result = []
+    for r in reports:
+        reported_by_username = r.reported_by_user.username if r.reported_by_user else None
+        reported_user_username = r.reported_user.username if r.reported_user else None
+        note_title = r.note.title if r.note else None
+
+        result.append({
+            "id": r.id,
+            "category": r.category,
+            "description": r.description,
+            "status": r.status,
+            "timestamp": to_athens_iso(r.timestamp),
+            "reported_by": reported_by_username or "—",
+            "reported_user": reported_user_username or "—",
+            "note_id": r.note_id,
+            "note_title": note_title or "—"
+        })
+
+    return jsonify(result), 200

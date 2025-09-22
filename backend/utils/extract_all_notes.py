@@ -44,25 +44,21 @@ def extract_text_from_pdf(path):
 
 
 def extract_text_from_docx(path):
-    """Εξαγωγή κειμένου από DOCX."""
     doc = Document(path)
     return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
 
 
 def extract_text_from_txt(path):
-    """Εξαγωγή κειμένου από TXT."""
     with open(path, 'r', encoding='utf-8', errors='ignore') as f:
         return f.read()
 
 
 def extract_text_from_image(path):
-    """OCR σε εικόνα (JPG/PNG)."""
     img = Image.open(path)
     return pytesseract.image_to_string(img, lang="ell+eng")
 
 
 def extract_text(path, ext):
-    """Router ανάλογα με το extension."""
     try:
         ext = ext.lower().strip()
         if ext == ".pdf":
@@ -81,7 +77,6 @@ def extract_text(path, ext):
 
 
 def process_all_notes():
-    """Διατρέχει όλα τα notes από τη βάση, εξάγει κείμενο και σώζει σε JSON."""
     results = []
     all_notes = Note.query.all()
 
@@ -91,7 +86,27 @@ def process_all_notes():
 
         if ext not in ALLOWED_EXTENSIONS:
             print(f"⏩ Παράλειψη μη υποστηριζόμενου αρχείου: {filename}")
-            continue
+
+            cleaned_text = (
+                f"📘 Αυτή η σημείωση ({note.title or 'Χωρίς τίτλο'}) αφορά το μάθημα "
+                f"{note.course.name if note.course else 'Άγνωστο μάθημα'} και έχει ανέβει από τον χρήστη "
+                f"{note.user.username if note.user else 'Άγνωστος'}. "
+                f"⚠️ Το αρχείο έχει τύπο {ext} που δεν υποστηρίζεται για εξαγωγή περιεχομένου."
+            )
+
+            results.append({
+                "filename": filename,
+                "extension": ext,
+                "title": note.title or "Χωρίς τίτλο",
+                "text": cleaned_text,
+                "downloads": getattr(note, "downloads", 0),
+                "comments": len(note.comments) if hasattr(note, "comments") else 0,
+                "uploader": note.user.username if note.user else "Άγνωστος",
+                "course": note.course.name if note.course else "Άγνωστο μάθημα"
+            })
+
+            continue  # Μην προχωράς σε εξαγωγή
+
 
         full_path = os.path.join(NOTES_FOLDER, filename)
         if not os.path.exists(full_path):
@@ -100,23 +115,34 @@ def process_all_notes():
 
         print(f"📄 Επεξεργασία: {filename}")
 
-        text = extract_text(full_path, ext)
+        try:
+            text = extract_text(full_path, ext)
+            cleaned_text = text.strip() if text else ""
 
-        if text and text.strip():
-            results.append({
-                "filename": filename,
-                "extension": ext,
-                "title": note.title or "Χωρίς τίτλο",
-                "text": text.strip(),
-                "downloads": getattr(note, "downloads", 0),
-                "comments": len(note.comments) if hasattr(note, "comments") else 0,
-                "uploader": note.user.username if note.user else "Άγνωστος",
-                "course": note.course.name if note.course else "Άγνωστο μάθημα"
-            })
-        else:
-            print(f"⚠️ Δεν εξήχθη κείμενο από: {filename} (ίσως σκαναρισμένο/κενό)")
+            if not cleaned_text:
+                print(f"⚠️ Δεν εξήχθη κείμενο από: {filename}")
+                cleaned_text = (
+                    f"📘 Το αρχείο αφορά το μάθημα {note.course.name if note.course else 'Άγνωστο μάθημα'} και έχει ανέβει από τον χρήστη "
+                    f"{note.user.username if note.user else 'Άγνωστος'}. Ο τίτλος της σημείωσης είναι: {note.title or 'Χωρίς τίτλο'}. "
+                    "⚠️ Δεν ήταν δυνατό να εξαχθεί το ακριβές περιεχόμενο, αλλά περιέχει χρήσιμες πληροφορίες σχετικές με το μάθημα."
+                )
 
-    # 💾 Αποθήκευση JSON
+
+        except Exception as e:
+            print(f"❌ Σφάλμα με {filename}: {e}")
+            cleaned_text = "❌ Παρουσιάστηκε σφάλμα κατά την επεξεργασία του αρχείου."
+
+        results.append({
+            "filename": filename,
+            "extension": ext,
+            "title": note.title or "Χωρίς τίτλο",
+            "text": cleaned_text,
+            "downloads": getattr(note, "downloads", 0),
+            "comments": len(note.comments) if hasattr(note, "comments") else 0,
+            "uploader": note.user.username if note.user else "Άγνωστος",
+            "course": note.course.name if note.course else "Άγνωστο μάθημα"
+        })
+
     with open("notes_text_dataset.json", "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
 

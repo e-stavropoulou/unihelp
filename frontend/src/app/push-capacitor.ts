@@ -9,10 +9,18 @@ import {
 import { environment } from 'src/environments/environment';
 
 export const initPushCapacitor = async () => {
-  if (Capacitor.getPlatform() === 'web') {
-    console.log('🚫 Push notifications not supported on web (use firebase.messaging instead)');
-    return;
-  }
+  const platform = Capacitor.getPlatform();
+
+if (platform === 'web') {
+  console.log('🌐 Skipping Capacitor push setup for Web (handled by firebase-messaging)');
+  return;
+}
+
+if (platform === 'ios') {
+  console.log('📱 Skipping push registration on iOS (no Apple Developer account)');
+  return;
+}
+
 
   try {
     const permStatus = await PushNotifications.requestPermissions();

@@ -358,3 +358,22 @@ ion-button[fill="outline"]:active {
 ion-content {
   --background: #fff;
 }
+
+.note-rating {
+  margin-top: 6px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: #333;
+}
+
+.star-rating {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.star-icon {
+  font-size: 22px;
+  color: #fbbf24; // 🟡 amber
+  cursor: pointer;
+}

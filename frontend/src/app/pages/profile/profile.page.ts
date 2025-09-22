@@ -55,11 +55,13 @@ export class ProfilePage implements OnInit {
   userData: any = null;
   canHelpCourses: string[] = [];
   needsHelpCourses: string[] = [];
-  avatarUrl: string | null = null;
-  avatarVisible = false; // για animation
+  avatarUrl: string = 'assets/img/placeholder-avatar.png';
+  avatarVisible = false;
   userPoints: number = 0;
   isNative = Capacitor.isNativePlatform();
-
+  averageRating: number = 0;
+  reviewCount: number = 0;
+  
 
 
   constructor(private router: Router, private http: HttpClient, private authService: AuthService, private ssoService: SsoService, private notificationsService: NotificationsService) {}
@@ -68,9 +70,15 @@ export class ProfilePage implements OnInit {
     this.loadUserData();
   }
 
-  getPushPermissionState(): 'default' | 'granted' | 'denied' {
+  getPushPermissionState(): 'default' | 'granted' | 'denied' | 'unsupported' {
+    if (typeof Notification === 'undefined') {
+      console.warn('⚠️ Notification API is not supported in this environment.');
+      return 'unsupported';
+    }
+  
     return Notification.permission as 'default' | 'granted' | 'denied';
   }
+  
   
   openNotificationSettings() {
     // Chrome-specific (για Safari/Firefox θα βάλεις οδηγίες)
@@ -82,7 +90,7 @@ export class ProfilePage implements OnInit {
     const userId = this.authService.getUserId();
     if (!userId) return;
   
-    this.notificationsService.requestWebPushToken(userId).then(() => {
+    this.notificationsService.requestWebPushToken().then(() => {
       // 👇 Δεν χρειάζεται πια flag – η HTML βασίζεται στο Notification.permission
       console.log('✅ Άδεια push ζητήθηκε');
     });
@@ -93,6 +101,9 @@ export class ProfilePage implements OnInit {
 
   ionViewWillEnter() {
     this.loadUserData();
+
+    this.notificationsService.initPush();
+
   }
 
   loadUserData() {
@@ -109,6 +120,11 @@ export class ProfilePage implements OnInit {
   
     this.http.get<any>(`${environment.API_URL}/profile`, { headers }).subscribe({
       next: (data) => {
+        if (!data) {
+          console.warn('[DEBUG] Empty profile response');
+          return;
+        }
+
         console.log('[DEBUG] /profile response data:', data);
         console.log('[DEBUG] /profile full data:', data);
         console.log('[DEBUG] upoints received:', data.upoints);
@@ -116,6 +132,9 @@ export class ProfilePage implements OnInit {
         this.canHelpCourses = data.can_help_courses || [];
         this.needsHelpCourses = data.needs_help_courses || [];
         this.userPoints = data.upoints || 0;
+        this.averageRating = data.average_rating;
+        this.reviewCount = data.review_count;
+
 
   
         this.avatarVisible = false; // για fade-in
@@ -139,7 +158,7 @@ export class ProfilePage implements OnInit {
         this.router.navigate(['/login']);
       }
     });
-  }
+  } 
 
   openAdminDashboard(): void {
     this.ssoService.openAdminDashboard();

@@ -66,7 +66,7 @@ export class LoginPage {
       
         // ✅ FCM push registration (Web)
         if (Capacitor.getPlatform() === 'web') {
-          this.notificationsService.requestWebPushToken(res.user_id)
+          this.notificationsService.requestWebPushToken()
             .then(() => console.log("✅ FCM token registered για χρήστη:", res.user_id))
             .catch(err => console.error("❌ FCM token registration failed:", err));
         } else {

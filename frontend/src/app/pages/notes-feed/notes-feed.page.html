@@ -74,6 +74,25 @@
             {{ note.course }} • {{ note.category }} • από {{ note.uploader }}
           </span>
         </div>
+
+                <!-- 🌟 Μέση Αξιολόγηση + User Review -->
+        <div class="note-rating">
+          <p *ngIf="note.average_rating">
+            ⭐ {{ note.average_rating }} / 5 ({{ note.review_count }} αξιολογήσεις)
+          </p>
+
+          <!-- 🌟 Διαδραστικά αστέρια -->
+          <div class="star-rating">
+            <ng-container *ngFor="let star of [1,2,3,4,5]">
+              <ion-icon
+                [name]="star <= (userRatings[note.id] || 0) ? 'star' : 'star-outline'"
+                class="star-icon"
+                (click)="!userRatings[note.id] && rateNote(note.id, star)"
+              ></ion-icon>
+            </ng-container>
+          </div>          
+        </div>
+
       
         <!-- Περιγραφή -->
         <div class="note-section">

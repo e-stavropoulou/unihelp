@@ -4,7 +4,6 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Capacitor } from '@capacitor/core';
 import { getMessagingInstance, getTokenWeb } from 'src/app/firebase';
-import { initPushCapacitor } from './push-capacitor';
 import { NotificationsService } from './services/notifications.service';
 import { ChatService } from './services/chat.service';
 
@@ -93,11 +92,8 @@ export class AppComponent implements OnInit {
   }
 
   enableWebPush() {
-    const userId = Number(localStorage.getItem('user_id'));
-    if (!userId) return;
-  
-    this.notificationsService.requestWebPushToken(userId);
-    this.notificationsService.initPush(userId);
+    this.notificationsService.requestWebPushToken();
+    
   }
   
 

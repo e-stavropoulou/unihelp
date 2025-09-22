@@ -141,7 +141,7 @@ export class NotificationsPage implements OnInit {
   enablePush() {
     const userId = this.authService.getUserId();
     if (userId !== null) {
-      this.notificationsService.initPush(userId).then(() => {
+      this.notificationsService.initPush().then(() => {
         this.showEnableBtn = false;
       });
     } else {

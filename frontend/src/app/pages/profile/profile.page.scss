@@ -1,4 +1,4 @@
-
+/* === Profile Header === */
 .profile-header {
   display: flex;
   justify-content: space-between;
@@ -10,12 +10,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.avatar-settings {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  position: relative;
 }
 
 .avatar-upload {
@@ -43,43 +38,27 @@
   width: 90px;
   height: 90px;
   border-radius: 50%;
-  object-fit: cover;   /* κρατάει σωστές αναλογίες */
-  object-position: center; /* κεντράρει το πρόσωπο */
+  object-fit: cover;
+  object-position: center;
   border: 2px solid #7B1E3B;
   transition: opacity 0.5s ease-in-out;
   opacity: 0;
 }
-
-
 .avatar-img.visible {
   opacity: 1;
 }
 
-
-
+/* === Info Cards === */
 .info-card {
   background: white;
   border-radius: 12px;
   border: 2px solid #7B1E3B;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  margin: 0 auto 1rem auto;
 }
 
-
-
-.button-row ion-button {
-  margin-top: 10px;
-}
-
-.footer-nav {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 8px 0;
-  font-size: 22px;
-  color: #7B1E3B;
-}
-
-
+/* === Buttons === */
 ion-button {
   --background: #7B1E3B;
   --background-hover: #7B1E3B;
@@ -88,7 +67,6 @@ ion-button {
   border-radius: 20px;
   font-weight: 600;
 }
-
 ion-button[color="danger"][fill="outline"] {
   --border-color: #7B1E3B;
   --color: #7B1E3B;
@@ -103,8 +81,6 @@ ion-button[color="danger"][fill="outline"] {
   margin-bottom: 10px;
   text-transform: none;
 }
-
-
 .custom-outline-btn {
   --color: #7B1E3B;
   --border-color: #7B1E3B;
@@ -116,7 +92,18 @@ ion-button[color="danger"][fill="outline"] {
   text-transform: none;
 }
 
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+.button-row ion-button {
+  flex: 1 1 100%;   /* ✅ Mobile default full width */
+  max-width: 100%;
+}
 
+/* === Tags === */
 .upoints-tag {
   background-color: #7B1E3B;
   color: white;
@@ -128,22 +115,15 @@ ion-button[color="danger"][fill="outline"] {
   font-weight: 500;
 }
 
-
-ion-footer {
-  ion-toolbar {
-    --background: #fff !important;
-    --border-color: transparent !important;
-    --border-width: 0 !important;
-    border-top: none !important;
-    box-shadow: none !important;
-    background-color: #fff !important;
-  }
+/* === Footer === */
+.footer-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 22px;
+  color: #7B1E3B;
 }
-
-.profile-content {
-  --background: #fff !important;
-}
-
 
 .footer-toolbar {
   --background: #fafafa;
@@ -152,47 +132,13 @@ ion-footer {
   box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.05);
 }
 
-.mini-btn {
-  font-size: 13px;
-  --padding-start: 10px;
-  --padding-end: 10px;
-  --background: #7B1E3B;
-  --color: #fff;
-  --border-radius: 8px;
-}
-
-.centered-button {
-  display: flex;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-
-::ng-deep .info-popover {
-  --width: 320px;
-  --max-height: 80vh;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  background: white;
-}
-
-/* ✅ μειώνει την αδιαφάνεια του backdrop */
-ion-popover {
-  --backdrop-opacity: 0.2;
-}
-
-
+/* === Toolbar === */
 .profile-toolbar {
   --background: #fff !important;
   --ion-toolbar-background: #fff !important;
   --color: #7B1E3B !important;
-  backdrop-filter: none !important; /* για να μην περνάει το gradient */
-  
-  /* ✅ πρόσθεσε σκιά κάτω από το toolbar */
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.138);
 }
-
-
 .info-icon-btn {
   --background: transparent !important;
   --box-shadow: none !important;
@@ -204,7 +150,50 @@ ion-popover {
   --padding-bottom: 0 !important;
 
   ion-icon {
-    color: #7B1E3B !important; /* ✅ μόνο το εικονίδιο στο χρώμα της εφαρμογής */
-    font-size: 22px;           /* προσαρμόζεις μέγεθος */
+    color: #7B1E3B !important;
+    font-size: 22px;
+  }
+}
+
+/* === Popover === */
+::ng-deep .info-popover {
+  --width: 320px;
+  --max-height: 80vh;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  background: white;
+}
+ion-popover {
+  --backdrop-opacity: 0.2;
+}
+
+/* === Buttons small === */
+.mini-btn {
+  font-size: 13px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --background: #7B1E3B;
+  --color: #fff;
+  --border-radius: 8px;
+}
+.centered-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+/* === Responsive for Web/Desktop === */
+@media (min-width: 768px) {
+  .button-row {
+    justify-content: flex-start;
+  }
+  .button-row ion-button {
+    flex: 1 1 auto;
+    max-width: 240px; /* ✅ κουμπιά πιο μαζεμένα */
+  }
+  .info-card,
+  .profile-header {
+    max-width: 600px; /* ✅ κάρτες και header δεν ξεχειλώνουν */
+    margin: 0 auto 1.5rem auto;
   }
 }

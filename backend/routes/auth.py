@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_from_directory, redirect, current_app
+from flask import Blueprint, request, jsonify, send_from_directory, redirect, current_app, send_file
 from models.user import db, User
 from models.course import Course, UserCourse
 from models.note import Note
@@ -24,6 +24,7 @@ import secrets
 from utils.email_utils import send_verification_email, send_reset_email
 from models.comment import Comment
 from utils.decorators import block_check
+import mimetypes
 
 
 
@@ -383,7 +384,7 @@ def get_my_notes():
             'description': note.description,
             'category': note.category,
             'upload_date': to_athens_iso(note.upload_date),
-            'filepath': f'{BASE_URL}/static/notes/{note.filename}',
+            'filepath': f'{BASE_URL}/download/{note.id}',
             'course': course.name if course else 'Άγνωστο',
             'semester': course.semester if course else None,
             'type': course.type if course else None
@@ -400,7 +401,6 @@ def get_all_notes():
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
 
-
     fav_ids = [fav.note_id for fav in Favorite.query.filter_by(user_id=user.id).all()]
     notes = Note.query.order_by(Note.upload_date.desc()).all()
 
@@ -415,16 +415,18 @@ def get_all_notes():
             'description': note.description,
             'downloads': note.downloads,
             'category': note.category,
-           'upload_date': to_athens_iso(note.upload_date),
-            'filepath': f'{BASE_URL}/static/notes/{note.filename}',
+            'upload_date': to_athens_iso(note.upload_date),
+            'filepath': f'{BASE_URL}/download/{note.id}',
             'course': course.name if course else 'Άγνωστο',
             'semester': course.semester if course else None,
             'type': course.type if course else None,
             'uploader': user_.username if user_ else 'Άγνωστος',
+            'user_id': note.user_id,          # 👈 πρόσθεσέ το εδώ
             'isFavorite': note.id in fav_ids
         })
 
     return jsonify(result), 200
+
 
 
 # -----------------------------   edit NOTE -----------------------------
@@ -564,7 +566,7 @@ def get_favorites():
             'description': note.description,
             'category': note.category,
             'upload_date': to_athens_iso(note.upload_date),
-            'filepath': f'{BASE_URL}/static/notes/{note.filename}',
+            'filepath': f'{BASE_URL}/download/{note.id}',
             'course': course.name if course else 'Άγνωστο',
             'semester': course.semester if course else None,
             'type': course.type if course else None,
@@ -596,10 +598,6 @@ def toggle_favorite():
         db.session.commit()
         return jsonify({'message': 'Προστέθηκε στα αγαπημένα!'}), 201
 
-# ----------------------------- SERVE FILE -----------------------------
-@auth_bp.route('/static/notes/<filename>')
-def serve_note_file(filename):
-    return send_from_directory(NOTES_UPLOAD_FOLDER, filename)
 
 
 # επιβεβαιώση email
@@ -609,16 +607,17 @@ def verify_email(token):
     user = User.query.filter_by(verification_token=token).first()
     frontend = current_app.config.get('FRONTEND_URL', 'http://localhost:8080').rstrip('/')
 
+    print("👉 FRONTEND_URL που χρησιμοποιώ:", frontend)
+
     if not user:
-        # Redirect σε σελίδα αποτυχίας
         return redirect(f"{frontend}/verify-invalid")
 
     user.is_verified = True
     user.verification_token = None
     db.session.commit()
 
-    # Redirect σε σελίδα επιτυχίας
     return redirect(f"{frontend}/email-verified")
+
 
 
 

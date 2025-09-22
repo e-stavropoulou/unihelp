@@ -29,6 +29,11 @@ export class UserProfilePage implements OnInit {
   avatarVisible = false;
   currentUserId: number | null = null;
 
+  averageRating: number | null = null;
+  reviewCount: number = 0;
+  userRating: number = 0; // Τι έχει βάλει ο current user (αν έχει)
+
+
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
@@ -64,6 +69,8 @@ export class UserProfilePage implements OnInit {
             : 'assets/img/placeholder-avatar.png';
           this.avatarVisible = true;
         }, 100);
+
+        this.loadUserReviewStats();
       },
       error: (err) => {
         console.error('❌ Σφάλμα:', err);
@@ -98,4 +105,60 @@ export class UserProfilePage implements OnInit {
       queryParams: { reportedUserId: this.user.id }
     });
   }
+
+  loadUserReviewStats() {
+    if (!this.user || !this.user.id) return;
+  
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+  
+    this.http.get<any>(`${environment.API_URL}/reviews/user/${this.user.id}`, { headers }).subscribe({
+      next: (data) => {
+        this.averageRating = data.average_rating;
+        this.reviewCount = data.review_count;
+  
+        const existingReview = data.reviews.find(
+          (r: any) => r.reviewer_id === this.currentUserId
+        );
+        if (existingReview) {
+          this.userRating = existingReview.rating;
+        }
+      },
+      error: (err) => {
+        console.error('Σφάλμα κατά την ανάκτηση αξιολογήσεων χρήστη:', err);
+      }
+    });
+  }
+
+  rateUser(rating: number) {
+    if (!this.user) return;
+  
+    // Αν έχει ήδη βαθμολογήσει, μην κάνει τίποτα (ούτε alert)
+    if (this.userRating > 0) return;
+  
+    const token = this.authService.getToken();
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+  
+    const payload = { rating };
+  
+    this.http.post(`${environment.API_URL}/reviews/user/${this.user.id}`, payload, { headers })
+      .subscribe({
+        next: (res: any) => {
+          this.userRating = rating;
+  
+          // ✅ Άμεσα ενημέρωσε τον μέσο όρο και τα reviews
+          this.loadUserReviewStats();
+        },
+        error: (err) => {
+          console.error('Σφάλμα κατά την αξιολόγηση χρήστη:', err);
+        }
+      });
+  }
+  
+  
+  
 }
