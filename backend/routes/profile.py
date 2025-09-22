@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_from_directory
+from flask import Blueprint, request, jsonify, send_from_directory, url_for
 import os
 from werkzeug.utils import secure_filename
 from models.shared import db
@@ -7,6 +7,9 @@ from models.course import Course, UserCourse
 from werkzeug.security import generate_password_hash
 from config import BASE_URL
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from sqlalchemy.sql import func
+from models.user_review import UserReview
+
 
 profile_bp = Blueprint('profile_bp', __name__)
 
@@ -21,18 +24,32 @@ def get_profile():
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
+    # ✅ Αν ο χρήστης έχει avatar, ξαναχτίσε σωστό URL με βάση το τρέχον host
+    avatar_url = None
+    if user.avatar_url:
+        filename = user.avatar_url.split("/")[-1]  # μόνο το όνομα αρχείου
+        avatar_url = url_for("profile_bp.serve_avatar", filename=filename, _external=True)
+
+
+    # ✅ Υπολογισμός μέσου όρου & πλήθους αξιολογήσεων
+    avg_rating = db.session.query(func.avg(UserReview.rating)).filter_by(reviewed_id=user.id).scalar()
+    review_count = db.session.query(func.count(UserReview.id)).filter_by(reviewed_id=user.id).scalar()
+
     return jsonify({
-    'email': user.email,
-    'username': user.username,
-    'department': user.department,
-    'avatar_url': user.avatar_url if user.avatar_url else None,
-    'can_help_courses': [uc.course.name for uc in user.user_courses if uc.can_help],
-    'can_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.can_help],
-    'needs_help_courses': [uc.course.name for uc in user.user_courses if uc.needs_help],
-    'needs_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.needs_help],
-    'upoints': user.upoints,
-    'role': user.role
-})
+        'email': user.email,
+        'username': user.username,
+        'department': user.department,
+        'avatar_url': avatar_url,  # 👈 εδώ βάζουμε το dynamic URL
+        'can_help_courses': [uc.course.name for uc in user.user_courses if uc.can_help],
+        'can_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.can_help],
+        'needs_help_courses': [uc.course.name for uc in user.user_courses if uc.needs_help],
+        'needs_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.needs_help],
+        'upoints': user.upoints,
+        'role': user.role,
+        'average_rating': round(avg_rating, 2) if avg_rating else None,
+        'review_count': review_count or 0
+    })
+
 
 
 
@@ -52,11 +69,16 @@ def upload_avatar():
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
 
-    avatar_url = f'{BASE_URL}/static/avatars/{filename}'
-    user.avatar_url = avatar_url
+    # 👉 Στη βάση αποθηκεύουμε μόνο το filename
+    user.avatar_url = filename
     db.session.commit()
 
+    # 👉 Το πλήρες URL το χτίζουμε με url_for
+    avatar_url = url_for("profile_bp.serve_avatar", filename=filename, _external=True)
+
+
     return jsonify({'message': 'Avatar uploaded successfully', 'avatar_url': avatar_url}), 200
+
 
 @profile_bp.route('/static/avatars/<filename>')
 def serve_avatar(filename):

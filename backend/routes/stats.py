@@ -8,6 +8,10 @@ from models.course import Course
 from models.comment import Comment
 from models.report import Report
 from flask import url_for
+from sqlalchemy import cast, Float
+from models.user_review import UserReview
+from models.note_review import NoteReview
+
 import os
 
 stats_bp = Blueprint('stats', __name__)
@@ -25,14 +29,13 @@ def stats_users():
 @jwt_required()
 def stats_top_contributors():
     results = (
-        db.session.query(User.username, func.count(Note.id).label('uploads'))
-        .join(Note, Note.user_id == User.id)
-        .group_by(User.id, User.username)
-        .order_by(func.count(Note.id).desc())
+        db.session.query(User.username, User.upoints)
+        .order_by(User.upoints.desc())
         .limit(5)
         .all()
     )
-    return jsonify([{"username": u, "uploads": int(n)} for (u, n) in results]), 200
+    return jsonify([{"username": u, "upoints": int(p)} for (u, p) in results]), 200
+
 
 # 3. Μαθήματα με τα περισσότερα αρχεία
 @stats_bp.route('/stats/notes-by-course', methods=['GET'])
@@ -126,3 +129,143 @@ def top_downloaded_note():
             'file_url': file_url
         }), 200
     return jsonify({}), 200
+
+
+@stats_bp.route('/stats/top-reported-notes', methods=['GET'])
+@jwt_required()
+def top_reported_notes():
+    results = (
+        db.session.query(
+            Note.title,
+            func.count(Report.id).label('report_count')
+        )
+        .join(Report, Report.note_id == Note.id)
+        .group_by(Note.id, Note.title)
+        .order_by(desc('report_count'))
+        .limit(5)   # ✅ top 5
+        .all()
+    )
+
+    return jsonify([
+        {"title": title, "report_count": int(rc)}
+        for (title, rc) in results
+    ]), 200
+
+@stats_bp.route('/stats/top-uploaders', methods=['GET'])
+@jwt_required()
+def stats_top_uploaders():
+    results = (
+        db.session.query(User.username, func.count(Note.id).label('uploads'))
+        .join(Note, Note.user_id == User.id)
+        .group_by(User.id, User.username)
+        .order_by(func.count(Note.id).desc())
+        .limit(5)
+        .all()
+    )
+    return jsonify([{"username": u, "uploads": int(n)} for (u, n) in results]), 200
+
+
+
+
+@stats_bp.route('/stats/top-rated-users', methods=['GET'])
+@jwt_required()
+def top_rated_users():
+    k = 5  # παράγοντας εμπιστοσύνης
+
+    max_ratings = (
+        db.session.query(func.count(UserReview.id))
+        .join(User, User.id == UserReview.reviewed_id)
+        .group_by(User.id)
+        .order_by(func.count(UserReview.id).desc())
+        .limit(1)
+        .scalar()
+    ) or 0
+
+    subq = (
+        db.session.query(
+            User.id.label("user_id"),
+            func.avg(UserReview.rating).label("avg_rating"),
+            func.count(UserReview.id).label("count_ratings")
+        )
+        .join(UserReview, UserReview.reviewed_id == User.id)
+        .group_by(User.id)
+        .subquery()
+    )
+
+    score_expr = (subq.c.avg_rating * (subq.c.count_ratings / (subq.c.count_ratings + k)))
+
+    results = (
+        db.session.query(
+            User.username,
+            subq.c.avg_rating,
+            subq.c.count_ratings,
+            score_expr.label("score")
+        )
+        .join(subq, subq.c.user_id == User.id)
+        .order_by(desc("score"))
+        .limit(5)
+        .all()
+    )
+
+    return jsonify([
+        {
+            "username": u,
+            "avg_rating": float(avg),
+            "count_ratings": int(cnt),
+            "score": round(float(sc), 3) if sc is not None else 0
+        }
+        for (u, avg, cnt, sc) in results
+    ]), 200
+
+
+
+
+@stats_bp.route('/stats/top-rated-notes', methods=['GET'])
+@jwt_required()
+def top_rated_notes():
+    k = 5  # παράγοντας εμπιστοσύνης
+
+    max_ratings = (
+        db.session.query(func.count(NoteReview.id))
+        .join(Note, Note.id == NoteReview.note_id)
+        .group_by(Note.id)
+        .order_by(func.count(NoteReview.id).desc())
+        .limit(1)
+        .scalar()
+    ) or 0
+
+    subq = (
+        db.session.query(
+            Note.id.label("note_id"),
+            Note.title.label("title"),
+            func.avg(NoteReview.rating).label("avg_rating"),
+            func.count(NoteReview.id).label("count_ratings")
+        )
+        .join(NoteReview, NoteReview.note_id == Note.id)
+        .group_by(Note.id, Note.title)
+        .subquery()
+    )
+
+    score_expr = (subq.c.avg_rating * (subq.c.count_ratings / (subq.c.count_ratings + k)))
+
+    results = (
+        db.session.query(
+            subq.c.title,
+            subq.c.avg_rating,
+            subq.c.count_ratings,
+            score_expr.label("score")
+        )
+        .order_by(desc("score"))
+        .limit(10)
+        .all()
+    )
+
+    return jsonify([
+        {
+            "title": t,
+            "avg_rating": float(avg),
+            "count_ratings": int(cnt),
+            "score": round(float(sc), 3) if sc is not None else 0
+        }
+        for (t, avg, cnt, sc) in results
+    ]), 200

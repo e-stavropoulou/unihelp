@@ -112,8 +112,9 @@ def dashboard_stats():
 @jwt_required()
 @admin_required
 def get_reports():
-    reports = Report.query.all()
+    reports = Report.query.filter_by(status="pending").all()
     return jsonify([r.to_dict() for r in reports])
+
 
 
 @admin_bp.route('/reports/<int:report_id>/resolve', methods=['POST'])
@@ -129,9 +130,15 @@ def resolve_report(report_id):
     if not report:
         return jsonify({"error": "Report not found"}), 404
 
-    report.status = action
+    # 🔑 Κανονικοποίηση
+    if action == "accept":
+        report.status = "accepted"
+    else:
+        report.status = "rejected"
+
     db.session.commit()
-    return jsonify({"message": f"Report {action}ed."})
+    return jsonify({"message": f"Report {report.status}."}), 200
+
 
 
 # =========================================================
@@ -367,3 +374,12 @@ def toggle_block_user(user_id):
             print(f"❌ Failed to send push: {e}")
 
     return jsonify({"message": f"User {'blocked' if is_blocked else 'unblocked'}."}), 200
+
+@admin_bp.route('/reports/history', methods=['GET'])
+@jwt_required()
+@admin_required
+def get_reports_history():
+    reports = Report.query.filter(Report.status.in_(["accepted", "rejected"]))\
+        .order_by(Report.timestamp.desc())\
+        .all()
+    return jsonify([r.to_dict() for r in reports]), 200

@@ -1,31 +1,7 @@
 // src/main.ts
 
-import { defineCustomElements } from '@ionic/core/loader'; // 👈 1ο πράγμα που τρέχει
-
-defineCustomElements(window);  // 👈 ΠΡΙΝ το bootstrapApplication
-
-// ✅ Global override για να πιάσεις τα "ERROR {}"
-const originalError = console.error;
-console.error = (...args: any[]) => {
-  originalError('🔎 Intercepted console.error:', ...args);
-
-  try {
-    if (args[0] instanceof Error) {
-      originalError('🔎 Stacktrace:', args[0].stack);
-    } else {
-      // Πάντα trace όταν είναι object
-      try {
-        originalError('🔎 JSON error:', JSON.stringify(args[0]));
-      } catch {
-        originalError('🔎 Could not stringify arg[0]');
-      }
-      console.trace('🔎 Console.error trace (forced)');
-    }
-  } catch (e) {
-    originalError('🔎 Failed inside console.error override:', e);
-  }
-};
-
+import { defineCustomElements } from '@ionic/core/loader';
+defineCustomElements(window);
 
 import { bootstrapApplication } from '@angular/platform-browser';
 import {
@@ -47,36 +23,38 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { environment } from './environments/environment';
 
-import { isDevMode } from '@angular/core';
+import { isDevMode, ErrorHandler } from '@angular/core';
 import { provideServiceWorker } from '@angular/service-worker';
+import { withInterceptors } from '@angular/common/http';
+import { AuthInterceptor } from './app/interceptors/auth.interceptor';
+import { GlobalErrorHandler } from './app/global-error-handler';
 
-
-
-// ✅ Δημιουργούμε providers array
+// ✅ Providers array
 const providers: any[] = [
   { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+  { provide: ErrorHandler, useClass: GlobalErrorHandler },
+
   provideIonicAngular(),
   provideRouter(routes, withPreloading(PreloadAllModules)),
-  provideHttpClient(),
+  provideHttpClient(withInterceptors([AuthInterceptor])),
   provideFirebaseApp(() => initializeApp(environment.firebase)),
+
+  // ✅ Angular Service Worker (caching/PWA)
   provideServiceWorker('ngsw-worker.js', {
     enabled: !isDevMode(),
     registrationStrategy: 'registerWhenStable:30000'
+  }),
+
+  // ✅ Firebase Service Worker (push)
+  provideServiceWorker('firebase-messaging-sw.js', {
+    enabled: !isDevMode(),
+    registrationStrategy: 'registerWhenStable:31000' // λίγα ms μετά τον ngsw
   })
 ];
-
-// ✅ Προσθέτουμε το firebase-messaging-sw.js ΜΟΝΟ αν είναι ενεργό στο environment
-if (environment.enableFirebaseMessagingSW) {
-  providers.push(
-    provideServiceWorker('firebase-messaging-sw.js', {
-      enabled: !isDevMode(),
-      registrationStrategy: 'registerWhenStable:30000'
-    })
-  );
-}
 
 // ✅ Bootstrap Angular App
 bootstrapApplication(AppComponent, {
   providers
+}).then(() => {
+  console.log("🟢 Angular app bootstrapped με NGSW + Firebase SW providers");
 });
-

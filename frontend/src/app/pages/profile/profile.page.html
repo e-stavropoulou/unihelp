@@ -18,7 +18,39 @@
     <div>
       <h2>Γεια σου, {{ userData?.username }} 👋</h2>
       <span class="upoints-tag">{{ userPoints }} UPoints</span>
+
+      <!-- ⭐ Αξιολόγηση -->
+    <div class="rating-section">
+      <!-- Αν έχει αξιολογήσεις -->
+      <ng-container *ngIf="(reviewCount || 0) > 0; else noReviews">
+        <p>
+          ⭐ {{ averageRating ?? 0 }} / 5 ({{ reviewCount || 0 }} αξιολογήσεις)
+        </p>
+        <div class="star-rating">
+          <ng-container *ngFor="let star of [1,2,3,4,5]">
+          <ion-icon
+            [name]="star <= (averageRating ?? 0) ? 'star' : 'star-outline'"
+            class="star-icon"
+          ></ion-icon>
+
+          </ng-container>
+        </div>
+      </ng-container>
+
+      <!-- Αν ΔΕΝ έχει αξιολογηθεί -->
+      <ng-template #noReviews>
+        <p style="font-style: italic; color: gray; font-size: 13px;">
+          Δεν έχεις αξιολογηθεί ακόμη.
+        </p>
+        <div class="star-rating">
+          <ng-container *ngFor="let star of [1,2,3,4,5]">
+            <ion-icon name="star-outline" class="star-icon empty"></ion-icon>
+          </ng-container>
+        </div>
+      </ng-template>
     </div>
+  </div>
+
     <div class="avatar-settings">
       <img
         [src]="avatarUrl || 'assets/img/placeholder-avatar.png'"
@@ -26,12 +58,12 @@
         class="avatar-img"
         [class.visible]="avatarVisible"
       />
-
       <ion-button fill="outline" size="small" class="settings-icon-btn" [routerLink]="['/profile-settings']">
         <ion-icon name="settings-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </div>
   </div>
+  
 
   <ion-card class="info-card">
     <ion-card-content>
@@ -67,8 +99,10 @@
     </ion-card-content>
   </ion-card>
 
+    <!-- Εμφάνιση ειδοποιήσεων ΜΟΝΟ αν υποστηρίζεται η Notification API -->
+
     <!-- Αν δεν έχει απαντήσει ποτέ -->
-    <ion-card *ngIf="getPushPermissionState() === 'default' && !isNative">
+    <ion-card *ngIf="getPushPermissionState() === 'default' && getPushPermissionState() !== 'unsupported' && !isNative">
       <ion-card-content>
         <ion-button expand="block" (click)="enableNotifications()">
           Ενεργοποίηση ειδοποιήσεων
@@ -77,7 +111,7 @@
     </ion-card>
 
     <!-- Αν έχει αρνηθεί -->
-    <ion-card *ngIf="getPushPermissionState() === 'denied' && !isNative">
+    <ion-card *ngIf="getPushPermissionState() === 'denied' && getPushPermissionState() !== 'unsupported' && !isNative">
       <ion-card-content>
         <ion-button expand="block" fill="outline" color="warning" (click)="openNotificationSettings()">
           Επανενεργοποίησε τις ειδοποιήσεις

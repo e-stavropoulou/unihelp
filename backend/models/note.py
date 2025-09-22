@@ -21,7 +21,18 @@ class Note(db.Model):
     course = db.relationship("Course", backref="notes")
 
     # ✅ Σχέσεις με cascade delete
-    favorites = db.relationship("Favorite", backref="note", cascade="all, delete-orphan")
-    comments = db.relationship("Comment", backref="note", cascade="all, delete-orphan")
-    # αν έχεις Report μοντέλο
-    reports = db.relationship("Report", backref="note", cascade="all, delete-orphan")
+    comments = db.relationship(
+    "Comment", backref="note",
+    cascade="all, delete-orphan",
+    passive_deletes=True   # ✅
+    )
+    reports = db.relationship(
+        "Report", backref="note",
+        cascade="all, delete-orphan",
+        passive_deletes=True   # ✅
+    )
+    favorites = db.relationship(
+        "Favorite", backref="note",
+        cascade="all, delete-orphan",
+        passive_deletes=True   # ✅
+    )

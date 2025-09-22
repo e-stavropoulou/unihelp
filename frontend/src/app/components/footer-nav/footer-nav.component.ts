@@ -57,7 +57,7 @@ export class FooterNavComponent implements OnInit {
   enableNotifications() {
     const userId = this.authService.getUserId();
     if (userId) {
-      this.notificationsService.initPush(userId);
+      this.notificationsService.initPush();
     } else {
       console.warn('❗️No user ID available για να αποθηκευτεί το token.');
     }

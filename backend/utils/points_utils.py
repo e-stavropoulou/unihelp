@@ -6,6 +6,8 @@ from models.user import User
 from utils.push_utils import send_push_notification  # ✅
 
 def award_points(user: User, amount: int, reason: str = None):
+    if user.upoints is None:
+        user.upoints = 0
     user.upoints += amount
 
     if reason:
@@ -26,7 +28,6 @@ def award_points(user: User, amount: int, reason: str = None):
                         "points": str(amount)
                     }
                 )
-
                 print(f"[Push 🔔] Status: {status} | {msg}")
             except Exception as e:
                 print(f"[Push ❌] Exception: {e}")

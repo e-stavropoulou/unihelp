@@ -52,14 +52,24 @@ def update_fcm_token():
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
     if not user:
+        print("❌ User not found in update-fcm-token")
         return jsonify({"error": "User not found"}), 404
+
     data = request.get_json()
     fcm_token = data.get('fcm_token')
-    if not fcm_token:
-        return jsonify({"error": "Token is required"}), 400
-    user.fcm_token = fcm_token
+    print(f"📥 /update-fcm-token called by user_id={user_id}, token={fcm_token}")
+
+    if fcm_token is None:
+        print("⚠️ Received null token, clearing from DB")
+        user.fcm_token = None
+    else:
+        user.fcm_token = fcm_token
+
     db.session.commit()
+    print(f"✅ Updated DB: user_id={user.id}, fcm_token={user.fcm_token}")
+
     return jsonify({"message": "FCM token updated successfully"}), 200
+
 
 # ✔️ Σήμανση ως διαβασμένη
 @notifications_bp.route('/notifications/<int:notification_id>/read', methods=['POST'])

@@ -1,16 +1,17 @@
-# routes/download_notes.py
-
-from flask import Blueprint, jsonify, send_from_directory
+from flask import Blueprint, jsonify, send_from_directory, send_file
 from flask_jwt_extended import jwt_required
 from models.note import Note
 from models.shared import db
 import os
+import mimetypes
+
 
 download_notes_bp = Blueprint('download_notes', __name__)
 
 NOTES_UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', 'notes')
 
 @download_notes_bp.route('/download/<int:note_id>', methods=['GET'])
+@jwt_required(optional=True)
 def download_note(note_id):
     note = Note.query.get(note_id)
     if not note:
@@ -19,4 +20,30 @@ def download_note(note_id):
     note.downloads += 1
     db.session.commit()
 
-    return send_from_directory(NOTES_UPLOAD_FOLDER, note.filename, as_attachment=True)
+    file_path = note.filepath
+    if not os.path.exists(file_path):
+        return jsonify({'error': 'Το αρχείο δεν βρέθηκε στον server'}), 404
+
+    # 🔍 Βρες σωστό mimetype από το extension
+    mime_type, _ = mimetypes.guess_type(file_path)
+    if mime_type is None:
+        mime_type = "application/octet-stream"  # fallback generic
+
+    print("📂 Serving file:", file_path)
+    print("📂 Exists?", os.path.exists(file_path))
+    print("📂 Size:", os.path.getsize(file_path))
+
+    response = send_file(
+        file_path,
+        as_attachment=True,            
+        download_name=note.filename,   
+        mimetype=mime_type,
+        conditional=True
+    )
+
+    # 🚫 disable cache για να μη σου σκάει 304 corrupted
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+
+    return response

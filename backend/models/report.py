@@ -7,7 +7,12 @@ class Report(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     reported_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     reported_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    note_id = db.Column(db.Integer, db.ForeignKey('note.id'), nullable=True)
+    note_id = db.Column(
+    db.Integer,
+    db.ForeignKey('note.id', ondelete="CASCADE"),
+    nullable=True
+)
+
     category = db.Column(db.String(50), nullable=False)
     description = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), default='pending')  # pending/accepted/rejected

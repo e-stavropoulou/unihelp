@@ -38,6 +38,8 @@ from routes.reports import reports_bp
 from routes.stats import stats_bp
 from routes.rag import rag_bp
 from routes.bot import bot_bp
+from routes.note_reviews import note_reviews_bp
+from routes.user_reviews import user_reviews_bp
 
 
 from config import (
@@ -90,14 +92,19 @@ def create_app():
 
     # -------------------- CORS --------------------
     CORS(
-    app,
-    resources={r"/*": {"origins": [
-        app.config['FRONTEND_URL'],
-        "http://localhost:4201",   # admin
-        "capacitor://localhost"
-    ]}},
-    supports_credentials=True
-)
+        app,
+        resources={r"/*": {"origins": [
+            app.config['FRONTEND_URL'],
+            "http://localhost:4201",   # admin frontend
+            "http://192.168.2.6:8080",   # 👉 UniHelp app
+            "http://192.168.2.6:4201",   # 👉 Admin
+            "capacitor://localhost"
+        ]}},
+        methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["Content-Type", "Authorization"],
+        supports_credentials=True
+    )
+
 
 
     # -------------------- Extensions --------------------
@@ -134,6 +141,8 @@ def create_app():
     app.register_blueprint(stats_bp)
     app.register_blueprint(rag_bp)
     app.register_blueprint(bot_bp)
+    app.register_blueprint(note_reviews_bp)
+    app.register_blueprint(user_reviews_bp)
 
 
     # -------------------- Frontend Build --------------------

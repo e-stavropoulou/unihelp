@@ -32,6 +32,8 @@ export class NotesFeedPage implements OnInit {
   semesters: number[] = Array.from({ length: 10 }, (_, i) => i + 1);
   currentUserId: number = 0;
   isMobile = Capacitor.isNativePlatform();
+  userRatings: { [noteId: number]: number } = {};
+
 
 
 
@@ -57,16 +59,37 @@ export class NotesFeedPage implements OnInit {
   loadAllNotes() {
     const token = this.authService.getToken();
     if (!token) return;
-
+  
     const headers = new HttpHeaders({
       Authorization: `Bearer ${token}`
     });
-
+  
     this.http.get<any[]>(`${environment.API_URL}/all-notes`, { headers })
       .subscribe({
         next: (data) => {
           this.notes = data;
           this.allCourses = [...new Set(data.map(note => note.course))];
+  
+          // 🔁 Για κάθε σημείωση, φέρε τον μέσο όρο αξιολόγησης
+          this.notes.forEach(note => {
+            this.http.get<any>(`${environment.API_URL}/reviews/note/${note.id}`, { headers })
+            .subscribe({
+              next: (reviewData) => {
+                note.average_rating = reviewData.average_rating;
+                note.review_count = reviewData.review_count;
+          
+                // 🔥 Εδώ είναι το missing κομμάτι:
+                const existingReview = reviewData.reviews.find((r: any) => r.reviewer_id === this.currentUserId);
+                if (existingReview) {
+                  this.userRatings[note.id] = existingReview.rating;
+                }
+              },
+              error: (err) => {
+                console.error(`Failed to load rating for note ${note.id}`, err);
+              }
+            });          
+          });
+  
           this.applyFilters();
         },
         error: (err) => {
@@ -74,7 +97,7 @@ export class NotesFeedPage implements OnInit {
         }
       });
   }
-
+  
   applyFilters() {
     this.filteredNotes = this.notes.filter(note => {
       const matchesSearch = note.title.toLowerCase().includes(this.searchTerm.toLowerCase());
@@ -232,6 +255,58 @@ export class NotesFeedPage implements OnInit {
         });
     }
   }
+
+  rateNote(noteId: number, rating: number) {
+    const token = this.authService.getToken();
+    if (!token) {
+      this.toastService.present('Πρέπει να είσαι συνδεδεμένος για να αξιολογήσεις.', 'error');
+      return;
+    }
+  
+    const note = this.notes.find(n => n.id === noteId);
+    if (!note) return;
+  
+    // 🚫 Αν είναι δική σου σημείωση, απαγορεύεται
+    if (note.user_id === this.currentUserId) {
+      this.toastService.present('Δεν μπορείς να αξιολογήσεις τις δικές σου σημειώσεις.', 'warning');
+      return;
+    }
+  
+    // ✅ Μην επιτρέπεις ξανά αξιολόγηση
+    if (this.userRatings[noteId]) {
+      this.toastService.present('Έχεις ήδη αξιολογήσει αυτή τη σημείωση.', 'warning');
+      return;
+    }
+  
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    const payload = { rating };
+  
+    this.http.post(`${environment.API_URL}/reviews/note/${noteId}`, payload, { headers })
+      .subscribe({
+        next: async (res: any) => {
+          this.userRatings[noteId] = rating;
+  
+          // Φρεσκάρισμα του average/review_count
+          this.http.get(`${environment.API_URL}/reviews/note/${noteId}`, { headers })
+            .subscribe((data: any) => {
+              note.average_rating = data.average_rating;
+              note.review_count = data.review_count;
+            });
+  
+          await this.toastService.present('Η αξιολόγηση καταχωρήθηκε!', 'success');
+        },
+        error: async (err) => {
+          console.error('Rating error:', err);
+          const serverMsg = err?.error?.error;
+          if (serverMsg === 'Έχεις ήδη αξιολογήσει αυτή τη σημείωση.') {
+            await this.toastService.present(serverMsg, 'warning');
+          } else {
+            await this.toastService.present('Σφάλμα κατά την αξιολόγηση.', 'error');
+          }
+        }
+      });
+  }
+  
 
   async addToFavorites(note: any) {
     const token = this.authService.getToken();

@@ -17,5 +17,5 @@ export const environment = {
 
   vapidKey: "BIsSXcHlg8P0Pgx7kLF6Yt2DPK1u47vFt5IsLMl-glIMUrb6uF_Bh1U90N5otuxwASqUHSHs5Z1VzDk37ixT7CM",
 
-  enableFirebaseMessagingSW: false   // ΝΑ ΤΟ ΒΑΖΩ ΦΑΛΣΕ ΟΤΑΝ ΕΙΝΑΙ ΓΙΑ ΙΟΣ
+  
 };

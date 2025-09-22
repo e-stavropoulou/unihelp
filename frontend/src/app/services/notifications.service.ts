@@ -9,6 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ChatService } from './chat.service';
 import { NgZone } from '@angular/core';
+import { registerFcmToken } from '../firebase';
 //import { MessagePayload } from 'firebase/messaging';
 
 
@@ -42,21 +43,26 @@ export class NotificationsService {
     private zone: NgZone  
   ) {}
 
-  async initPush(userId?: number): Promise<void> {
-    if (this.isInitialized) {
-      console.log('⚠️ [Push] initPush already called – skipping');
-      return;
-    }
-  
+  async initPush(): Promise<void> {
+    if (this.isInitialized) return;
     this.isInitialized = true;
   
     const platform = Capacitor.getPlatform();
+    console.log("🖥️ [Push] Platform detected:", platform);
+  
     if (platform === 'web') {
+      // 👇 Πάντα ζητά token αν έχει permission
+      if (Notification.permission === 'granted') {
+        console.log("🔑 Permission already granted, requesting token...");
+        const token = await registerFcmToken();
+        if (token) this.fcmToken = token;
+      }
       await this.initWebFCM();
     }
   
     this.refreshUnreadCount();
   }
+  
   
   
 
@@ -74,10 +80,24 @@ export class NotificationsService {
       this.isListenerAttached = true;
   
       await onMessageWeb?.(messaging, (payload: MessagePayload) => {
+        console.log('📩 [Push] Web message received (raw):', JSON.stringify(payload));
+  
         this.zone.run(() => {
           console.log('📩 [Push] Web message received:', payload);
   
           this.currentMessage.next(payload);
+  
+          // 👇 Αν υπάρχει notification στο payload → δείξε system notification
+          if (payload?.notification) {
+            const { title, body } = payload.notification;
+            if (Notification.permission === 'granted') {
+              new Notification(title || 'UniHelp', {
+                body: body || 'Νέα ειδοποίηση',
+                icon: '/assets/icons/icon-192x192.png',
+                data: payload.data || {}
+              });
+            }
+          }
   
           const type = payload?.data?.['type'];
           const chatId = payload?.data?.['chat_id'];
@@ -125,54 +145,49 @@ export class NotificationsService {
   
 
   /** 🔹 Χρησιμοποιείται με κουμπί - ΜΟΝΟ σε user gesture */
-  public async requestWebPushToken(userId: number): Promise<void> {
+  public async requestWebPushToken(): Promise<void> {
     try {
-      const messaging = await getMessagingInstance();
-      if (!messaging) return;
-
-      const permission = await Notification.requestPermission();
-      if (permission !== 'granted') {
-        console.warn('🚫 User denied push permission');
-        return;
+      const token = await registerFcmToken();  // αυτό ήδη στέλνει στο backend
+      if (token) {
+        this.fcmToken = token;
+        console.log('📡 Got FCM token:', token);
+      } else {
+        console.warn('⚠️ Token not received from Firebase');
       }
-
-      const token = await getTokenWeb?.(messaging, {
-        vapidKey: environment.vapidKey
-      });
-      
-
-      if (!token) {
-        console.warn('🚫 No token received');
-        return;
-      }
-
-      this.fcmToken = token;
-      localStorage.setItem('fcm_token', token);
-      console.log('📲 Web push token:', token);
-
-      this.sendTokenToBackend(userId, token);
-
     } catch (err) {
-      console.error('❌ Failed to request web token:', err);
+      console.error('❌ Failed to request push token:', err);
     }
   }
-
+  
+  
+  
   
 
   /** 🔹 Στέλνει FCM token στο backend */
   private sendTokenToBackend(userId: number, token: string) {
     const jwt = this.authService.getToken();
-    if (!jwt) return;
-
+    if (!jwt) {
+      console.warn('🚫 No JWT token – skipping token send');
+      return;
+    }
+  
     const headers = { Authorization: `Bearer ${jwt}` };
-
+    console.log(`📡 [Push] Στέλνω FCM token στο backend...`);
+    console.log(`🆔 userId=${userId}, token=${token.substring(0, 20)}...`);
+  
     this.http.post(`${environment.API_URL}/update-fcm-token`, {
       fcm_token: token
     }, { headers }).subscribe({
-      next: () => console.log('✅ Token sent to backend'),
-      error: err => console.error('❌ Token send failed:', err)
+      next: res => {
+        console.log('✅ [Push] Token sent successfully!');
+        console.log('📥 Backend response:', res);
+      },
+      error: err => {
+        console.error('❌ [Push] Token send failed:', err);
+      }
     });
   }
+  
 
   /** 🔹 Πάρε αριθμό αδιάβαστων ειδοποιήσεων */
   refreshUnreadCount() {

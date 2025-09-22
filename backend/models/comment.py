@@ -6,7 +6,7 @@ class Comment(db.Model):
     __tablename__ = 'comment'
 
     id = db.Column(db.Integer, primary_key=True)
-    note_id = db.Column(db.Integer, db.ForeignKey('note.id'), nullable=False)
+    note_id = db.Column(db.Integer, db.ForeignKey('note.id', ondelete='CASCADE'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
     text = db.Column(db.Text, nullable=False)              # 🔸 Τρέχον σχόλιο
@@ -25,5 +25,6 @@ class Comment(db.Model):
         'CommentEditHistory',
         backref='comment',
         cascade='all, delete-orphan',
+        passive_deletes=True,  
         lazy='dynamic'
     )

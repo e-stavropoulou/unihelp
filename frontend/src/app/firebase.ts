@@ -29,11 +29,10 @@ export async function getMessagingInstance() {
 
 
 // ✅ Εγγραφή token ανάλογα με την πλατφόρμα
-export async function registerFcmToken(): Promise<void> {
+export async function registerFcmToken(): Promise<string | null> {
   if (isWeb) {
-    // --- Web flow ---
     const messaging = await getMessagingInstance();
-    if (!messaging) return;
+    if (!messaging) return null;
 
     try {
       const { getToken } = await import('firebase/messaging');
@@ -45,13 +44,15 @@ export async function registerFcmToken(): Promise<void> {
         console.log('🌐 Web FCM Token:', currentToken);
         localStorage.setItem('fcm_token', currentToken);
         await sendTokenToBackend(currentToken);
+        return currentToken;   // ✅ επιστρέφει το token
       } else {
         console.warn('⚠️ Δεν δημιουργήθηκε Web FCM token.');
+        return null;
       }
     } catch (err) {
       console.error('❌ Σφάλμα Web FCM:', err);
+      return null;
     }
-
   } else {
     // --- Native flow (iOS/Android) ---
     try {
@@ -73,6 +74,8 @@ export async function registerFcmToken(): Promise<void> {
     } catch (err) {
       console.error('❌ Σφάλμα Native FCM:', err);
     }
+
+    return null; // ✅ consistency στην Promise
   }
 }
 
