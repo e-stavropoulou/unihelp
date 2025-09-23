@@ -20,9 +20,8 @@ def to_athens_iso(dt: datetime) -> str:
         dt = dt.replace(tzinfo=ZoneInfo("UTC"))
     return dt.astimezone(ATHENS_TZ).isoformat()
 
-# -----------------------
+
 # POST /report
-# -----------------------
 @reports_bp.route('/report', methods=['POST'])
 @jwt_required()
 def create_report():
@@ -51,9 +50,8 @@ def create_report():
 
     return jsonify({"message": "Report created"}), 201
 
-# -----------------------
+
 # GET /my-reports
-# -----------------------
 @reports_bp.route('/my-reports', methods=['GET'])
 @jwt_required()
 def my_reports():
@@ -77,9 +75,8 @@ def my_reports():
 
     return jsonify(result)
 
-# -----------------------
+
 # GET /admin/reports
-# -----------------------
 @reports_bp.route('/admin/reports', methods=['GET'])
 @jwt_required()
 def get_pending_reports():
@@ -111,9 +108,7 @@ def get_pending_reports():
 
     return jsonify(result), 200
 
-# -----------------------
 # POST /admin/reports/<id>/accept
-# -----------------------
 @reports_bp.route('/admin/reports/<int:report_id>/accept', methods=['POST'])
 @jwt_required()
 def accept_report(report_id):
@@ -127,16 +122,14 @@ def accept_report(report_id):
 
     reporter = User.query.get(report.reported_by)
     if reporter:
-        # ✅ Μόνο award_points (κάνει και in-app + push)
+        # award_points (in-app + push)
         award_points(reporter, 3, "🚨 Η αναφορά σου έγινε δεκτή! Κέρδισες 3 πόντους.")
 
     db.session.commit()
     return jsonify({"message": "Report accepted"}), 200
 
 
-# -----------------------
 # POST /admin/reports/<id>/reject
-# -----------------------
 @reports_bp.route('/admin/reports/<int:report_id>/reject', methods=['POST'])
 @jwt_required()
 def reject_report(report_id):
@@ -151,9 +144,8 @@ def reject_report(report_id):
 
     return jsonify({"message": "Report rejected"}), 200
 
-# -----------------------
+
 # GET /admin/reports/history
-# -----------------------
 @reports_bp.route('/admin/reports/history', methods=['GET'])
 @jwt_required()
 def get_reports_history():

@@ -12,7 +12,7 @@
     placeholder="Αναζήτηση με τίτλο...">
   </ion-searchbar>
 
-  <!-- Φίλτρο: Κατηγορία -->
+  <!-- FILTRA -->
   <ion-item class="custom-ion-select">
     <ion-label>Κατηγορία</ion-label>
     <ion-select interface="alert"[(ngModel)]="selectedCategory" (ionChange)="applyFilters()">
@@ -24,8 +24,6 @@
     </ion-select>
   </ion-item>
   
-
-  <!-- Φίλτρο: Μάθημα -->
   <ion-item class="custom-ion-select">
     <ion-label>Μάθημα</ion-label>
     <ion-select interface="alert"[(ngModel)]="selectedCourse" (ionChange)="applyFilters()">
@@ -34,7 +32,6 @@
     </ion-select>
   </ion-item>
 
-  <!-- Φίλτρο: Εξάμηνο -->
   <ion-item class="custom-ion-select">
   <ion-label>Εξάμηνο</ion-label>
   <ion-select interface="alert"[(ngModel)]="selectedSemester" (ionChange)="applyFilters()">
@@ -43,7 +40,6 @@
   </ion-select>
 </ion-item>
 
-  <!-- Φίλτρο: Τύπος -->
   <ion-item class="custom-ion-select">
     <ion-label>Τύπος</ion-label>
     <ion-select interface="alert"[(ngModel)]="selectedType" (ionChange)="applyFilters()">
@@ -60,14 +56,13 @@
     <ion-card *ngFor="let note of filteredNotes" class="note-card">
 
       <ion-card-content>
-        <!-- Κουμπί αναφοράς -->
         <div class="report-btn">
           <ion-button size="small" fill="clear" (click)="goToReport(note.id)">
             <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
           </ion-button>
         </div>
       
-        <!-- Τίτλος + uploader -->
+        <!-- title + uploader -->
         <div class="note-header">
           <h3 class="note-title">{{ note.title }}</h3>
           <span class="note-subtitle">
@@ -75,13 +70,12 @@
           </span>
         </div>
 
-                <!-- 🌟 Μέση Αξιολόγηση + User Review -->
+                <!-- rating + user review -->
         <div class="note-rating">
           <p *ngIf="note.average_rating">
             ⭐ {{ note.average_rating }} / 5 ({{ note.review_count }} αξιολογήσεις)
           </p>
 
-          <!-- 🌟 Διαδραστικά αστέρια -->
           <div class="star-rating">
             <ng-container *ngFor="let star of [1,2,3,4,5]">
               <ion-icon
@@ -94,7 +88,6 @@
         </div>
 
       
-        <!-- Περιγραφή -->
         <div class="note-section">
           <strong>Περιγραφή:</strong>
           <p>{{ note.description || 'Χωρίς περιγραφή.' }}</p>
@@ -108,59 +101,57 @@
           <div><strong>Τύπος:</strong><br> {{ note.type }}</div>
         </div>
       
-<!-- Ενέργειες -->
-<div class="actions">
-  <a class="filled" (click)="downloadNote(note)">
-    <ion-icon name="document-text-outline"></ion-icon>
-    Άνοιγμα αρχείου
-  </a>
+  
+  <div class="actions">
+    <a class="filled" (click)="downloadNote(note)">
+      <ion-icon name="document-text-outline"></ion-icon>
+      Άνοιγμα αρχείου
+    </a>
 
-  <ion-button class="outline" (click)="addToFavorites(note)">
-    <ion-icon [name]="note.isFavorite ? 'heart-dislike-outline' : 'heart-outline'"></ion-icon>
-    {{ note.isFavorite ? 'Αφαίρεση' : 'Αγαπημένο' }}
-  </ion-button>
+    <ion-button class="outline" (click)="addToFavorites(note)">
+      <ion-icon [name]="note.isFavorite ? 'heart-dislike-outline' : 'heart-outline'"></ion-icon>
+      {{ note.isFavorite ? 'Αφαίρεση' : 'Αγαπημένο' }}
+    </ion-button>
 
-  <ion-button class="filled" (click)="toggleComments(note)">
-    <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
-    Προβολή σχολίων
-  </ion-button>
+    <ion-button class="filled" (click)="toggleComments(note)">
+      <ion-icon name="chatbubble-ellipses-outline"></ion-icon>
+      Προβολή σχολίων
+    </ion-button>
 
-  <ion-button class="outline" (click)="toggleCommentBox(note)">
-    <ion-icon name="add-outline"></ion-icon>
-    Προσθήκη σχολίου
-  </ion-button>
-</div>
-
-
-<!-- Πεδίο για προσθήκη νέου σχολίου -->
-<div *ngIf="note.showCommentBox" class="comment-box">
-  <div class="form-group">
-    <label class="form-label">Σχόλιο</label>
-    <input
-      [(ngModel)]="note.newComment"
-      name="newComment{{note.id}}"
-      class="custom-input"
-      type="text"
-      placeholder="Γράψε το σχόλιό σου..."
-    />
+    <ion-button class="outline" (click)="toggleCommentBox(note)">
+      <ion-icon name="add-outline"></ion-icon>
+      Προσθήκη σχολίου
+    </ion-button>
   </div>
 
-  <ion-button expand="block" (click)="submitComment(note)">
-    Υποβολή
-  </ion-button>
-</div>
 
-<!-- Λίστα σχολίων -->
+  <!-- prosthiki sxoliou -->
+  <div *ngIf="note.showCommentBox" class="comment-box">
+    <div class="form-group">
+      <label class="form-label">Σχόλιο</label>
+      <input
+        [(ngModel)]="note.newComment"
+        name="newComment{{note.id}}"
+        class="custom-input"
+        type="text"
+        placeholder="Γράψε το σχόλιό σου..."
+      />
+    </div>
+
+    <ion-button expand="block" (click)="submitComment(note)">
+      Υποβολή
+    </ion-button>
+  </div>
+
+
 <div *ngIf="note.showComments" class="comments-list">
 
-  <!-- Αν δεν υπάρχουν σχόλια -->
   <ng-container *ngIf="note.comments.length === 0; else commentsExist">
     <p style="text-align: center; color: #888; font-style: italic;">
       Δεν υπάρχουν σχόλια ακόμη για αυτή τη σημείωση. Μπορείς να είσαι ο πρώτος που θα προσθέσει ένα σχόλιο!
     </p>
   </ng-container>
 
-  <!-- Αν υπάρχουν σχόλια -->
   <ng-template #commentsExist>
     <div *ngFor="let c of note.comments" class="comment-item">
       <div class="comment-header">
@@ -178,15 +169,15 @@
           <ion-button size="small" class="delete-btn" (click)="deleteComment(note, c)">Delete</ion-button>
         </ng-container>
     
-        <ion-button size="small" fill="clear" color="medium"
-          (click)="goToReport(note.id, c.user_id)">
-          <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
-        </ion-button>
-      </div>
-    </div>        
-  </ng-template>
-</div>
-      </ion-card-content>
+          <ion-button size="small" fill="clear" color="medium"
+            (click)="goToReport(note.id, c.user_id)">
+            <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
+          </ion-button>
+          </div>
+        </div>        
+      </ng-template>
+    </div>
+  </ion-card-content>
     
     </ion-card>    
   </ng-container>

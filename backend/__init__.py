@@ -20,7 +20,7 @@ from models.notification import Notification
 from models.chat_history import ChatHistory
 
 
-# ✅ Firebase Admin SDK
+# Firebase Admin SDK
 import firebase_admin
 from firebase_admin import credentials
 
@@ -55,7 +55,7 @@ from config import (
 def create_app():
     app = Flask(__name__)
 
-    # -------------------- Βάση/Γενικές Ρυθμίσεις --------------------
+    
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
 
@@ -65,12 +65,12 @@ def create_app():
     app.config['FRONTEND_URL'] = FRONTEND_URL     
     
 
-    # ✅ Firebase Admin init (μόνο μία φορά)
+    # Firebase Admin init 
     if not firebase_admin._apps:
         cred = credentials.Certificate("firebase/service-account.json")
         firebase_admin.initialize_app(cred)
 
-    # -------------------- JWT Ρυθμίσεις --------------------
+    #  JWT related settings
     app.config['JWT_SECRET_KEY'] = JWT_SECRET
     app.config['JWT_ACCESS_TOKEN_EXPIRES']  = timedelta(minutes=15)
     app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=7)
@@ -90,14 +90,14 @@ def create_app():
     def missing_token_callback(reason):
         return jsonify(msg='Missing Authorization Header'), 401
 
-    # -------------------- CORS --------------------
+    # cors related settings
     CORS(
         app,
         resources={r"/*": {"origins": [
             app.config['FRONTEND_URL'],
             "http://localhost:4201",   # admin frontend
-            "http://192.168.2.6:8080",   # 👉 UniHelp app
-            "http://192.168.2.6:4201",   # 👉 Admin
+            "http://192.168.2.6:8080",   # UniHelp app
+            "http://192.168.2.6:4201",   # Admin
             "capacitor://localhost"
         ]}},
         methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -107,7 +107,7 @@ def create_app():
 
 
 
-    # -------------------- Extensions --------------------
+    # exentions 
     db.init_app(app)
     Migrate(app, db)
 
@@ -127,7 +127,7 @@ def create_app():
     from models.bot_message import BotMessage
 
 
-    # -------------------- Blueprints --------------------
+    #BLUEPRINTS
     app.register_blueprint(auth_bp)
     app.register_blueprint(profile_bp)
     app.register_blueprint(search_users_bp)
@@ -145,7 +145,7 @@ def create_app():
     app.register_blueprint(user_reviews_bp)
 
 
-    # -------------------- Frontend Build --------------------
+    # FRONTEND (SPA) SERVING
     build_dir = os.path.join(os.path.dirname(__file__), "..", "frontend", "www")
     app.static_folder = build_dir
     app.static_url_path = ""
@@ -155,11 +155,11 @@ def create_app():
     def serve_spa(path):
         full_path = os.path.join(build_dir, path)
 
-        # Αν ζητάει static αρχείο → στείλτο
+       
         if os.path.exists(full_path) and not os.path.isdir(full_path):
             return send_from_directory(build_dir, path)
 
-        # Διαφορετικά γύρνα πάντα index.html
+        
         print("👉 SPA fallback triggered for:", path)
         return send_from_directory(build_dir, "index.html")
 

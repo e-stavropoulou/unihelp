@@ -1,5 +1,5 @@
 from .shared import db
-from .course import Course, UserCourse  # όχι πια user_course (όχι πίνακας)
+from .course import Course, UserCourse  
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)

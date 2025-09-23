@@ -15,7 +15,7 @@ from models.comment import Comment
 app = create_app()
 app.app_context().push()
 
-# 📂 Φάκελος με τα αρχεία
+# fakelos me tis simioseis
 NOTES_FOLDER = '/Users/evelina/unihelp/backend/uploads/notes'
 
 # 📑 Υποστηριζόμενες επεκτάσεις
@@ -23,14 +23,14 @@ ALLOWED_EXTENSIONS = ('.pdf', '.docx', '.txt', '.png', '.jpg', '.jpeg')
 
 
 def extract_text_from_pdf(path):
-    """Εξαγωγή κειμένου από PDF (με fallback OCR αν είναι σκαναρισμένο)."""
+    """eksagw keimeno apo pdf, me pytesseract an den yparxei"""
     doc = fitz.open(path)
     text = ""
     for page in doc:
         text += page.get_text()
 
     if not text.strip():
-        # Αν δεν βρεθεί καθόλου text → OCR fallback
+        # an den vtrethei text → OCR fallback
         print(f"🔄 OCR σε σκαναρισμένο PDF: {path}")
         text_pages = []
         for page_num in range(len(doc)):
@@ -105,7 +105,7 @@ def process_all_notes():
                 "course": note.course.name if note.course else "Άγνωστο μάθημα"
             })
 
-            continue  # Μην προχωράς σε εξαγωγή
+            continue  
 
 
         full_path = os.path.join(NOTES_FOLDER, filename)

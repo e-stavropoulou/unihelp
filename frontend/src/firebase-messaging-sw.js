@@ -16,7 +16,6 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// ✅ Όταν το app είναι στο background
 messaging.onBackgroundMessage((payload) => {
   console.log('📩 [SW] Background message:', payload);
 
@@ -27,7 +26,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationOptions = {
     body: notification.body || 'Νέα ειδοποίηση',
     icon: '/assets/icons/icon-192x192.png',
-    data: data // μπορεί να χρειαστεί για click_action
+    data: data 
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

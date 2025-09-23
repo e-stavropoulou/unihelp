@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: 10px;
   padding: 12px;
-  height: 100%; /* 🔥 απαραίτητο για scroll */
+  height: 100%; 
   overflow-y: auto;
 }
 
@@ -102,11 +102,11 @@
 }
 
 .custom-btn {
-  --background: #7B1E3B;      /* κύριο χρώμα */
-  --background-hover: #5a1029; /* πιο σκούρο στο hover */
+  --background: #7B1E3B;      
+  --background-hover: #5a1029; 
   --background-activated: #5a1029;
-  --color: #fff;              /* χρώμα εικονιδίου/κειμένου */
-  --border-radius: 50%;       /* κάνει το κουμπί κυκλικό αν είναι icon-only */
+  --color: #fff;              
+  --border-radius: 50%;       
   --padding-start: 8px;
   --padding-end: 8px;
 }

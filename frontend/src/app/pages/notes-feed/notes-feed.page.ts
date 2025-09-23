@@ -35,9 +35,6 @@ export class NotesFeedPage implements OnInit {
   userRatings: { [noteId: number]: number } = {};
 
 
-
-
-  // 🔄 Γενικό popover για Κατηγορία, Εξάμηνο, Τύπος
   filterPopoverOpen = false;
   filterPopoverEvent: any = null;
   currentFilterKey: 'category' | 'semester' | 'type' = 'category';
@@ -70,7 +67,6 @@ export class NotesFeedPage implements OnInit {
           this.notes = data;
           this.allCourses = [...new Set(data.map(note => note.course))];
   
-          // 🔁 Για κάθε σημείωση, φέρε τον μέσο όρο αξιολόγησης
           this.notes.forEach(note => {
             this.http.get<any>(`${environment.API_URL}/reviews/note/${note.id}`, { headers })
             .subscribe({
@@ -78,7 +74,6 @@ export class NotesFeedPage implements OnInit {
                 note.average_rating = reviewData.average_rating;
                 note.review_count = reviewData.review_count;
           
-                // 🔥 Εδώ είναι το missing κομμάτι:
                 const existingReview = reviewData.reviews.find((r: any) => r.reviewer_id === this.currentUserId);
                 if (existingReview) {
                   this.userRatings[note.id] = existingReview.rating;
@@ -111,8 +106,6 @@ export class NotesFeedPage implements OnInit {
   }
 
 
-
-
   clearCourse() {
     this.selectedCourse = '';
     this.applyFilters();
@@ -122,12 +115,11 @@ export class NotesFeedPage implements OnInit {
     return (s || '')
       .toLowerCase()
       .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // remove tones
+      .replace(/[\u0300-\u036f]/g, '') 
       .replace(/ς/g, 'σ')
       .trim();
   }
 
-  // 🔄 POPUP ΓΙΑ ΤΑ ΥΠΟΛΟΙΠΑ ΦΙΛΤΡΑ
   openGenericPopover(ev: any, key: 'category' | 'semester' | 'type') {
     this.filterPopoverEvent = ev;
     this.currentFilterKey = key;
@@ -164,9 +156,6 @@ export class NotesFeedPage implements OnInit {
     this.applyFilters();
   }
 
-  // ===========================
-  // 📝 NOTES FUNCTIONALITY
-  // ===========================
 
   downloadNote(note: any) {
     const token = this.authService.getToken();
@@ -266,13 +255,11 @@ export class NotesFeedPage implements OnInit {
     const note = this.notes.find(n => n.id === noteId);
     if (!note) return;
   
-    // 🚫 Αν είναι δική σου σημείωση, απαγορεύεται
     if (note.user_id === this.currentUserId) {
       this.toastService.present('Δεν μπορείς να αξιολογήσεις τις δικές σου σημειώσεις.', 'warning');
       return;
     }
   
-    // ✅ Μην επιτρέπεις ξανά αξιολόγηση
     if (this.userRatings[noteId]) {
       this.toastService.present('Έχεις ήδη αξιολογήσει αυτή τη σημείωση.', 'warning');
       return;
@@ -286,7 +273,6 @@ export class NotesFeedPage implements OnInit {
         next: async (res: any) => {
           this.userRatings[noteId] = rating;
   
-          // Φρεσκάρισμα του average/review_count
           this.http.get(`${environment.API_URL}/reviews/note/${noteId}`, { headers })
             .subscribe((data: any) => {
               note.average_rating = data.average_rating;

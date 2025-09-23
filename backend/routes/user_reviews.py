@@ -10,7 +10,7 @@ from utils.points_utils import award_points
 user_reviews_bp = Blueprint("user_reviews_bp", __name__)
 
 
-# 🔸 POST /reviews/user/<user_id>
+# POST /reviews/user/<user_id>
 @user_reviews_bp.route("/reviews/user/<int:user_id>", methods=["POST"])
 @jwt_required()
 def create_or_update_user_review(user_id):
@@ -53,7 +53,7 @@ def create_or_update_user_review(user_id):
 
     db.session.commit()
 
-    # ✅ Βράβευση μόνο σε νέα αξιολόγηση
+  
     if is_new:
         award_points(reviewer_user, 5, "🎯 Ευχαριστούμε για την αξιολόγησή σου!")
 
@@ -67,7 +67,7 @@ def create_or_update_user_review(user_id):
         "review": review.to_dict()
     }), 200
 
-# 🔸 GET /reviews/user/<user_id>
+# GET /reviews/user/<user_id>
 @user_reviews_bp.route("/reviews/user/<int:user_id>", methods=["GET"])
 @jwt_required(optional=True)
 def get_user_reviews(user_id):

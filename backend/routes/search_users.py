@@ -22,7 +22,7 @@ def search_users():
                 User.username.ilike(f"%{query}%"),
                 User.email.ilike(f"%{query}%")
             ),
-            User.id != current_user_id  # ✅ Μην επιστρέψεις τον εαυτό του
+            User.id != current_user_id  
         ).all()
 
         print(f"🔍 Found {len(users)} matching users (excluding self)")

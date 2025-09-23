@@ -18,7 +18,7 @@ with app.app_context():
     # Reset points
     User.query.update({User.upoints: 0})
 
-    # Διαγραφή όλων των δεδομένων (εκτός Courses)
+    # DIAGRAFI DEDOMENOS EKTOS APO COURSE
     Notification.query.delete()
     Report.query.delete()
     CommentEditHistory.query.delete()

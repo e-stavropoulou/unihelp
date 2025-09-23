@@ -37,7 +37,6 @@
         </div>
       </ng-container>
 
-      <!-- Αν ΔΕΝ έχει αξιολογηθεί -->
       <ng-template #noReviews>
         <p style="font-style: italic; color: gray; font-size: 13px;">
           Δεν έχεις αξιολογηθεί ακόμη.
@@ -99,9 +98,7 @@
     </ion-card-content>
   </ion-card>
 
-    <!-- Εμφάνιση ειδοποιήσεων ΜΟΝΟ αν υποστηρίζεται η Notification API -->
-
-    <!-- Αν δεν έχει απαντήσει ποτέ -->
+    <!-- eidopoihseis -->
     <ion-card *ngIf="getPushPermissionState() === 'default' && getPushPermissionState() !== 'unsupported' && !isNative">
       <ion-card-content>
         <ion-button expand="block" (click)="enableNotifications()">
@@ -110,7 +107,7 @@
       </ion-card-content>
     </ion-card>
 
-    <!-- Αν έχει αρνηθεί -->
+    <!-- an arnithei -->
     <ion-card *ngIf="getPushPermissionState() === 'denied' && getPushPermissionState() !== 'unsupported' && !isNative">
       <ion-card-content>
         <ion-button expand="block" fill="outline" color="warning" (click)="openNotificationSettings()">
@@ -140,7 +137,7 @@
       Οι Αναφορές μου
     </ion-button>
 
-    <!-- ΜΟΝΟ για admins -->
+    <!-- only admins -->
     <ion-button 
     *ngIf="userData?.role === 'admin'"
     expand="block"
@@ -151,8 +148,6 @@
   </ion-button>
   
 
-  
-    
   </div>
 </ion-content> 
 

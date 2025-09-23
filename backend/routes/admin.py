@@ -258,7 +258,7 @@ def add_course():
     if not name or not semester or not ctype:
         return jsonify({'error': 'Λείπουν απαιτούμενα πεδία'}), 400
 
-    # Προαιρετικός καθαρισμός
+   
     name = name.strip()
     ctype = ctype.strip()
 
@@ -282,7 +282,7 @@ def delete_course(course_id):
     if not course:
         return jsonify({"error": "Course not found"}), 404
 
-    # Προαιρετικά: έλεγχος αν το μάθημα έχει σημειώσεις
+    # έλεγχος αν το μάθημα έχει σημειώσεις
     notes_count = Note.query.filter_by(course_id=course.id).count()
     if notes_count > 0:
         return jsonify({
@@ -348,7 +348,7 @@ def toggle_block_user(user_id):
     user.is_blocked = is_blocked
     db.session.commit()
 
-    # 🔔 Δημιουργία ειδοποίησης
+    # Δημιουργία ειδοποίησης
     message = "Ο λογαριασμός σου έχει μπλοκαριστεί από τον διαχειριστή." if is_blocked \
               else "Ο λογαριασμός σου έχει επανενεργοποιηθεί."
     notif = Notification(
@@ -360,7 +360,7 @@ def toggle_block_user(user_id):
     db.session.add(notif)
     db.session.commit()
 
-    # 📲 Push notification
+    # Push notification
     if user.fcm_token:
         try:
             status, resp = send_push_notification(

@@ -7,12 +7,12 @@ class Favorite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey('user.id', ondelete='CASCADE'),   # αν θες να σβήνονται και τα favorites όταν σβήσει ο χρήστης
+        db.ForeignKey('user.id', ondelete='CASCADE'),   
         nullable=False
     )
     note_id = db.Column(
         db.Integer,
-        db.ForeignKey('note.id', ondelete='CASCADE'),   # ✅ όταν σβήνει το note, φεύγουν και τα favorites
+        db.ForeignKey('note.id', ondelete='CASCADE'),   
         nullable=False
     )
 

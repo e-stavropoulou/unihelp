@@ -10,14 +10,14 @@ from typing import List
 
 rag_bp = Blueprint("rag_bp", __name__)
 
-# 📦 Φόρτωση FAISS index
+# fortosi FAISS index
 embedding = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = FAISS.load_local("faiss_index", embedding, allow_dangerous_deserialization=True)
 
-# 🔍 Βασικός FAISS retriever
+#  FAISS retriever
 base_retriever = vectorstore.as_retriever(search_kwargs={"k": 20})
 
-# 🔎 Εύρεση του summary doc (που φτιάξαμε στο FAISS index)
+# euresi summary doc (FAISS index)
 summary_doc = None
 for doc in vectorstore.similarity_search("πίνακας μεταδεδομένων", k=20):
     if doc.metadata.get("type") == "global_summary":
@@ -26,7 +26,7 @@ for doc in vectorstore.similarity_search("πίνακας μεταδεδομέν�
         break
 
 
-# ✅ Custom retriever που προσθέτει πάντα το summary doc
+# Custom retriever poy vazei to summary doc
 class SummaryBoostingRetriever(BaseRetriever):
     def __init__(self, base_retriever, summary_doc):
         super().__init__()
@@ -50,13 +50,13 @@ class SummaryBoostingRetriever(BaseRetriever):
     def lc_attributes(self) -> dict:
         return {}
 
-# ✅ Χρήση του enhanced retriever
+# xrisi enhanced retriever
 retriever = SummaryBoostingRetriever(base_retriever, summary_doc)
 
-# 🤖 Set up LLM
+# Set up LLM
 llm = ChatOpenAI(model="gpt-4o", temperature=0)
 
-# 🔗 RAG QA chain
+# RAG QA chain
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     retriever=retriever,
@@ -64,7 +64,7 @@ qa_chain = RetrievalQA.from_chain_type(
     return_source_documents=True
 )
 
-# 💬 RAG endpoint
+# RAG endpoint
 @rag_bp.route("/ask-rag", methods=["POST"])
 @jwt_required()
 def ask_rag():

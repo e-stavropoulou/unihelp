@@ -20,13 +20,13 @@ def to_athens_iso(dt: datetime) -> str:
         dt = dt.replace(tzinfo=ZoneInfo("UTC"))
     return dt.astimezone(ATHENS_TZ).isoformat()
 
-# 🔹 Δημιουργία ή λήψη chat
+# dhmiourgia i energou chat me allo xristi
 @chat_bp.route('/chats/<int:other_user_id>', methods=['POST'])
 @jwt_required()
 def start_or_get_chat(other_user_id):
     current_user_id = int(get_jwt_identity())
 
-    # 🔍 Δες αν υπάρχει ενεργό chat
+    # des an to chat yparxei
     existing_chat = ChatRoom.query.filter(
         ((ChatRoom.user1_id == current_user_id) & (ChatRoom.user2_id == other_user_id)) |
         ((ChatRoom.user1_id == other_user_id) & (ChatRoom.user2_id == current_user_id))
@@ -35,7 +35,7 @@ def start_or_get_chat(other_user_id):
     if existing_chat:
         return jsonify({"chat_id": existing_chat.id})
 
-    # 🔧 Δημιουργία νέου ενεργού chat (χωρίς award points!)
+    # dhmioyrgia neou chat 
     new_chat = ChatRoom(user1_id=current_user_id, user2_id=other_user_id)
     db.session.add(new_chat)
     db.session.commit()
@@ -43,19 +43,19 @@ def start_or_get_chat(other_user_id):
     return jsonify({"chat_id": new_chat.id})
 
 
-# 🔹 Λήψη όλων των συνομιλιών χρήστη
+# lipsi twn chats tou xristi
 @chat_bp.route('/chats', methods=['GET'])
 @jwt_required()
 def get_user_chats():
     current_user_id = int(get_jwt_identity())
 
-    # ✅ Υποερώτηση για τελευταίο μήνυμα ανά chat
+    
     last_message_times = db.session.query(
         Message.chat_id,
         func.max(Message.timestamp).label('last_message_time')
     ).group_by(Message.chat_id).subquery()
 
-    # ✅ Πάρε τα chats μαζί με last_message_time
+    # join me to chatroom kai taksinomisi me vasi to teleytaio minima
     chats = db.session.query(ChatRoom, last_message_times.c.last_message_time).\
         outerjoin(last_message_times, ChatRoom.id == last_message_times.c.chat_id).\
         filter(
@@ -86,7 +86,7 @@ def get_user_chats():
     return jsonify(result)
 
 
-# 🔹 Ανάκτηση μηνυμάτων ενός chat
+# anaktisi twn minimatwn enos chat
 @chat_bp.route('/chats/<int:chat_id>/messages', methods=['GET'])
 @jwt_required()
 def get_chat_messages(chat_id):
@@ -110,7 +110,7 @@ def get_chat_messages(chat_id):
 
 
 
-# 🔹 Αποστολή μηνύματος
+# send message se chat
 @chat_bp.route('/chats/<int:chat_id>/messages', methods=['POST'])
 @jwt_required()
 def send_message(chat_id):
@@ -128,16 +128,16 @@ def send_message(chat_id):
     if not chat or current_user_id not in [chat.user1_id, chat.user2_id]:
         return jsonify({"error": "Unauthorized"}), 403
 
-    # 📩 Αποθήκευση μηνύματος
+    
     message = Message(chat_id=chat_id, sender_id=current_user_id, content=content)
     db.session.add(message)
-    db.session.commit()   # ✅ commit πριν το push
+    db.session.commit()   
 
-    # 🔔 Push notification στον παραλήπτη
+    
     recipient_id = chat.user2_id if chat.user1_id == current_user_id else chat.user1_id
     sender = User.query.get(current_user_id)
 
-    # ✅ force refresh recipient
+    
     recipient = db.session.query(User).filter_by(id=recipient_id).first()
     db.session.refresh(recipient)
 
@@ -161,25 +161,25 @@ def send_message(chat_id):
     else:
         print(f"⚠️ Ο {recipient.username if recipient else 'N/A'} δεν έχει fcm_token.")
 
-    # ➕ Έλεγχος αν υπάρχει ήδη ιστορικό συνομιλίας
+    
     history_exists = ChatHistory.query.filter(
         ((ChatHistory.user1_id == current_user_id) & (ChatHistory.user2_id == recipient_id)) |
         ((ChatHistory.user1_id == recipient_id) & (ChatHistory.user2_id == current_user_id))
     ).first()
 
     if not history_exists:
-        # Δημιουργία ιστορικού
+        
         new_history = ChatHistory(user1_id=current_user_id, user2_id=recipient_id)
         db.session.add(new_history)
 
-        # Award πόντους ΜΟΝΟ την πρώτη φορά
+        
         award_points(sender, 5, "💬 Κέρδισες 5 πόντους για τη δημιουργία νέας συζήτησης!")
 
     db.session.commit()
     return jsonify({"message": "Message sent", "id": message.id})
 
 
-# 🔹 Πλήθος αδιάβαστων μηνυμάτων
+# anaktisi arithmou anagnwristwn minimatwn
 @chat_bp.route('/messages/unread-count', methods=['GET'])
 @jwt_required()
 def get_unread_message_count():
@@ -193,7 +193,7 @@ def get_unread_message_count():
     return jsonify({"unread_count": count})
 
 
-# 🔹 Μαρκάρισμα ως αναγνωσμένα
+# markarismata minimatwn 
 @chat_bp.route('/chats/<int:chat_id>/mark-read', methods=['PUT'])
 @jwt_required()
 def mark_messages_as_read(chat_id):
@@ -208,7 +208,7 @@ def mark_messages_as_read(chat_id):
     return jsonify({"message": "Messages marked as read"})
 
 
-# 🔹 Διαγραφή chat και όλων των μηνυμάτων
+# delete chat
 @chat_bp.route('/chats/<int:chat_id>', methods=['DELETE'])
 @jwt_required()
 def delete_chat(chat_id):
@@ -218,11 +218,11 @@ def delete_chat(chat_id):
     if not chat or current_user_id not in [chat.user1_id, chat.user2_id]:
         return jsonify({"error": "Unauthorized"}), 403
 
-    # 🔥 Σβήσε τα μηνύματα και το chat
+    
     Message.query.filter_by(chat_id=chat_id).delete()
     db.session.delete(chat)
 
-    # ➕ Καταχώρισε ιστορικό αν δεν υπάρχει ήδη
+    
     history_exists = ChatHistory.query.filter(
         ((ChatHistory.user1_id == chat.user1_id) & (ChatHistory.user2_id == chat.user2_id)) |
         ((ChatHistory.user1_id == chat.user2_id) & (ChatHistory.user2_id == chat.user1_id))
@@ -235,7 +235,7 @@ def delete_chat(chat_id):
     db.session.commit()
     return jsonify({"message": "Chat deleted"})
 
-# 🔹 Πληροφορίες συνομιλητή
+# anaktisi pliroforiwn allou xristi se chat
 @chat_bp.route('/chats/<int:chat_id>/partner', methods=['GET'])
 @jwt_required()
 def get_chat_partner(chat_id):
@@ -245,7 +245,7 @@ def get_chat_partner(chat_id):
     if not chat or current_user_id not in [chat.user1_id, chat.user2_id]:
         return jsonify({"error": "Unauthorized"}), 403
 
-    # Πάρε το άλλο άτομο του chat
+    # anaktisi pliroforiwn allou xristi
     other_user_id = chat.user2_id if chat.user1_id == current_user_id else chat.user1_id
     other_user = User.query.get(other_user_id)
 

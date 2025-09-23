@@ -64,15 +64,11 @@ export class ReportPage implements OnInit {
         next: async () => {
           await this.toastService.present('Η αναφορά υποβλήθηκε!', 'success');
 
-          // --- Επιλογή redirect ---
           if (this.noteId) {
-            // Αναφορά για σημείωση ή σχόλιο -> πίσω στις σημειώσεις
             this.router.navigate(['/notes-feed']);
           } else if (this.reportedUserId) {
-            // Αναφορά χρήστη (π.χ. από αναζήτηση) -> πίσω στη σελίδα αναζήτησης
             this.router.navigate(['/search-users']);
           } else {
-            // Default fallback
             this.router.navigate(['/']);
           }
         },
@@ -83,7 +79,7 @@ export class ReportPage implements OnInit {
   }
 
   goBack(ev: Event) {
-    ev.preventDefault(); // για να μην εκτελέσει το defaultHref
+    ev.preventDefault(); 
     this.location.back();
   }
 }

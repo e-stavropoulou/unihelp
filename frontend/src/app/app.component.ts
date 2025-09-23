@@ -37,7 +37,7 @@ export class AppComponent implements OnInit {
     console.log('🟢 [UniHelp] App initialized');
     this.setupSSO();
   
-    // 🌍 Global error listeners
+    // Global error listeners
     window.addEventListener('error', (event) => {
       console.log('🌍 Global JS error:', event.error);
       console.log('📌 Error source:', event.filename, 'line:', event.lineno, 'col:', event.colno);
@@ -47,7 +47,7 @@ export class AppComponent implements OnInit {
       console.log('🌍 Unhandled promise rejection:', event.reason);
     });
   
-    // ✅ Άμεσο update badge χωρίς call στο backend
+    // update badge without call backend
     window.addEventListener('new-chat-message', () => {
       console.log('📬 Push: νέο μήνυμα! +1 στο badge');
       this.chatService.increaseUnreadCount();
@@ -60,7 +60,7 @@ export class AppComponent implements OnInit {
       console.log('📱 Detected platform:', platform);
   
       if (platform === 'web') {
-        this.notificationsService.initPush(); // ✅ Μόνο στο web
+        this.notificationsService.initPush(); 
       } else {
         console.log('🚫 Push notifications skipped on native platform:', platform);
       }
@@ -70,9 +70,7 @@ export class AppComponent implements OnInit {
   
   
 
-  /**
-   * ✅ Setup SSO communication με το Admin Dashboard
-   */
+  /* Setup SSO communication with Admin Dashboard */
   private setupSSO() {
     window.addEventListener('message', (event) => {
       if (event.origin !== environment.ADMIN_ORIGIN) {
@@ -97,9 +95,7 @@ export class AppComponent implements OnInit {
   }
   
 
-  /**
-   * ✅ Στέλνει token στο Admin Dashboard
-   */
+  /* token to admin dashboard */
   private sendTokenToAdmin(adminWindow: Window) {
     const token = localStorage.getItem('token');
     const userIdStr = localStorage.getItem('user_id');

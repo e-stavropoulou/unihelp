@@ -4,19 +4,17 @@ ion-content {
   --padding-top: 20px;
 }
 
-/* Κάθε στοιχείο φόρμας */
 ion-item {
   --background: transparent;
   margin-bottom: 20px;
 
   display: flex;
-  flex-direction: column; /* κάθετα label + input */
+  flex-direction: column; 
   align-items: flex-start;
   padding-left: 0;
   padding-right: 0;
 }
 
-/* Ετικέτες */
 ion-label {
   font-weight: bold;
   color: #333;
@@ -25,7 +23,6 @@ ion-label {
   width: 100%;
 }
 
-/* Select dropdown */
 select {
   width: 100%;
   padding: 10px 12px;
@@ -35,7 +32,7 @@ select {
   box-sizing: border-box;
   background: #fff;
   color: #000;
-  appearance: none; /* καθαρό dropdown */
+  appearance: none; 
 }
 
 select:focus {
@@ -57,7 +54,6 @@ textarea {
   resize: vertical;
 }
 
-/* Κουμπί υποβολής */
 ion-button {
   --border-radius: 10px;
   --background: #7B1E3B;

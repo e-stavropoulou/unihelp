@@ -1,7 +1,7 @@
 /* 🔹 Ενιαίο background στη λίστα */
 ion-list {
   background: transparent !important;
-  padding: 0; /* βγάζει τα extra κενά */
+  padding: 0; 
   margin: 0;
 }
 
@@ -11,14 +11,14 @@ ion-item {
   background: transparent !important;
   border: none !important;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;
-  --inner-border-width: 0; /* βγάζει τις default ionic γραμμές */
+  --inner-border-width: 0; 
   padding: 10px 0;
   min-height: 60px;
 }
 
 /* 🔹 Avatar styling */
 ion-avatar img {
-  border: 2px solid #7B1E3B; /* μπορντό περίγραμμα */
+  border: 2px solid #7B1E3B; 
   border-radius: 50%; 
   object-fit: cover;
 }
@@ -52,5 +52,5 @@ ion-item::after {
   display: block;
   height: 1px;
   background: rgb(128, 3, 76); 
-  margin: 0 0 0 60px; /* αφήνει κενό για το avatar */
+  margin: 0 0 0 60px; 
 }

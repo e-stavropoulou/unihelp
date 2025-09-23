@@ -81,7 +81,6 @@ export class ProfilePage implements OnInit {
   
   
   openNotificationSettings() {
-    // Chrome-specific (για Safari/Firefox θα βάλεις οδηγίες)
     window.open('chrome://settings/content/notifications', '_blank');
   }
   
@@ -91,12 +90,9 @@ export class ProfilePage implements OnInit {
     if (!userId) return;
   
     this.notificationsService.requestWebPushToken().then(() => {
-      // 👇 Δεν χρειάζεται πια flag – η HTML βασίζεται στο Notification.permission
       console.log('✅ Άδεια push ζητήθηκε');
     });
   }
-  
-  
   
 
   ionViewWillEnter() {
@@ -137,7 +133,7 @@ export class ProfilePage implements OnInit {
 
 
   
-        this.avatarVisible = false; // για fade-in
+        this.avatarVisible = false; // fade-in
         setTimeout(() => {
           const backendBase = environment.API_URL;
           const rawAvatar = data.avatar_url;

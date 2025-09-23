@@ -64,7 +64,7 @@ export class LoginPage {
         this.authService.setToken(res.token, res.user_id, res.email, res.role);
         this.showResend = false;
       
-        // ✅ FCM push registration (Web)
+        // FCM push registration (Web)
         if (Capacitor.getPlatform() === 'web') {
           this.notificationsService.requestWebPushToken()
             .then(() => console.log("✅ FCM token registered για χρήστη:", res.user_id))
@@ -73,7 +73,6 @@ export class LoginPage {
           console.log('🚫 Skipping push init after login on native platform');
         }
       
-        // Προαιρετικά:
         this.chatService.refreshUnreadMessages();
         this.notificationsService.refreshUnreadCount();
       

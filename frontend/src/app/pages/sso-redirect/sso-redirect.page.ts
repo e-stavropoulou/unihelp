@@ -50,29 +50,24 @@ export class SsoRedirectPage implements OnInit {
 
       console.log('📤 [SSO Redirect] Sending token to opener', message);
 
-      // ✅ Αν υπάρχει opener, στείλε postMessage
       if (window.opener && !window.opener.closed) {
         window.opener.postMessage(message, environment.ADMIN_ORIGIN);
 
-        // Κλείσε το popup μετά από λίγο
         setTimeout(() => {
           window.close();
         }, 700);
       } else {
-        // ❗ Fallback: redirect με query params
         const encodedUser = encodeURIComponent(JSON.stringify(userInfo));
         const redirectUrl = `${target}?token=${token}&user=${encodedUser}`;
         console.log('🔁 [SSO Redirect] Fallback redirect:', redirectUrl);
         window.location.href = redirectUrl;
       }
 
-      // 🔙 Αφαίρεσε αυτή τη σελίδα από το history για να μην πας "πίσω" εδώ
       this.router.navigateByUrl('/profile', { replaceUrl: true });
     } else {
       console.warn('⚠️ [SSO Redirect] Missing token or user info – redirecting anyway');
       window.location.href = target;
 
-      // Και πάλι, καθάρισε το history
       this.router.navigateByUrl('/profile', { replaceUrl: true });
     }
   }

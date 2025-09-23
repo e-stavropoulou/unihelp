@@ -8,11 +8,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ----------------- 🔁 Ενσωμάτωση FAISS -----------------
+# ensomatosi faiss
 embedding = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = FAISS.load_local("../faiss_index", embedding, allow_dangerous_deserialization=True)
 
-# 🔗 Φτιάχνει το RAG chain
+# ftiaxnei rag chain
 llm = ChatOpenAI(model="gpt-4o")
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
@@ -20,17 +20,17 @@ qa_chain = RetrievalQA.from_chain_type(
     chain_type="stuff"
 )
 
-# 🔤 Κανονικοποίηση κειμένου (χωρίς τόνους, πεζά, καθαρό)
+# kanonikopoisi keimenou
 def normalize(text):
     return unicodedata.normalize("NFKC", text.strip().lower())
 
-# ----------------- 🔎 Custom λογική για metrics -----------------
+# metrics
 def answer_from_metrics(query):
     query = query.lower()
     with open("notes_text_dataset.json", "r", encoding="utf-8") as f:
         notes = json.load(f)
 
-    # --- 🔹 Πιο κατεβασμένη σημείωση ---
+    # most downloaded
     if "λήψεις" in query or "κατεβασμένη" in query:
         top_note = max(notes, key=lambda x: x.get("downloads", 0))
         return f"""📥 Πιο κατεβασμένη σημείωση:
@@ -39,7 +39,7 @@ def answer_from_metrics(query):
 Μάθημα: {top_note["course"]}
 Λήψεις: {top_note["downloads"]}"""
 
-    # --- 🔹 Περισσότερα σχόλια ---
+    # most commented
     elif "σχόλια" in query:
         top_note = max(notes, key=lambda x: x.get("comments", 0))
         return f"""💬 Περισσότερα σχόλια:
@@ -48,15 +48,15 @@ def answer_from_metrics(query):
 Μάθημα: {top_note["course"]}
 Σχόλια: {top_note["comments"]}"""
 
-    # --- 🔹 Πόσα αρχεία έχει ένα μάθημα ---
+    # arxeia mathimaton
     elif "πόσα" in query and "αρχεία" in query and "μάθημα" in query:
         match = re.search(r"μάθημα\s+(.+?)[\?;.,]*$", query)
         if match:
             asked_course_raw = match.group(1).strip()
-            asked_course = normalize(re.sub(r"[^\w\s]", "", asked_course_raw))  # Αφαίρεση σημείων στίξης
+            asked_course = normalize(re.sub(r"[^\w\s]", "", asked_course_raw))  
             count = sum(1 for note in notes if normalize(note["course"]) == asked_course)
 
-            # 🔍 Εύρεση του πραγματικού ονόματος όπως είναι στο dataset
+            
             for note in notes:
                 if normalize(note["course"]) == asked_course:
                     display_name = note["course"]
@@ -68,7 +68,7 @@ def answer_from_metrics(query):
 
 
 
-    # --- 🔹 Ποιο μάθημα έχει τις περισσότερες σημειώσεις ---
+    # mathimata me perissoteres simioseis
     elif "μαθήματα" in query and "περισσότερες" in query:
         course_counts = {}
         for note in notes:
@@ -81,7 +81,7 @@ def answer_from_metrics(query):
 
     return None
 
-# ----------------- 🎙️ Ερώτηση χρήστη -----------------
+# erotisi xristi
 while True:
     query = input("\n❓ Ρώτα το UniHelp Bot (ή γράψε 'exit'): ")
     if query.lower() == "exit":
@@ -89,11 +89,4 @@ while True:
 
     response = qa_chain.invoke(query)
     print(f"\n🤖 Bot: {response['result']}")
-    # 🔁 Αν έχει σχέση με metric, δώσε χειροκίνητη απάντηση
-    # metric_answer = answer_from_metrics(query)
-    # if metric_answer:
-    #     print(f"\n🤖 Bot: {metric_answer}")
-    # else:
-    #     # 🤖 RAG απάντηση
-    #     response = qa_chain.invoke(query)
-    #     print(f"\n🤖 Bot: {response['result']}")
+    

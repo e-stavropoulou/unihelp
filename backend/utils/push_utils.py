@@ -27,7 +27,7 @@ def get_access_token():
 
 
 def send_push_notification(token: str, title: str, body: str, image: str = None, data: dict = None):
-    """Στέλνει push notification σε ένα συγκεκριμένο FCM token"""
+    """Sends a push notification via Firebase Cloud Messaging (FCM)."""
     print("🚨 ΚΛΗΘΗΚΕ send_push_notification με token:", token)
     access_token = get_access_token()
     headers = {
@@ -56,7 +56,7 @@ def send_push_notification(token: str, title: str, body: str, image: str = None,
         print("🟢 Το αίτημα στο FCM έγινε.")
         print(f"🔔 Push response: {response.status_code} - {response.text}")
 
-        # ✅ Έλεγχος για UNREGISTERED
+        # UNREGISTERED
         if response.status_code == 404 and "UNREGISTERED" in response.text:
             print(f"⚠️ Token {token} είναι UNREGISTERED – διαγραφή από DB")
             user = User.query.filter_by(fcm_token=token).first()

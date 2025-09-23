@@ -22,9 +22,6 @@ ion-searchbar {
   margin-bottom: 16px;
 }
 
-
-/* ✅ Styling για dropdown φίλτρα */
-
 ion-item.custom-ion-select {
   --background: transparent !important;
   --inner-border-width: 0px;
@@ -60,14 +57,12 @@ ion-item.custom-ion-select ion-select {
 
 }
 
-/* 🚫 Αφαίρεση επίμονου λευκού outline όταν έχει focus */
 ion-item.custom-ion-select ion-select:focus {
   outline: none !important;
   box-shadow: none !important;
 }
 
 
-/* ✅ Στοίχιση placeholder/τιμής δεξιά */
 ion-item.custom-ion-select ion-select::part(text) {
   display: flex;
   justify-content: flex-end;
@@ -79,7 +74,6 @@ ion-item.custom-ion-select ion-select::part(text) {
 }
 
 
-/* 📄 Κάρτα Σημείωσης */
 
 .note-card {
   position: relative; 
@@ -98,7 +92,6 @@ ion-item.custom-ion-select ion-select::part(text) {
   }
 }
 
-/* 🚩 Κουμπί αναφοράς */
 .report-btn {
   position: absolute;
   top: 12px;
@@ -115,11 +108,11 @@ ion-item.custom-ion-select ion-select::part(text) {
   color: #a2211f;
 }
 
-/* Τίτλος + υπότιτλος */
+
 .note-header {
   text-align: center;
   margin-bottom: 8px;
-  padding-right: 36px; /* αφήνει χώρο για το κουμπί αναφοράς */
+  padding-right: 36px; 
 }
 .note-title {
   font-size: 19px;
@@ -132,7 +125,7 @@ ion-item.custom-ion-select ion-select::part(text) {
   color: #7B1E3B;
 }
 
-/* Περιγραφή */
+
 .note-section {
   margin: 12px 0;
   font-size: 14px;
@@ -140,7 +133,7 @@ ion-item.custom-ion-select ion-select::part(text) {
   color: #333;
 }
 
-/* Metadata σε grid */
+
 .note-meta-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -157,22 +150,22 @@ ion-item.custom-ion-select ion-select::part(text) {
   text-align: center;
 }
 
-/* Ενέργειες */
+
 .actions {
   display: flex;
-  justify-content: center;      /* όλα στη μέση */
+  justify-content: center;      
   align-items: center;
-  gap: 12px;                    /* ίδιο κενό ανάμεσά τους */
+  gap: 12px;                    
   margin-top: 12px;
-  flex-wrap: wrap;              /* αν δεν χωράνε πάνε κάτω */
+  flex-wrap: wrap;              
 }
 
 /* Όλα τα κουμπιά ίδια */
 .actions a,
 .actions ion-button {
-  flex: 1 1 180px;              /* ίδια βάση ~180px, μεγαλώνουν/μικραίνουν αναλογικά */
-  max-width: 200px;             /* να μη γίνουν τεράστια σε wide screen */
-  height: 44px;                 /* ίδιο ύψος */
+  flex: 1 1 180px;              
+  max-width: 200px;             
+  height: 44px;                 
   font-size: 14px;
   font-weight: 600;
   border-radius: 10px;
@@ -185,7 +178,6 @@ ion-item.custom-ion-select ion-select::part(text) {
 }
 
 
-/* 🔴 Γεμάτα κουμπιά (filled) */
 .actions a.filled,
 .actions ion-button.filled {
   background: #7B1E3B;
@@ -198,7 +190,6 @@ ion-item.custom-ion-select ion-select::part(text) {
   border-color: #a2211f;
 }
 
-/* ⚪ Διάφανα κουμπιά (outline) */
 .actions a.outline,
 .actions ion-button.outline,
 ion-button[fill="outline"] {
@@ -209,11 +200,10 @@ ion-button[fill="outline"] {
   --border-color: #7B1E3B !important;
   border: 2px solid #7B1E3B !important;
 
-  /* ✅ διορθώσεις */
   --background-hover: #fdeaea !important;
-  --background-activated: transparent !important; /* όταν κάνεις tap */
-  --background-focused: transparent !important;   /* όταν μένει focus */
-  --ion-color-base: transparent !important;       /* Ionic internal */
+  --background-activated: transparent !important; 
+  --background-focused: transparent !important;   
+  --ion-color-base: transparent !important;       
 }
 
 .actions a.outline:hover,
@@ -222,7 +212,6 @@ ion-button[fill="outline"]:hover {
   background: #fdeaea !important;
 }
 
-/* 🚑 Διόρθωση stuck pink focus */
 .actions a.outline:focus,
 .actions ion-button.outline:focus,
 ion-button[fill="outline"]:focus,
@@ -234,9 +223,6 @@ ion-button[fill="outline"]:active {
 }
 
 
-
-
-/* Σχόλια */
 .comment-actions {
   display: flex;
   justify-content: space-between;
@@ -251,7 +237,6 @@ ion-button[fill="outline"]:active {
 }
 
 
-/* 💬 Σχόλια */
 .comments-list {
   margin-top: 10px;
   padding: 10px;
@@ -309,9 +294,6 @@ ion-button[fill="outline"]:active {
   margin-top: 12px;
 }
 
-
-/* ➕ Προσθήκη σχολίου */
-
 .comment-box {
   margin-top: 20px;
 }
@@ -345,15 +327,11 @@ ion-button[fill="outline"]:active {
 }
 
 
-/* 📦 Popover για custom επιλογές (π.χ. φίλτρα) */
 ::ng-deep .course-popover {
   --width: min(420px, 90vw);
   --height: 60vh;
 }
 
-//ion-content {
-  //--background: linear-gradient(180deg, #fff7f5 0%, #f5faff 100%);
-//}
 
 ion-content {
   --background: #fff;

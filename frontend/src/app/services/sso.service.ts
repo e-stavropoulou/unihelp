@@ -15,7 +15,6 @@ export class SsoService {
     this.setupMessageListener();
   }
 
-  /** 📥 Listener για μηνύματα από admin */
   private setupMessageListener() {
     window.addEventListener('message', (event: MessageEvent) => {
       const allowedOrigins = [environment.ADMIN_ORIGIN, 'capacitor://localhost'];
@@ -56,7 +55,6 @@ export class SsoService {
     });
   }
 
-  /** 📤 Στέλνει token + user info */
   private replyWithTokens(target: Window) {
     const token = this.authService.getToken?.() || localStorage.getItem('token');
     const refresh = localStorage.getItem('refresh_token');
@@ -78,7 +76,7 @@ export class SsoService {
             refresh,
             userInfo,
           },
-          targetOrigin // ✅ Να είναι ξεκάθαρο και σίγουρο
+          targetOrigin 
         );
         console.log(`[SSO] ✅ Token sent to ${targetOrigin}`);
       } else {
@@ -90,10 +88,6 @@ export class SsoService {
   }
   
   
-  
-  
-
-  /** ✅ Ανοίγει admin dashboard σε νέο tab (ή redirect για mobile) */
   openAdminDashboard(): void {
     const token = this.authService.getToken();
     const role = this.authService.getRole();
@@ -102,7 +96,7 @@ export class SsoService {
 
     const targetUrl = environment.ADMIN_ORIGIN;
 
-    // --- ΠΕΡΙΠΤΩΣΗ 1: Mobile App (Capacitor) ---
+    // --- Mobile App (Capacitor) ---
     const isMobile = (window as any).Capacitor?.isNativePlatform?.();
     if (isMobile) {
       const encoded = encodeURIComponent(targetUrl);
@@ -110,7 +104,7 @@ export class SsoService {
       return;
     }
 
-    // --- ΠΕΡΙΠΤΩΣΗ 2: Web Browser ---
+    // --- Web Browser ---
     const newTab = window.open(targetUrl, '_blank');
     if (!newTab) {
       console.warn('[SSO] Αποτυχία ανοίγματος νέου tab (πιθανώς popup blocker)');
@@ -118,10 +112,10 @@ export class SsoService {
     }
 
     this.pendingWin = newTab;
-    this.kickoffReplyLoop(); // επαναλαμβάνει την αποστολή token
+    this.kickoffReplyLoop(); // epanapostoli token
   }
 
-  /** 🔁 Επαναλαμβανόμενη αποστολή token μέχρι να το πάρει */
+  /** epanalamvanomeni apostoli token mexri na to parei */
   private kickoffReplyLoop() {
     if (this.sendTimer) clearInterval(this.sendTimer);
     this.attempts = 0;
@@ -135,10 +129,9 @@ export class SsoService {
         return;
       }
       this.replyWithTokens(this.pendingWin);
-    }, 200); // κάθε 200ms για 5s
+    }, 200); 
   }
 
-  /** ✉️ Χειροκίνητη αποστολή token */
   sendTokenToAdmin(win: Window) {
     this.replyWithTokens(win);
   }

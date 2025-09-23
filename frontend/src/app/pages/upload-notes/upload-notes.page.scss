@@ -35,8 +35,6 @@ textarea.custom-input {
   resize: vertical;
 }
 
-/* -------- Searchbar styles (κρατάμε όπως είχες) -------- */
-
 .custom-search {
   --background: #fff;
   --border-color: #7B1E3B;   
@@ -82,8 +80,6 @@ textarea.custom-input {
   font-size: 15px;
   color: #333;
 }
-
-/* -------- Chips & selected courses -------- */
 
 .selected-courses {
   display: flex;
@@ -138,8 +134,6 @@ ion-alert.custom-alert {
   font-weight: 600;
 }
 
-/* -------- Upload button -------- */
-
 .custom-red-btn {
   --background: #7B1E3B;
   --background-hover: #a2211f;
@@ -151,8 +145,6 @@ ion-alert.custom-alert {
   font-size: 16px;
   text-transform: none;
 }
-
-/* -------- Ion Select (Κατηγορία) -------- */
 
 .custom-ion-select {
   --background: #fff;

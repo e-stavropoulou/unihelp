@@ -82,7 +82,7 @@ export class ChatDetailPage implements OnInit {
     this.loadMessages();
     this.loadChatPartnerInfo();
   
-    // ✅ Συνδρομή σε νέα μηνύματα από FCM
+    
     this.messageSub = this.chatService.newChatMessage$.subscribe((message) => {
       if (!message) return;
   
@@ -90,7 +90,6 @@ export class ChatDetailPage implements OnInit {
       const currentChatId = Number(this.chatId);
   
       if (incomingChatId === currentChatId) {
-        // ✅ Αν το μήνυμα είναι από τον ίδιο τον χρήστη, αγνόησέ το
         if (Number(message.sender_id) === this.userId) return;
       
         this.ngZone.run(() => {
@@ -132,7 +131,7 @@ export class ChatDetailPage implements OnInit {
       this.chatService.refreshUnreadMessages(); 
     });
 
-    // ✅ Scroll στο τέλος αφού μπεις
+    
     setTimeout(() => this.scrollToBottom(), 200);
   }
 
@@ -249,7 +248,7 @@ export class ChatDetailPage implements OnInit {
   scrollToBottom() {
     setTimeout(() => {
       this.content.scrollToBottom(300);
-    }, 100); // μικρό delay για να έχει κάνει render
+    }, 100); 
   }
   
 }

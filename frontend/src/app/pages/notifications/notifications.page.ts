@@ -58,7 +58,6 @@ export class NotificationsPage implements OnInit {
   async ngOnInit() {
   console.log('🚀 Notifications page loaded');
 
-  // ✅ Εμφάνισε κουμπί ενεργοποίησης μόνο αν δεν έχει token
   if (!this.notificationsService.fcmToken) {
     this.showEnableBtn = true;
   }
@@ -114,7 +113,7 @@ export class NotificationsPage implements OnInit {
     this.http.post(`${environment.API_URL}/notifications/${id}/read`, {}, { headers }).subscribe({
       next: () => {
         this.notifications = this.notifications.map(n => n.id === id ? { ...n, is_read: true } : n);
-        this.notificationsService.refreshUnreadCount(); // ✅ Ενημέρωση badge
+        this.notificationsService.refreshUnreadCount(); 
       },
       error: err => console.error('❌ Read failed:', err)
     });
@@ -131,7 +130,7 @@ export class NotificationsPage implements OnInit {
         const deleted = this.notifications.find(n => n.id === id);
         this.notifications = this.notifications.filter(n => n.id !== id);
         if (deleted?.is_read === false) {
-          this.notificationsService.refreshUnreadCount(); // ✅ Αν ήταν αδιάβαστη, μείωσε
+          this.notificationsService.refreshUnreadCount(); 
         }
       },
       error: err => console.error('❌ Delete failed:', err)

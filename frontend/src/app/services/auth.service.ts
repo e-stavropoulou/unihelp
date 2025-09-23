@@ -16,7 +16,6 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // ✔️ Καταγραφή μετά το login
   setToken(token: string, user_id: number, email: string, role: string, refreshToken?: string) {
     localStorage.setItem(this.TOKEN_KEY, token);
     localStorage.setItem(this.USER_ID_KEY, user_id.toString());
@@ -30,9 +29,7 @@ export class AuthService {
   getRefreshToken(): string | null {
     return localStorage.getItem('refresh_token');
   }
-  
 
-  // ✔️ Χρήσιμα getters
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
@@ -60,17 +57,17 @@ export class AuthService {
     localStorage.removeItem(this.ROLE_KEY);
   }
 
-  // ✔️ Login
+  // Login
   loginUser(credentials: { email: string; password: string }): Observable<any> {
     return this.http.post(`${environment.API_URL}/login`, credentials);
   }
 
-  // ✔️ Resend email
+  // Resend email
   resendVerificationEmail(email: string): Observable<any> {
     return this.http.post(`${environment.API_URL}/resend-verification`, { email });
   }
 
-  // ✔️ FCM update
+  // FCM update
   updateFcmToken(fcm_token: string): Observable<any> {
     return this.http.post(`${environment.API_URL}/update-fcm-token`, 
       { fcm_token },
@@ -101,7 +98,7 @@ export class AuthService {
   });
   
     if (redirect) {
-      window.location.replace('/login'); // πιο καθαρό redirect
+      window.location.replace('/login'); 
     }
   }
   

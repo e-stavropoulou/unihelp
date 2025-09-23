@@ -10,7 +10,7 @@ from utils.points_utils import award_points
 
 note_reviews_bp = Blueprint("note_reviews_bp", __name__)
 
-# 🔸 POST /reviews/note/<note_id>
+
 @note_reviews_bp.route("/reviews/note/<int:note_id>", methods=["POST"])
 @jwt_required()
 def create_or_update_note_review(note_id):
@@ -41,12 +41,11 @@ def create_or_update_note_review(note_id):
     )
     db.session.add(review)
 
-    # ✅ Πόντοι για reviewer
     reviewer = User.query.get(current_user_id)
     if reviewer:
         award_points(reviewer, 5, "🎯 Ευχαριστούμε για την αξιολόγησή σου!")
 
-    # ✅ Πόντοι για uploader αν πήρε 4 ή 5
+
     uploader = note.user
     if uploader:
         if rating == 4:
@@ -59,7 +58,6 @@ def create_or_update_note_review(note_id):
     return jsonify({"message": "Η αξιολόγηση καταχωρήθηκε.", "review": review.to_dict()}), 201
 
 
-# 🔸 GET /reviews/note/<note_id>
 @note_reviews_bp.route("/reviews/note/<int:note_id>", methods=["GET"])
 @jwt_required(optional=True)
 def get_note_reviews(note_id):

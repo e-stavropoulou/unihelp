@@ -150,11 +150,11 @@ ion-textarea::part(native)
 .footer-nav ion-icon {
   cursor: pointer;
   transition: transform 0.2s ease;
-  transform: translateY(-10px); /* Σήκωσε τα icons π.χ. 4px πιο πάνω */
+  transform: translateY(-10px); 
 }
 
 .footer-nav ion-icon:hover {
-  transform: translateY(-4px) scale(1.15); /* Σήκωσε και κάνε zoom όταν hover */
+  transform: translateY(-4px) scale(1.15); 
 }
 
 
@@ -204,7 +204,7 @@ ion-back-button {
 ion-header,
 ion-toolbar {
   --ion-background-color: #ffffff !important;
-  --background: #ffffff !important;   /* καλύπτει όλες τις περιπτώσεις */
+  --background: #ffffff !important;   
   --ion-toolbar-background: #ffffff !important;
   --color: #7B1E3B !important;
   color: #7B1E3B !important;
@@ -222,9 +222,9 @@ ion-title {
 /* ------------------------ Footer / Tab bar ------------------------ */
 ion-footer,
 ion-tab-bar {
-  --background: #ffffff !important; /* άσπρο */
-  --color: #7B1E3B !important;      /* default icon color */
-  --color-selected: #7B1E3B !important; /* ενεργό icon */
+  --background: #ffffff !important; 
+  --color: #7B1E3B !important;      
+  --color-selected: #7B1E3B !important; 
   box-shadow: 0 -1px 4px rgba(0,0,0,0.05);
 }
 
