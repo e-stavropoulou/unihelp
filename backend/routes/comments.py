@@ -7,7 +7,7 @@ from models.note import Note
 from models.user import User
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from utils.points_utils import award_points  # ✅ ΝΕΟ
+from utils.points_utils import award_points  
 
 comments_bp = Blueprint('comments_bp', __name__)
 
@@ -21,9 +21,8 @@ def to_athens_iso(dt: datetime) -> str:
     return dt.astimezone(ATHENS_TZ).isoformat()
 
 
-# -------------------------
+
 # GET comments for a note
-# -------------------------
 @comments_bp.route('/notes/<int:note_id>/comments', methods=['GET'])
 @jwt_required()
 def get_comments(note_id):
@@ -43,9 +42,8 @@ def get_comments(note_id):
     ]), 200
 
 
-# -------------------------
+
 # POST new comment
-# -------------------------
 @comments_bp.route('/notes/<int:note_id>/comments', methods=['POST'])
 @jwt_required()
 def add_comment(note_id):
@@ -68,11 +66,9 @@ def add_comment(note_id):
     )
     db.session.add(new_comment)
 
-    # ✅ Πόντοι + επιβράβευση
     user = User.query.get(user_id)
     award_points(user, 5, "🎯 Κέρδισες 5 πόντους για το σχόλιό σου!")
 
-    # ✅ Τελικό commit
     db.session.commit()
 
     return jsonify({
@@ -84,9 +80,8 @@ def add_comment(note_id):
     }), 201
 
 
-# -------------------------
+
 # PUT edit comment
-# -------------------------
 @comments_bp.route('/comments/<int:comment_id>', methods=['PUT'])
 @jwt_required()
 def edit_comment(comment_id):
@@ -129,9 +124,8 @@ def edit_comment(comment_id):
     }), 200
 
 
-# -------------------------
+
 # DELETE comment
-# -------------------------
 @comments_bp.route('/comments/<int:comment_id>', methods=['DELETE'])
 @jwt_required()
 def delete_comment(comment_id):

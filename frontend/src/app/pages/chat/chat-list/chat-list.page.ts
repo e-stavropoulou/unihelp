@@ -33,7 +33,7 @@ import { CommonModule } from '@angular/common';
 import { ToastService } from 'src/app/services/toast.service';
 
 
-// ✅ ΔΗΛΩΣΗ ΤΥΠΟΥ CHAT
+// TYPOS CHAT
 interface ChatPreview {
   chat_id: number;
   other_username: string;
@@ -85,11 +85,11 @@ export class ChatListPage implements OnInit {
 
   ngOnInit() {
     this.fetchChats();
-    this.listenForMessages(); // ✅ για real-time push
+    this.listenForMessages(); // REAL-TIME UPDATES
   }
 
   ionViewWillEnter() {
-    this.fetchChats(); // Επαναφόρτωση όταν μπαίνει πάλι στη σελίδα
+    this.fetchChats(); // EPANARXH KATHE FORA POY FAINETAI H SELIDA
   }
 
   fetchChats() {
@@ -136,12 +136,9 @@ export class ChatListPage implements OnInit {
     const currentChatId = this.chatService.currentChatId$.value;
   
     if (currentChatId === chatId) {
-      // ✅ Είμαι ήδη μέσα σε αυτή τη συνομιλία -> δεν αυξάνω unread
       console.log(`📩 [ChatListPage] Μήνυμα στο ανοιχτό chat ${chatId}, αγνοώ unread`);
-      // αλλά απλώς μετακινώ το chat στην κορυφή
       this.moveChatToTop(chatId);
     } else {
-      // ❌ Εκτός -> αυξάνω unread
       this.updateUnreadCount(chatId);
     }
   }
@@ -162,9 +159,6 @@ export class ChatListPage implements OnInit {
   goToBot() {
     this.router.navigate(['/bot']);
   }
-  
-  
-  
   
 
   updateUnreadCount(chatId: number) {

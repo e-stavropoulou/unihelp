@@ -3,7 +3,6 @@
     <ion-title>Συνομιλίες</ion-title>
 
         
-        <!-- ✅ Κουμπί bot στη δεξιά πλευρά -->
         <ion-buttons slot="end">
           <ion-button fill="clear" (click)="goToBot()">
             <ion-icon name="sparkles-outline"></ion-icon>
@@ -39,7 +38,7 @@
         </ion-label>
       </ion-item>
 
-      <!-- Swipe αριστερά (side="end") για επιλογές -->
+      
       <ion-item-options side="end">
         <ion-item-option color="danger" (click)="confirmDelete(chat, sliding, $event)">
           <ion-icon slot="start" name="trash-outline"></ion-icon>

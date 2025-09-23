@@ -51,7 +51,6 @@ export class NotificationsService {
     console.log("🖥️ [Push] Platform detected:", platform);
   
     if (platform === 'web') {
-      // 👇 Πάντα ζητά token αν έχει permission
       if (Notification.permission === 'granted') {
         console.log("🔑 Permission already granted, requesting token...");
         const token = await registerFcmToken();
@@ -64,9 +63,6 @@ export class NotificationsService {
   }
   
   
-  
-
-  /** 🔹 ΜΟΝΟ listener για Web (token ζητείται από user gesture) */
   private async initWebFCM(): Promise<void> {
     try {
       const messaging = await getMessagingInstance();
@@ -144,7 +140,6 @@ export class NotificationsService {
   }
   
 
-  /** 🔹 Χρησιμοποιείται με κουμπί - ΜΟΝΟ σε user gesture */
   public async requestWebPushToken(): Promise<void> {
     try {
       const token = await registerFcmToken();  // αυτό ήδη στέλνει στο backend
@@ -160,10 +155,6 @@ export class NotificationsService {
   }
   
   
-  
-  
-
-  /** 🔹 Στέλνει FCM token στο backend */
   private sendTokenToBackend(userId: number, token: string) {
     const jwt = this.authService.getToken();
     if (!jwt) {
@@ -189,7 +180,6 @@ export class NotificationsService {
   }
   
 
-  /** 🔹 Πάρε αριθμό αδιάβαστων ειδοποιήσεων */
   refreshUnreadCount() {
     const jwt = this.authService.getToken();
     if (!jwt) {

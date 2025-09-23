@@ -22,7 +22,7 @@ ion-item {
 }
 
 .user-msg ion-label {
-  background: #fdeaea; /* απαλό ροζ */
+  background: #fdeaea; 
   border-radius: 14px 14px 0 14px;
   padding: 10px 14px;
   max-width: 80%;
@@ -58,14 +58,14 @@ ion-item {
   margin-top: 12px;
   margin-bottom: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  align-items: stretch; /* ✅ γεμίζει σωστά το textarea */
+  align-items: stretch; 
 }
 
 
 ion-textarea {
   --background: transparent !important; /* διάφανο */
   background: transparent !important;
-  min-height: 60px;     /* να φαίνεται πάντα */
+  min-height: 60px;     
   font-size: 14px;
   color: #000;
   --padding-start: 12px;
@@ -90,7 +90,7 @@ ion-textarea::part(placeholder) {
   color: #fff;
 }
 
-/* 🔹 Toolbar buttons (πίσω + κάδος) */
+
 ion-header ion-button {
   --background: transparent !important;
   --color: #7B1E3B !important;

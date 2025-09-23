@@ -8,7 +8,7 @@ class UserCourse(db.Model):
     can_help = db.Column(db.Boolean, default=False)
     needs_help = db.Column(db.Boolean, default=False)
 
-    # Σχέσεις για να μπορείς να κάνεις uc.user ή uc.course
+    
     user = db.relationship("User", back_populates="user_courses")
     course = db.relationship("Course", back_populates="course_users")
 
@@ -21,5 +21,4 @@ class Course(db.Model):
     semester = db.Column(db.Integer, nullable=False)
     type = db.Column(db.String(50), nullable=False, default="υποχρεωτικό")
 
-    # Σχέση με UserCourse
     course_users = db.relationship('UserCourse', back_populates='course')

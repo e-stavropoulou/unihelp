@@ -23,7 +23,7 @@ with open(DATA_PATH, "r", encoding="utf-8") as f:
 
 docs = []
 
-# ➕ Εμπλουτισμένα chunks ανά σημείωση
+# chunks me metadata
 for note in notes:
     metadata = {
         "filename": note.get("filename", "χωρίς όνομα"),
@@ -53,7 +53,7 @@ for note in notes:
         docs.append(Document(page_content=chunk, metadata=metadata))
 
 
-# ✅ Δημιουργία reasoning-friendly pseudo-document
+# dhmiourgia reasoning-friendly pseudo-document
 metadata_lines = [
     f'Η σημείωση "{note["title"]}" του χρήστη {note["uploader"]} για το μάθημα {note["course"]} έχει {note["downloads"]} λήψεις και {note["comments"]} σχόλια.'
     for note in notes
@@ -70,7 +70,7 @@ docs.insert(0, Document(
 ))
 
 
-# 📦 Δημιουργία FAISS index
+# dhmioyrgia FAISS index
 print("📚 Φτιάχνεται το FAISS index...")
 vectorstore = FAISS.from_documents(docs, embedding)
 vectorstore.save_local(INDEX_PATH)

@@ -21,7 +21,7 @@
 .settings-icon-btn {
   position: absolute;
   top: -6px;
-  right: -6px;
+  right: -20px;
   z-index: 2;
   --border-radius: 50%;
   --border-width: 1px;
@@ -58,50 +58,113 @@
   margin: 0 auto 1rem auto;
 }
 
+/* === Web/Desktop === */
+@media (min-width: 768px) {
+  .info-card {
+    max-width: 800px;  /* 🔽 δεν ξεχειλώνει */
+    margin: 0 auto 1.5rem auto;
+  }
+}
+
+
 /* === Buttons === */
 ion-button {
-  --background: #7B1E3B;
-  --background-hover: #7B1E3B;
-  --background-activated: #7B1E3B;
-  --color: #fff;
-  border-radius: 20px;
-  font-weight: 600;
+  --background: #7B1E3B !important;
+  --background-hover: #7B1E3B !important;
+  --background-activated: #7B1E3B !important;
+  --color: #fff !important;
+  border-radius: 20px !important;
+  font-weight: 600 !important;
 }
+
 ion-button[color="danger"][fill="outline"] {
-  --border-color: #7B1E3B;
-  --color: #7B1E3B;
+  --border-color: #7B1E3B !important;
+  --color: #7B1E3B !important;
 }
 
-.custom-red-btn {
-  --background: #7B1E3B;
-  --background-hover: #7B1E3B;
-  --color: white;
-  --border-radius: 14px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  text-transform: none;
-}
+.custom-red-btn,
 .custom-outline-btn {
-  --color: #7B1E3B;
-  --border-color: #7B1E3B;
-  --background: #fff;
-  --border-width: 2px;
-  --border-radius: 14px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  text-transform: none;
+  font-weight: 600 !important;
+  text-transform: none !important;
 }
 
+/* === Container (Mobile default) === */
 .button-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  justify-content: center;
+  display: flex !important;
+  flex-direction: column !important;   /* 📱 Mobile: κάθετα */
+  align-items: center !important;
+  gap: 0.4rem !important;
+  width: 100% !important;
+  margin: 0 auto !important;
 }
+
 .button-row ion-button {
-  flex: 1 1 100%;   /* ✅ Mobile default full width */
-  max-width: 100%;
+  width: 100% !important;    /* 📱 Full width */
+  height: 44px !important;
+  margin: 0 !important;
 }
+
+/* === Responsive Web/Desktop === */
+@media (min-width: 768px) {
+  .button-row {
+    display: grid !important;
+    justify-content: center !important;
+    gap: 1rem !important;
+    max-width: 700px !important;
+    margin: 0 auto !important;
+  }
+
+  .button-row ion-button {
+    width: 220px !important;
+    height: 44px !important;
+  }
+
+  /* === 3 κουμπιά → όλα σε 1 σειρά === */
+  .button-row:has(ion-button:nth-child(3)):not(:has(ion-button:nth-child(4))) {
+    grid-template-columns: repeat(3, 220px) !important;
+  }
+
+  /* === 4 κουμπιά → 2 + 2 === */
+  .button-row:has(ion-button:nth-child(4)):not(:has(ion-button:nth-child(5))) {
+    grid-template-columns: repeat(2, 220px) !important;
+  }
+
+ /* === 5 κουμπιά → 3 πάνω + 2 κάτω στα κενά === */
+.button-row:has(ion-button:nth-child(5)):not(:has(ion-button:nth-child(6))) {
+  grid-template-columns: repeat(5, 130px) !important; /* 5 στήλες ίσου πλάτους */
+  gap: 0.5rem !important;                           /* μικρότερο κενό */
+  justify-items: center !important;
+}
+
+.button-row:has(ion-button:nth-child(5)):not(:has(ion-button:nth-child(6)))
+  ion-button {
+  width: 200px !important;  /* σταθερό πλάτος κουμπιών */
+  height: 44px !important;
+}
+
+.button-row:has(ion-button:nth-child(5)):not(:has(ion-button:nth-child(6)))
+  ion-button:nth-child(1) {
+  grid-column: 1 !important;
+}
+.button-row:has(ion-button:nth-child(5)):not(:has(ion-button:nth-child(6)))
+  ion-button:nth-child(2) {
+  grid-column: 3 !important;
+}
+.button-row:has(ion-button:nth-child(5)):not(:has(ion-button:nth-child(6)))
+  ion-button:nth-child(3) {
+  grid-column: 5 !important;
+}
+.button-row:has(ion-button:nth-child(5)):not(:has(ion-button:nth-child(6)))
+  ion-button:nth-child(4) {
+  grid-column: 2 !important;
+}
+.button-row:has(ion-button:nth-child(5)):not(:has(ion-button:nth-child(6)))
+  ion-button:nth-child(5) {
+  grid-column: 4 !important;
+}
+
+}
+
 
 /* === Tags === */
 .upoints-tag {
@@ -182,18 +245,3 @@ ion-popover {
   margin-top: 10px;
 }
 
-/* === Responsive for Web/Desktop === */
-@media (min-width: 768px) {
-  .button-row {
-    justify-content: flex-start;
-  }
-  .button-row ion-button {
-    flex: 1 1 auto;
-    max-width: 240px; /* ✅ κουμπιά πιο μαζεμένα */
-  }
-  .info-card,
-  .profile-header {
-    max-width: 600px; /* ✅ κάρτες και header δεν ξεχειλώνουν */
-    margin: 0 auto 1.5rem auto;
-  }
-}

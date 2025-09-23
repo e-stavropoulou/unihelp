@@ -31,7 +31,7 @@ export class UserProfilePage implements OnInit {
 
   averageRating: number | null = null;
   reviewCount: number = 0;
-  userRating: number = 0; // Τι έχει βάλει ο current user (αν έχει)
+  userRating: number = 0; 
 
 
   constructor(
@@ -100,7 +100,6 @@ export class UserProfilePage implements OnInit {
 
   openReportUser() {
     if (!this.user) return;
-    // Αντί για modal -> redirect στη σελίδα αναφορών
     this.router.navigate(['/report'], {
       queryParams: { reportedUserId: this.user.id }
     });
@@ -135,7 +134,6 @@ export class UserProfilePage implements OnInit {
   rateUser(rating: number) {
     if (!this.user) return;
   
-    // Αν έχει ήδη βαθμολογήσει, μην κάνει τίποτα (ούτε alert)
     if (this.userRating > 0) return;
   
     const token = this.authService.getToken();
@@ -150,7 +148,6 @@ export class UserProfilePage implements OnInit {
         next: (res: any) => {
           this.userRating = rating;
   
-          // ✅ Άμεσα ενημέρωσε τον μέσο όρο και τα reviews
           this.loadUserReviewStats();
         },
         error: (err) => {

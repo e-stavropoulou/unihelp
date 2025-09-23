@@ -20,7 +20,7 @@ def to_athens_iso(dt: datetime) -> str:
         dt = dt.replace(tzinfo=ZoneInfo("UTC"))
     return dt.astimezone(ATHENS_TZ).isoformat()
 
-# 🔔 Επιστροφή όλων των ειδοποιήσεων
+
 @notifications_bp.route('/notifications', methods=['GET', 'OPTIONS'])
 @jwt_required(optional=True)
 def get_notifications():
@@ -45,7 +45,7 @@ def get_notifications():
     except Exception as e:
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
 
-# ✔️ Αποθήκευση FCM Token
+
 @notifications_bp.route('/update-fcm-token', methods=['POST'])
 @jwt_required()
 def update_fcm_token():
@@ -71,7 +71,6 @@ def update_fcm_token():
     return jsonify({"message": "FCM token updated successfully"}), 200
 
 
-# ✔️ Σήμανση ως διαβασμένη
 @notifications_bp.route('/notifications/<int:notification_id>/read', methods=['POST'])
 @jwt_required()
 def mark_notification_read(notification_id):
@@ -86,7 +85,7 @@ def mark_notification_read(notification_id):
     db.session.commit()
     return jsonify({"message": "Notification marked as read"}), 200
 
-# ✔️ Διαγραφή ειδοποίησης
+
 @notifications_bp.route('/notifications/<int:notification_id>', methods=['DELETE'])
 @jwt_required()
 def delete_notification(notification_id):
@@ -101,7 +100,7 @@ def delete_notification(notification_id):
     db.session.commit()
     return jsonify({"message": "Notification deleted"}), 200
 
-# 🔢 Unread count
+
 @notifications_bp.route('/notifications/unread-count', methods=['GET'])
 @jwt_required()
 def unread_notifications_count():
@@ -112,7 +111,7 @@ def unread_notifications_count():
     unread_count = Notification.query.filter_by(user_id=user.id, is_read=False).count()
     return jsonify({"unread_count": unread_count}), 200
 
-# 🚀 Νέο: Αποστολή push notification
+
 @notifications_bp.route('/notifications/send-push', methods=['POST'])
 @jwt_required()
 def send_push_notification():
@@ -126,7 +125,7 @@ def send_push_notification():
         if not user or not user.fcm_token:
             return jsonify({"error": "User not found or missing FCM token"}), 404
 
-        # 🔔 Αποθήκευση στη βάση
+        # apothikseusi sti vasi
         new_notification = Notification(
             user_id=user.id,
             message=message,
@@ -136,7 +135,7 @@ def send_push_notification():
         db.session.add(new_notification)
         db.session.commit()
 
-        # 📲 Αποστολή push με νέο API
+        # apostoli push
         from utils.push_utils import send_push_notification as send_fcm_push
         status, response_text = send_fcm_push(
             token=user.fcm_token,
@@ -155,7 +154,7 @@ def send_push_notification():
     except Exception as e:
         return jsonify({"error": "Internal Server Error", "details": str(e)}), 500
 
-# 🚀 Γρήγορο test push στον logged-in χρήστη
+# test push
 @notifications_bp.route('/notifications/test-push', methods=['POST'])
 @jwt_required()
 def test_push():

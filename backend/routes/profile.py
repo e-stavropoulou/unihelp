@@ -24,14 +24,14 @@ def get_profile():
     if not user:
         return jsonify({'error': 'User not found'}), 404
 
-    # ✅ Αν ο χρήστης έχει avatar, ξαναχτίσε σωστό URL με βάση το τρέχον host
+    #an o user exei avatar_url, ftiaxnw to full url
     avatar_url = None
     if user.avatar_url:
         filename = user.avatar_url.split("/")[-1]  # μόνο το όνομα αρχείου
         avatar_url = url_for("profile_bp.serve_avatar", filename=filename, _external=True)
 
 
-    # ✅ Υπολογισμός μέσου όρου & πλήθους αξιολογήσεων
+    # ypologismos mesou orou kai plithous kritikon
     avg_rating = db.session.query(func.avg(UserReview.rating)).filter_by(reviewed_id=user.id).scalar()
     review_count = db.session.query(func.count(UserReview.id)).filter_by(reviewed_id=user.id).scalar()
 
@@ -39,7 +39,7 @@ def get_profile():
         'email': user.email,
         'username': user.username,
         'department': user.department,
-        'avatar_url': avatar_url,  # 👈 εδώ βάζουμε το dynamic URL
+        'avatar_url': avatar_url,  
         'can_help_courses': [uc.course.name for uc in user.user_courses if uc.can_help],
         'can_help_courses_ids': [uc.course_id for uc in user.user_courses if uc.can_help],
         'needs_help_courses': [uc.course.name for uc in user.user_courses if uc.needs_help],
@@ -69,11 +69,11 @@ def upload_avatar():
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
 
-    # 👉 Στη βάση αποθηκεύουμε μόνο το filename
+    # apothikeyo mono filename stin vasi
     user.avatar_url = filename
     db.session.commit()
 
-    # 👉 Το πλήρες URL το χτίζουμε με url_for
+    # url me url_for
     avatar_url = url_for("profile_bp.serve_avatar", filename=filename, _external=True)
 
 
@@ -166,7 +166,7 @@ def update_can_help():
             user_id=user.id,
             course_id=course_id,
             can_help=can_help,
-            needs_help=False  # ή True/False ανάλογα με το προεπιλεγμένο
+            needs_help=False  
         ))
 
     db.session.commit()

@@ -9,7 +9,7 @@ export const environment = {
     apiKey: "AIzaSyB4jRTATu4V9_rEK1qzRKTuOU1sFtA8d1g",
     authDomain: "unihelp-notifications.firebaseapp.com",
     projectId: "unihelp-notifications",
-    storageBucket: "unihelp-notifications.appspot.com", // και εδώ είχες typo
+    storageBucket: "unihelp-notifications.appspot.com", 
     messagingSenderId: "480151685287",
     appId: "1:480151685287:web:c7f858997f9a52055af382",
     measurementId: "G-YHWF328860"

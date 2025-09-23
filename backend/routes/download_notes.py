@@ -24,7 +24,6 @@ def download_note(note_id):
     if not os.path.exists(file_path):
         return jsonify({'error': 'Το αρχείο δεν βρέθηκε στον server'}), 404
 
-    # 🔍 Βρες σωστό mimetype από το extension
     mime_type, _ = mimetypes.guess_type(file_path)
     if mime_type is None:
         mime_type = "application/octet-stream"  # fallback generic
@@ -41,7 +40,6 @@ def download_note(note_id):
         conditional=True
     )
 
-    # 🚫 disable cache για να μη σου σκάει 304 corrupted
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Pragma"] = "no-cache"
     response.headers["Expires"] = "0"

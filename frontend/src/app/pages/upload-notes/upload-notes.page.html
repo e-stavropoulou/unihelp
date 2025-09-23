@@ -40,7 +40,6 @@
       
 
     
-<!-- 🔍 Αναζήτηση Μαθήματος -->
 <label class="form-label">Αναζήτηση Μαθήματος</label>
 
 <div class="search-wrapper" (click)="onSearchWrapperClick($event)">
@@ -54,7 +53,6 @@
   ></ion-searchbar>
 </div>
 
-<!-- 📋 Dropdown Λίστα Μαθημάτων -->
 <div class="dropdown-container" *ngIf="showDropdown && filteredCourses.length > 0">
   <ion-list class="custom-dropdown">
     <ion-item
@@ -67,8 +65,6 @@
     </ion-item>
   </ion-list>
 </div>
-
-
 
 <div class="selected-courses" *ngIf="selectedCourseName">
   <ion-chip>

@@ -10,7 +10,6 @@
 <ion-content class="ion-padding">
   <form (ngSubmit)="saveChanges()" #form="ngForm">
 
-    <!-- Προσωπικά στοιχεία -->
     <div class="form-group">
       <label class="form-label">Ονοματεπώνυμο</label>
       <input
@@ -59,7 +58,6 @@
     </div>
     
 
-    <!-- Αυτοαξιολόγηση -->
     <div class="form-group">
       <label class="form-label">Μπορώ να βοηθήσω:</label>
 
@@ -72,7 +70,6 @@
         placeholder="Αναζήτηση μαθήματος"
       ></ion-searchbar>
 
-      <!-- Εμφάνιση επιλεγμένων μαθημάτων -->
       <div class="selected-courses" *ngIf="selectedCourseIds.length > 0">
         <ng-container *ngFor="let course of allCourses">
           <ion-chip *ngIf="selectedCourseIds.includes(course.id)">
@@ -90,7 +87,6 @@
         </ng-container>        
       </div>
 
-      <!-- Αναζήτηση μαθημάτων -->
       <ion-list class="course-list-box" *ngIf="isFocused && filteredCourses.length > 0">
         <ion-item
           *ngFor="let course of filteredCourses"
@@ -111,7 +107,6 @@
       </ion-list>
     </div>
 
-    <!-- Avatar -->
     <div class="avatar-upload-wrapper">
       <label class="avatar-clickable">
         <input type="file" accept="image/*" hidden (change)="onAvatarChange($event)" />
@@ -120,7 +115,6 @@
       <div class="avatar-text">Αλλαγή avatar</div>
     </div>
 
-    <!-- Υποβολή -->
     <ion-button expand="block" type="submit" color="primary" [disabled]="!changesMade()">
       Αποθήκευση Αλλαγών
     </ion-button>

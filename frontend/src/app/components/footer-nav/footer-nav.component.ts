@@ -26,7 +26,7 @@ import { addIcons } from 'ionicons';
 export class FooterNavComponent implements OnInit {
 
 
-  // ✅ Δέσιμο απευθείας με BehaviorSubject
+  
   unreadCount$ = this.notificationsService.unreadCount$;
   unreadMessages$ = this.chatService.unreadMessages$;
 

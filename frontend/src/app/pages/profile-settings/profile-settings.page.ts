@@ -153,7 +153,6 @@ export class ProfileSettingsPage implements OnInit {
     const token = this.authService.getToken();
     if (!token) return;
 
-    // 🛑 Αν δεν έχει τουλάχιστον ένα μάθημα
     if (this.selectedCourseIds.length === 0) {
       await this.toastService.present('Πρέπει να επιλέξεις τουλάχιστον ένα μάθημα στο πεδίο "Μπορώ να βοηθήσω".', 'warning');
       return;
@@ -173,10 +172,8 @@ export class ProfileSettingsPage implements OnInit {
     }
 
     try {
-      // Update βασικού προφίλ
       await this.http.post(`${environment.API_URL}/update-profile`, profilePayload, { headers }).toPromise();
 
-      // Upload avatar αν έχει αλλαχτεί
       if (this.avatarFile) {
         const formData = new FormData();
         formData.append('avatar', this.avatarFile);
@@ -188,7 +185,6 @@ export class ProfileSettingsPage implements OnInit {
       }
       
 
-      // Υπολογισμός διαφορών can_help και αποστολή
       const updates = this.allCourses.filter(course => {
         const wasSelected = this.originalCourseIds.includes(course.id);
         const isSelected = this.selectedCourseIds.includes(course.id);
@@ -204,23 +200,6 @@ export class ProfileSettingsPage implements OnInit {
       });
 
       await Promise.all(updateRequests);
-
-      // Καλούμε το δικό σου service
-      /* this.zone.run(async () => {
-        const toast = await this.toastCtrl.create({
-          message: 'Το προφίλ ενημερώθηκε!',
-          duration: 2000,
-          position: 'bottom'
-        });
-        await toast.present();
-      });
-      
-      
-
-      await this.goBackToProfile();
-      console.log("✅ Toast dismissed, πάμε redirect...");  
-      console.log("🚀 Calling navigate to /profile...");
-      */
 
       this.zone.run(async () => {
         await this.toastService.present('Το προφίλ ενημερώθηκε!', 'success');

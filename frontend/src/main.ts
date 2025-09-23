@@ -29,7 +29,7 @@ import { withInterceptors } from '@angular/common/http';
 import { AuthInterceptor } from './app/interceptors/auth.interceptor';
 import { GlobalErrorHandler } from './app/global-error-handler';
 
-// ✅ Providers array
+// Providers array
 const providers: any[] = [
   { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
   { provide: ErrorHandler, useClass: GlobalErrorHandler },
@@ -39,20 +39,20 @@ const providers: any[] = [
   provideHttpClient(withInterceptors([AuthInterceptor])),
   provideFirebaseApp(() => initializeApp(environment.firebase)),
 
-  // ✅ Angular Service Worker (caching/PWA)
+  // Angular Service Worker (caching/PWA)
   provideServiceWorker('ngsw-worker.js', {
     enabled: !isDevMode(),
     registrationStrategy: 'registerWhenStable:30000'
   }),
 
-  // ✅ Firebase Service Worker (push)
+  // Firebase Service Worker (push)
   provideServiceWorker('firebase-messaging-sw.js', {
     enabled: !isDevMode(),
     registrationStrategy: 'registerWhenStable:31000' // λίγα ms μετά τον ngsw
   })
 ];
 
-// ✅ Bootstrap Angular App
+// Bootstrap Angular App
 bootstrapApplication(AppComponent, {
   providers
 }).then(() => {

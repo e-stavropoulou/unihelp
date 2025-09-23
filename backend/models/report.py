@@ -18,7 +18,7 @@ class Report(db.Model):
     status = db.Column(db.String(20), default='pending')  # pending/accepted/rejected
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Σχέσεις
+   
     reported_by_user = db.relationship("User", foreign_keys=[reported_by])
     reported_user = db.relationship("User", foreign_keys=[reported_user_id])
     #note = db.relationship("Note", foreign_keys=[note_id])

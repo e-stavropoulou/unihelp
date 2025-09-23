@@ -3,7 +3,7 @@
 from models.notification import Notification
 from models.shared import db
 from models.user import User
-from utils.push_utils import send_push_notification  # ✅
+from utils.push_utils import send_push_notification  
 
 def award_points(user: User, amount: int, reason: str = None):
     if user.upoints is None:
@@ -11,11 +11,11 @@ def award_points(user: User, amount: int, reason: str = None):
     user.upoints += amount
 
     if reason:
-        # ✅ Ειδοποίηση in-app
+        # in-app
         reward = Notification(user_id=user.id, message=reason)
         db.session.add(reward)
 
-        # ✅ Push notification
+        # ush notification
         if user.fcm_token:
             try:
                 title = "🎉 Μπράβο!"

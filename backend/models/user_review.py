@@ -9,17 +9,17 @@ class UserReview(db.Model):
     reviewer_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     reviewed_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     
-    rating = db.Column(db.Integer, nullable=False)  # Πρέπει να είναι 1 έως 5
+    rating = db.Column(db.Integer, nullable=False)  #  1-5
     comment = db.Column(db.Text, nullable=True)
     
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # 🚫 Κάθε χρήστης μπορεί να βαθμολογήσει έναν άλλο χρήστη μόνο μία φορά
+    # xristis vathmologei xristi mia fora
     __table_args__ = (
         db.UniqueConstraint('reviewer_id', 'reviewed_id', name='unique_user_review'),
     )
 
-    # Σχέσεις για να παίρνεις username κτλ.
+   
     reviewer = db.relationship("User", foreign_keys=[reviewer_id], backref="given_reviews")
     reviewed = db.relationship("User", foreign_keys=[reviewed_id], backref="received_reviews")
 

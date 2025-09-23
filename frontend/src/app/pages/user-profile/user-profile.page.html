@@ -37,13 +37,11 @@
         </ul>
       </div>
 
-      <!-- ⭐ Αξιολόγηση Χρήστη -->
       <div class="rating-section">
         <p *ngIf="averageRating !== null">
           ⭐ {{ averageRating }} / 5 ({{ reviewCount }} αξιολογήσεις)
         </p>
 
-        <!-- 🔄 Ενιαία εμφάνιση αστεριών -->
         <div class="star-rating" *ngIf="user?.id !== currentUserId">
           <ng-container *ngFor="let star of [1,2,3,4,5]">
             <ion-icon
@@ -59,9 +57,6 @@
 
     </ion-card-content>
 
-
-
-    <!-- Κουμπί chat -->
     <ion-button
       expand="block"
       color="primary"
@@ -71,7 +66,6 @@
       💬 Στείλε Μήνυμα
     </ion-button>
 
-    <!-- Κουμπί αναφοράς -->
     <ion-button
       expand="block"
       color="medium"

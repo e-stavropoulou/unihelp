@@ -14,7 +14,7 @@ import { MessagePayload } from './notifications.service';
 @Injectable({ providedIn: 'root' })
 export class ChatService {
   unreadMessages$ = new BehaviorSubject<number>(0);
-  newChatMessage$ = new BehaviorSubject<any>(null);  // ✅ θα στέλνει νέο μήνυμα σε real time
+  newChatMessage$ = new BehaviorSubject<any>(null);  
   currentChatId$ = new BehaviorSubject<number | null>(null);
 
   setCurrentChatId(chatId: number | null) {
@@ -26,12 +26,11 @@ export class ChatService {
     private authService: AuthService,
     private ngZone: NgZone
   ) {
-    //this.listenForNewMessages();  // ✅ Ενεργοποίηση listener
   }
 
   async listenForNewMessages() {
     const messaging = await getMessagingInstance();
-    if (!messaging) return; // ❌ Δεν τρέχει σε iOS/Android WebView
+    if (!messaging) return; 
   
     await onMessageWeb?.(messaging, (payload: MessagePayload) => {
       console.log('📥 Νέο μήνυμα από FCM:', payload);
@@ -103,7 +102,7 @@ export class ChatService {
       { headers }
     ).pipe(
       map((res) => {
-        this.refreshUnreadMessages();  // 🔄 Κάνε sync μόλις ολοκληρωθεί
+        this.refreshUnreadMessages();  
         return res;
       })
     );

@@ -5,18 +5,18 @@ import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { getMessaging, deleteToken } from "firebase/messaging"
 
-// ✅ Firebase init
+// Firebase init
 export const firebaseApp = initializeApp(environment.firebase);
 
-// ✅ Flag για Web vs Native
+// Flag για Web vs Native
 export const isWeb = !Capacitor.isNativePlatform();
 
 
-// ✅ Web only: επιστρέφει messaging instance
+// Web only: messaging instance
 export async function getMessagingInstance() {
   if (!isWeb) return null;
 
-  // Dynamic import -> δεν φορτώνεται ποτέ σε iOS/Android
+  // Dynamic import oxi se native
   const { getMessaging, isSupported } = await import('firebase/messaging');
 
   const supported = await isSupported();
@@ -28,7 +28,7 @@ export async function getMessagingInstance() {
 }
 
 
-// ✅ Εγγραφή token ανάλογα με την πλατφόρμα
+// eggrafi token analoga me platforma
 export async function registerFcmToken(): Promise<string | null> {
   if (isWeb) {
     const messaging = await getMessagingInstance();
@@ -44,7 +44,7 @@ export async function registerFcmToken(): Promise<string | null> {
         console.log('🌐 Web FCM Token:', currentToken);
         localStorage.setItem('fcm_token', currentToken);
         await sendTokenToBackend(currentToken);
-        return currentToken;   // ✅ επιστρέφει το token
+        return currentToken;   
       } else {
         console.warn('⚠️ Δεν δημιουργήθηκε Web FCM token.');
         return null;
@@ -75,12 +75,12 @@ export async function registerFcmToken(): Promise<string | null> {
       console.error('❌ Σφάλμα Native FCM:', err);
     }
 
-    return null; // ✅ consistency στην Promise
+    return null; 
   }
 }
 
 
-// ✅ Web only: service worker registration
+// Web only: service worker registration
 if (isWeb && 'serviceWorker' in navigator) {
   navigator.serviceWorker.register('/firebase-messaging-sw.js')
     .then((registration) => {
@@ -92,7 +92,7 @@ if (isWeb && 'serviceWorker' in navigator) {
 }
 
 
-// ✅ Safe exports για web μόνο (lazy import)
+// Safe exports web (lazy import)
 export async function getTokenWeb(messaging: any, options?: any) {
   if (!isWeb) return undefined;
   const { getToken } = await import('firebase/messaging');
@@ -106,7 +106,7 @@ export async function onMessageWeb(messaging: any, callback: any) {
 }
 
 async function sendTokenToBackend(token: string) {
-  const jwt = localStorage.getItem('token'); // ή από AuthService
+  const jwt = localStorage.getItem('token'); 
   if (!jwt) return;
   await fetch(`${environment.API_URL}/update-fcm-token`, {
     method: 'POST',
@@ -128,7 +128,6 @@ export async function clearFcmToken() {
       localStorage.removeItem("fcm_token");
       console.log("🗑️ FCM token deleted");
 
-      // 👇 ενημέρωσε και backend (προαιρετικό αλλά καλό να γίνει)
       const jwt = localStorage.getItem("token");
       if (jwt) {
         await fetch(`${environment.API_URL}/update-fcm-token`, {

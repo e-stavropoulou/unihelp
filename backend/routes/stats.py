@@ -16,7 +16,7 @@ import os
 
 stats_bp = Blueprint('stats', __name__)
 
-# 1. Συνολικοί χρήστες και admins
+# 1. synolika χρήστες + admins
 @stats_bp.route('/stats/users', methods=['GET'])
 @jwt_required()
 def stats_users():
@@ -24,7 +24,7 @@ def stats_users():
     admins = db.session.query(func.count(User.id)).filter(User.role == 'admin').scalar() or 0
     return jsonify({"total_users": total_users, "admins": admins}), 200
 
-# 2. Top Contributors (βάσει uploads)
+# 2. Top Contributors me upoints
 @stats_bp.route('/stats/top-contributors', methods=['GET'])
 @jwt_required()
 def stats_top_contributors():
@@ -37,7 +37,7 @@ def stats_top_contributors():
     return jsonify([{"username": u, "upoints": int(p)} for (u, p) in results]), 200
 
 
-# 3. Μαθήματα με τα περισσότερα αρχεία
+# 3. mathomata me perissoteres simeioseis
 @stats_bp.route('/stats/notes-by-course', methods=['GET'])
 @jwt_required()
 def stats_notes_by_course():
@@ -50,7 +50,7 @@ def stats_notes_by_course():
     )
     return jsonify([{"course": c, "count": int(cnt)} for (c, cnt) in results]), 200
 
-# 4. Συνολικό πλήθος σημειώσεων
+# 4. synolikos arithmos simeioseon
 @stats_bp.route('/stats/total-notes', methods=['GET'])
 @jwt_required()
 def total_notes():
@@ -58,14 +58,14 @@ def total_notes():
     return jsonify({'total_notes': total}), 200
 
 
-# 7. Συνολικός αριθμός αναφορών
+# 5. synolikos arithmos anaforon
 @stats_bp.route('/stats/total-reports', methods=['GET'])
 @jwt_required()
 def total_reports():
     total = db.session.query(func.count(Report.id)).scalar() or 0
     return jsonify({'total_reports': total}), 200
 
-# 8. Χρήστες με τις περισσότερες αναφορές
+# 6. most reported users
 @stats_bp.route('/stats/most-reported-users', methods=['GET'])
 @jwt_required()
 def most_reported_users():
@@ -79,7 +79,7 @@ def most_reported_users():
     )
     return jsonify([{"username": u, "report_count": int(r)} for (u, r) in results]), 200
 
-# 9. Συχνές κατηγορίες παραπόνων
+# 7. report categories
 @stats_bp.route('/stats/report-categories', methods=['GET'])
 @jwt_required()
 def report_categories():
@@ -91,6 +91,7 @@ def report_categories():
     )
     return jsonify([{"category": c, "count": int(n)} for (c, n) in results]), 200
 
+# 8. top commented note
 @stats_bp.route('/stats/top-commented-note', methods=['GET'])
 @jwt_required()
 def top_commented_note():
@@ -142,7 +143,7 @@ def top_reported_notes():
         .join(Report, Report.note_id == Note.id)
         .group_by(Note.id, Note.title)
         .order_by(desc('report_count'))
-        .limit(5)   # ✅ top 5
+        .limit(5)   # top 5
         .all()
     )
 
@@ -170,7 +171,7 @@ def stats_top_uploaders():
 @stats_bp.route('/stats/top-rated-users', methods=['GET'])
 @jwt_required()
 def top_rated_users():
-    k = 5  # παράγοντας εμπιστοσύνης
+    k = 5  # paragontas empistosunis
 
     max_ratings = (
         db.session.query(func.count(UserReview.id))
@@ -223,7 +224,7 @@ def top_rated_users():
 @stats_bp.route('/stats/top-rated-notes', methods=['GET'])
 @jwt_required()
 def top_rated_notes():
-    k = 5  # παράγοντας εμπιστοσύνης
+    k = 5  # paragontas empistosunis
 
     max_ratings = (
         db.session.query(func.count(NoteReview.id))

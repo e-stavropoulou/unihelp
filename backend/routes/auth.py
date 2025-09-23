@@ -10,7 +10,7 @@ import os
 from models.notification import Notification
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo  # Python 3.9+
+from zoneinfo import ZoneInfo  
 from config import BASE_URL
 from flask_jwt_extended import (
     create_access_token,
@@ -42,18 +42,18 @@ ATHENS_TZ = ZoneInfo("Europe/Athens")
 
 def to_athens_iso(dt: datetime) -> str:
     """
-    Μετατρέπει datetime (UTC ή naive) σε ISO string στη ζώνη ώρας Europe/Athens
+    datetime (UTC ή naive) se ISO string Europe/Athens
     """
     if dt is None:
         return None
     if dt.tzinfo is None:
-        # θεωρούμε ότι το dt που έρχεται από τη DB είναι UTC
+        # esto oti dt apo DB einai UTC
         dt = dt.replace(tzinfo=ZoneInfo("UTC"))
     return dt.astimezone(ATHENS_TZ).isoformat()
 
 
 
-# ----------------------------- REGISTER -----------------------------
+# register
 @auth_bp.route('/register', methods=['POST'])
 def register():
     print("🚀 Register endpoint reached")
@@ -61,7 +61,7 @@ def register():
     data = request.json
     print("📥 Data received:", data)
 
-    skills = data.get('skills')  # λίστα με course names για τα οποία μπορεί να βοηθήσει
+    skills = data.get('skills')  # can help
     if not skills or not isinstance(skills, list) or len(skills) == 0:
         print("❌ No skills provided!")
         return jsonify({'error': 'Πρέπει να επιλέξεις τουλάχιστον 1 μάθημα.'}), 400
@@ -104,7 +104,7 @@ def register():
         department=data.get('department', "Μηχανικών Η/Υ και Πληροφορικής")
     )
 
-    # Δημιουργία σχέσης UserCourse με can_help = True
+    # sxesi UserCourse me can_help = True
     print("📚 Adding selected skills (can_help=True):", skills)
     for course_name in skills:
         course = Course.query.filter_by(name=course_name).first()
@@ -114,7 +114,7 @@ def register():
         else:
             print(f"⚠️ Course not found: {course_name}")
 
-    # Token για επαλήθευση email
+    # Token gia epalitheusi email
     token = secrets.token_urlsafe(32)
     user.verification_token = token
     user.is_verified = False
@@ -135,7 +135,7 @@ def register():
 
 
 
-# ----------------------------- LOGIN -----------------------------
+# login
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -160,7 +160,7 @@ def login():
             'error': 'not_verified'
         }), 403
     
-        # 🚫 Έλεγχος αν ο χρήστης είναι μπλοκαρισμένος
+        # elegxos gia block
     if user.is_blocked:
         print("🔴 User is blocked")
         return jsonify({
@@ -168,7 +168,7 @@ def login():
             'error': 'blocked'
         }), 403
 
-    # ✅ Εκδίδουμε ΚΑΙ access ΚΑΙ refresh token
+    # access + refresh tokens
     access_token = create_access_token(identity=str(user.id), additional_claims={"role": user.role})
     refresh_token = create_refresh_token(identity=str(user.id))
     print("🟢 Login success, tokens created")
@@ -178,23 +178,21 @@ def login():
         'email': user.email,
         'user_id': user.id,
         'role': user.role,
-        # ✅ Νέα ονόματα (για admin)
         'access_token': access_token,
         'refresh_token': refresh_token,
-        # ✅ Backwards-compat με το main app που διαβάζει 'token'
         'token': access_token
     }), 200
 
 
 @auth_bp.route('/refresh', methods=['POST'])
-@jwt_required(refresh=True)   # ✅ ΣΗΜΑΝΤΙΚΟ: απαιτεί refresh token
+@jwt_required(refresh=True)   
 def refresh():
     user_id = get_jwt_identity()
     new_access = create_access_token(identity=str(user_id))
     return jsonify({'access_token': new_access}), 200
 
 
-# ----------------------------- CHECK CREDENTIALS -----------------------------
+# check if email or username exists
 @auth_bp.route('/check-credentials', methods=['POST'])
 def check_credentials():
     data = request.json
@@ -205,7 +203,7 @@ def check_credentials():
         'username_exists': User.query.filter_by(username=username).first() is not None
     }), 200
 
-# ----------------------------- COURSES -----------------------------
+# courses
 @auth_bp.route('/courses', methods=['GET'])
 def get_courses():
     courses = Course.query.all()
@@ -219,7 +217,7 @@ def get_courses():
 ]), 200
 
 
-# ----------------------------- UPLOAD NOTE -----------------------------
+# upload note
 @auth_bp.route('/upload-note', methods=['POST'])
 @jwt_required()
 @block_check
@@ -270,18 +268,18 @@ def upload_note():
         db.session.add(note)
         uploaded_files.append(filename)
 
-    # 🎯 Πρόσθεσε 10 πόντους στον χρήστη
+    # prso8hkh 10 pontwn ston xrhsth
     user.upoints += 10
     print("⭐ Προστέθηκαν 10 πόντοι στον χρήστη.")
 
-    # 🎉 Δημιουργία ειδοποίησης για τον ίδιο τον χρήστη
+    # dhmioyrgia notification epibravewshs
     reward_notification = Notification(
         user_id=user.id,
         message="Μπράβο! 🎉 Κέρδισες 10 πόντους για την ανάρτηση της σημείωσης."
     )
     db.session.add(reward_notification)
 
-    # 📲 Στείλε push notification στον ίδιο τον χρήστη (αν έχει FCM token)
+    # push epibravewshs
     if user.fcm_token:
         try:
             status, resp = send_push_notification(
@@ -300,7 +298,7 @@ def upload_note():
     db.session.commit()
     print("✅ Αποθηκεύτηκαν οι σημειώσεις και η ειδοποίηση επιβράβευσης.")
 
-    # 🔔 Δημιουργία ειδοποιήσεων για άλλους χρήστες που ενδιαφέρονται
+    # eidopoisi se allous xrhstes pou endiaferontai
     course = Course.query.get(course_id)
     if not course:
         print("❌ Δεν βρέθηκε το μάθημα.")
@@ -329,7 +327,7 @@ def upload_note():
     db.session.commit()
     print(f"📨 Δημιουργήθηκαν {len(notifications)} ειδοποιήσεις στη βάση.")
 
-    # 🔔 Αποστολή push ειδοποιήσεων
+    # push
     sent_count = 0
     for uc in interested_users:
         if uc.user_id == user.id:
@@ -365,7 +363,7 @@ def upload_note():
 
 
 
-# ----------------------------- MY NOTES -----------------------------
+# my notes
 @auth_bp.route('/my-notes', methods=['GET'])
 @jwt_required()
 def get_my_notes():
@@ -393,7 +391,7 @@ def get_my_notes():
     return jsonify(result), 200
 
 
-# ----------------------------- ALL NOTES -----------------------------
+# all notes
 @auth_bp.route('/all-notes', methods=['GET'])
 @jwt_required()
 @block_check
@@ -429,7 +427,7 @@ def get_all_notes():
 
 
 
-# -----------------------------   edit NOTE -----------------------------
+# edit note
 @auth_bp.route('/edit-note/<int:note_id>', methods=['PUT'])
 @jwt_required()
 def edit_note(note_id):
@@ -442,7 +440,7 @@ def edit_note(note_id):
     if not note or note.user_id != user.id:
         return jsonify({'error': 'Δεν έχεις δικαίωμα επεξεργασίας αυτής της σημείωσης.'}), 403
 
-    # ❗ Διαβάζουμε από request.form αντί για request.json
+    
     title = request.form.get('title')
     description = request.form.get('description')
     category = request.form.get('category')
@@ -453,7 +451,7 @@ def edit_note(note_id):
     note.category = category or note.category
     note.course_id = course_id or note.course_id
 
-    # ✅ Ανέβηκε νέο αρχείο;
+    
     new_file = request.files.get('file')
     if new_file:
         if note.filepath and os.path.exists(note.filepath):
@@ -471,7 +469,7 @@ def edit_note(note_id):
     return jsonify({'message': 'Η σημείωση ενημερώθηκε επιτυχώς.'}), 200
 
 
-# ----------------------------- DELETE NOTE -----------------------------
+# delete note
 @auth_bp.route('/delete-note/<int:note_id>', methods=['DELETE'])
 @jwt_required()
 def delete_note(note_id):
@@ -514,7 +512,7 @@ def delete_note(note_id):
 
 
     
-# ----------------------------- GET NOTE -----------------------------    
+# get note
 @auth_bp.route('/get-note/<int:note_id>', methods=['GET'])
 @jwt_required()
 def get_note(note_id):
@@ -542,8 +540,7 @@ def get_note(note_id):
         } if course else None
     }), 200
 
-
-# ----------------------------- FAVORITES -----------------------------
+# favories
 @auth_bp.route('/favorites', methods=['GET'])
 @jwt_required()
 def get_favorites():
@@ -576,7 +573,7 @@ def get_favorites():
     return jsonify(result), 200
 
 
-# ----------------------------- TOGGLE FAVORITE -----------------------------
+# toggle favorite
 @auth_bp.route('/favorite', methods=['POST'])
 @jwt_required()
 def toggle_favorite():
@@ -600,7 +597,7 @@ def toggle_favorite():
 
 
 
-# επιβεβαιώση email
+# epiveveosi email
 
 @auth_bp.route('/verify/<token>', methods=['GET'])
 def verify_email(token):
@@ -650,6 +647,7 @@ def resend_verification():
 
     return jsonify({'message': 'Το email επιβεβαίωσης εστάλη ξανά.'}), 200
 
+
 @auth_bp.route('/forgot-password', methods=['POST'])
 def forgot_password():
     data = request.json
@@ -670,6 +668,7 @@ def forgot_password():
 
     return jsonify({'message': 'Στάλθηκε email επαναφοράς κωδικού.'}), 200
 
+
 @auth_bp.route('/reset-password/<token>', methods=['POST'])
 def reset_password(token):
     data = request.json
@@ -682,7 +681,7 @@ def reset_password(token):
     if not user or user.reset_token_expiry < datetime.utcnow():
         return jsonify({'error': 'Ο σύνδεσμος έχει λήξει ή δεν είναι έγκυρος.'}), 400
 
-    # Έλεγχος αν ο νέος κωδικός είναι ίδιος με τον παλιό
+    # elegxei an o neos kwdikos einai idios me ton palio
     if check_password_hash(user.password, new_password):
         return jsonify({'error': 'Ο νέος κωδικός δεν μπορεί να είναι ίδιος με τον τρέχοντα.'}), 400
 
