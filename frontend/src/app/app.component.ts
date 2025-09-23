@@ -9,14 +9,16 @@ import { ChatService } from './services/chat.service';
 
 
 interface SSOMessage {
-  type: 'TOKEN_REQUEST' | 'TOKEN_RESPONSE' | 'LOGOUT_REQUEST';
+  type: 'READY' | 'UNIHELP_TOKEN' | 'TOKEN_RECEIVED' | 'LOGOUT_REQUEST';
   token?: string;
+  refresh?: string | null; 
   userInfo?: {
     user_id: number;
     email: string;
     role: string;
   };
 }
+
 
 @Component({
   selector: 'app-root',
@@ -81,7 +83,7 @@ export class AppComponent implements OnInit {
       const message: SSOMessage = event.data;
       console.log('📨 [SSO] Message received:', message);
 
-      if (message.type === 'TOKEN_REQUEST') {
+      if (message.type === 'READY') {
         this.sendTokenToAdmin(event.source as Window);
       }
     });
@@ -95,37 +97,38 @@ export class AppComponent implements OnInit {
   }
   
 
-  /* token to admin dashboard */
-  private sendTokenToAdmin(adminWindow: Window) {
-    const token = localStorage.getItem('token');
-    const userIdStr = localStorage.getItem('user_id');
-    const email = localStorage.getItem('email');
-    const role = localStorage.getItem('role');
+/* token to admin dashboard */
+private sendTokenToAdmin(adminWindow: Window) {
+  const token = localStorage.getItem('token');
+  const refresh = localStorage.getItem('refresh_token');
+  const userIdStr = localStorage.getItem('user_id');
+  const email = localStorage.getItem('email');
+  const role = localStorage.getItem('role');
 
-    console.log('📤 [SSO] Token request received, checking credentials...');
+  console.log('📤 [SSO] Sending UNIHELP_TOKEN with credentials...');
 
-    const response: SSOMessage = token && userIdStr && email && role
-      ? {
-          type: 'TOKEN_RESPONSE',
-          token: token,
-          userInfo: {
-            user_id: parseInt(userIdStr, 10),
-            email: email,
-            role: role
-          }
+  const response: SSOMessage = token && userIdStr && email && role
+    ? {
+        type: 'UNIHELP_TOKEN',
+        token: token,
+        refresh: refresh,
+        userInfo: {
+          user_id: parseInt(userIdStr, 10),
+          email: email,
+          role: role
         }
-      : { type: 'TOKEN_RESPONSE' };
+      }
+    : { type: 'UNIHELP_TOKEN' };
 
-    try {
-      const targetOrigin = environment.ADMIN_ORIGIN;
-      console.log('📤 [SSO] Sending token to:', targetOrigin);
-      adminWindow.postMessage(response, targetOrigin);      
-    } catch (e) {
-      console.warn('⚠️ [SSO] Fallback to * origin (unsafe):', e);
-      adminWindow.postMessage(response, '*');
-    }
+  try {
+    const targetOrigin = environment.ADMIN_ORIGIN;
+    console.log('📤 [SSO] Sending token to:', targetOrigin);
+    adminWindow.postMessage(response, targetOrigin);
+  } catch (e) {
+    console.warn('⚠️ [SSO] Fallback to * origin (unsafe):', e);
+    adminWindow.postMessage(response, '*');
   }
-  
+}
 
   async initWebPush() {
     try {

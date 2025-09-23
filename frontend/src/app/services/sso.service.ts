@@ -3,7 +3,8 @@ import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 
-type IncomingType = 'UNIHELP_NEED_TOKEN' | 'TOKEN_REQUEST' | 'LOGOUT_REQUEST' | 'READY' | 'TOKEN_RECEIVED';
+type IncomingType = 'READY' | 'LOGOUT_REQUEST' | 'TOKEN_RECEIVED';
+
 
 @Injectable({ providedIn: 'root' })
 export class SsoService {
@@ -28,11 +29,9 @@ export class SsoService {
       if (!msg?.type) return;
 
       switch (msg.type) {
-        case 'UNIHELP_NEED_TOKEN':
-        case 'TOKEN_REQUEST':
         case 'READY':
           this.replyWithTokens(event.source as Window);
-          break;
+          break;        
           case 'LOGOUT_REQUEST':
             console.warn('[SSO] Λήφθηκε LOGOUT από το admin.');
           
@@ -132,14 +131,14 @@ export class SsoService {
 
     this.sendTimer = setInterval(() => {
       this.attempts++;
-      if (!this.pendingWin || this.attempts > 25) {
+      if (!this.pendingWin || this.attempts > 100) {
         clearInterval(this.sendTimer);
         this.sendTimer = null;
         this.pendingWin = null;
         return;
       }
       this.replyWithTokens(this.pendingWin);
-    }, 300); 
+    }, 500); 
   }
 
   sendTokenToAdmin(win: Window) {
