@@ -18,44 +18,205 @@
     :root {
       --ion-color-primary: #7B1E3B;
       --ion-color-primary-contrast: #ffffff;
-      --ion-background-color: #121212;
+  
+      --ion-background-color: #181818;
       --ion-text-color: #ffffff;
+      --ion-item-background: rgba(30, 30, 30, 0.9);
+      --ion-toolbar-background: #1e1e1e !important;
+      --ion-card-background: rgba(20, 20, 20, 0.85);
+      --ion-footer-background: #1a1a1a;
     }
   
-    ion-content {
-      --background: #121212 !important;
-      color: #ffffff !important;
+    /* 🔹 Κεντρικά */
+    ion-content,
+    ion-page {
+      --background: var(--ion-background-color) !important;
+      color: var(--ion-text-color) !important;
     }
   
-    ion-toolbar {
-      --background: #121212 !important;
-      --color: #ffffff !important;
-    }
-  
+    /* 🔹 Όλα τα κείμενα λευκά */
     ion-title,
     ion-label,
-    ion-text {
-      color: #ffffff !important;
+    ion-text,
+    ion-card-title,
+    ion-card-subtitle,
+    ion-card-content,
+    ion-note,
+    strong,
+    p,
+    span,
+    h1, h2, h3, h4, h5, h6 {
+      color: var(--ion-text-color) !important;
+    }
+
+    /* Όλα τα labels/κείμενα να γίνουν λευκά */
+  ion-label,
+  ion-text,
+  strong,
+  p,
+  li,
+  span {
+    color: #ffffff !important;
+  }
+
+  /* Αν θέλεις πιο απαλό γκρι για δευτερεύον */
+  li,
+  small,
+  .hint-text {
+    color: #dddddd !important;
+  }
+
+  /* Για ion-label που εξαφανίζεται */
+  ion-label strong {
+    color: #ffffff !important;
+    font-weight: 600;
+  }
+  
+  ion-toolbar,
+  ion-header {
+    --background: #1e1e1e !important;
+    --color: #ffffff !important;
+  }
+
+
+  /* Shadow part fix */
+  ion-toolbar::part(container),
+  ion-toolbar::part(content) {
+    background: #1e1e1e !important;
+    color: #ffffff !important;
+  }
+
+  /* Σβήνει το ανοιχτό ροζ πλαίσιο γύρω από labels/items */
+  ion-item,
+  ion-label {
+    background: transparent !important;
+  }
+
+  /* Εναλλακτικά αν θες consistent σκούρο */
+  ion-item {
+    --background: rgba(30, 30, 30, 0.9) !important;
+  }
+  
+    /* 🔹 Footer */
+    ion-footer,
+    app-footer-nav,
+    .footer-nav {
+      background: var(--ion-footer-background) !important;
+      color: var(--ion-text-color) !important;
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.858); /* σκιά αντί για border */
+  
+      ion-icon {
+        color: var(--ion-text-color) !important;
+      }
+  
+      ion-badge.notif-badge {
+        --background: #a83e5c !important; /* μπορντό */
+        --color: #ffffff !important;
+      }
     }
   
+    /* 🔹 Cards / Modals */
+    ion-card,
+    .info-card,
+    .form-box,
+    ion-item,
+    ion-list,
+    ion-modal {
+      background: var(--ion-card-background) !important;
+      color: var(--ion-text-color) !important;
+      border-radius: 12px;
+    }
+  
+    /* 🔹 Input / Search */
     input,
     ion-input,
     ion-textarea,
-    select {
-      background: #1e1e1e !important;
-      color: #ffffff !important;
-      border: 1px solid #ffffff !important;
+    select,
+    ion-searchbar {
+      background: rgba(40, 40, 40, 0.9) !important;
+      color: var(--ion-text-color) !important;
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 6px 10px;
+  
+      &::placeholder {
+        color: #aaaaaa !important;
+      }
     }
   
-    ion-button {
-      --background: #7B1E3B;
-      --color: #ffffff;
+    /* 🔹 Avatar placeholders */
+    ion-avatar img,
+    .avatar-img,
+    .avatar-img-clickable {
+      background: #444 !important; /* σταθερό γκρι */
+      filter: brightness(1) !important; /* να μη μαυρίζει */
+      border-radius: 50%;
     }
   
-    .form-box {
-      background: #1e1e1e !important;
+    /* 🔹 Report button */
+    .report-btn ion-button {
+      --background: transparent !important;
+      --color: #ff4444 !important;
+    }
+  
+    .report-btn ion-icon {
+      color: #ff4444 !important;
+      font-size: 20px;
+    }
+  
+    /* 🔹 Chips (tags) */
+    ion-chip {
+      background: rgba(60, 60, 60, 0.9) !important;
       color: #ffffff !important;
-      border: 1px solid #333 !important;
+  
+      ion-label,
+      .course-name,
+      .course-semester {
+        color: #ffffff !important;
+      }
+  
+      ion-icon.remove-icon {
+        color: #cccccc !important;
+      }
+  
+      ion-icon.remove-icon:hover {
+        color: #ff4444 !important; /* hover κόκκινο */
+      }
+    }
+  
+    /* 🔹 Custom <textarea> */
+    textarea.custom-input {
+      background: rgba(40, 40, 40, 0.9) !important;
+      color: #ffffff !important;
+      border: 1px solid #444 !important;
+      border-radius: 8px;
+      padding: 8px 10px;
+  
+      &::placeholder {
+        color: #aaaaaa !important;
+      }
+    }
+  
+    /* 🔹 Ionic <ion-textarea> */
+    ion-textarea {
+      --background: rgba(40, 40, 40, 0.9) !important;
+      --color: #ffffff !important;
+      border: none !important;
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+  
+    ion-textarea textarea {
+      background: transparent !important;
+      color: #ffffff !important;
+    }
+  
+    ion-textarea textarea::placeholder {
+      color: #aaaaaa !important;
+    }
+  
+    ion-textarea:focus-within {
+      border: 1px solid #a83e5c !important; /* μπορντό outline στο focus */
     }
   }
   
