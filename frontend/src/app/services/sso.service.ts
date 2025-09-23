@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 
-type IncomingType = 'UNIHELP_NEED_TOKEN' | 'TOKEN_REQUEST' | 'LOGOUT_REQUEST' | 'READY';
+type IncomingType = 'UNIHELP_NEED_TOKEN' | 'TOKEN_REQUEST' | 'LOGOUT_REQUEST' | 'READY' | 'TOKEN_RECEIVED';
 
 @Injectable({ providedIn: 'root' })
 export class SsoService {
@@ -17,7 +17,7 @@ export class SsoService {
 
   private setupMessageListener() {
     window.addEventListener('message', (event: MessageEvent) => {
-      const allowedOrigins = [environment.ADMIN_ORIGIN, 'capacitor://localhost'];
+      const allowedOrigins = [environment.ADMIN_ORIGIN, 'capacitor://localhost', 'http://localhost', 'ionic://localhost'];
       if (!allowedOrigins.includes(event.origin)) {
         console.warn('[SSO] 🔒 Blocked message from unexpected origin:', event.origin);
         return;
@@ -49,6 +49,16 @@ export class SsoService {
             }
           
             break;
+
+            case 'TOKEN_RECEIVED':
+            console.log('[SSO] 🎉 Admin confirmed token, stopping loop');
+            if (this.sendTimer) {
+              clearInterval(this.sendTimer);
+              this.sendTimer = null;
+            }
+            this.pendingWin = null;
+            break;
+
           
           
       }
@@ -129,7 +139,7 @@ export class SsoService {
         return;
       }
       this.replyWithTokens(this.pendingWin);
-    }, 200); 
+    }, 300); 
   }
 
   sendTokenToAdmin(win: Window) {

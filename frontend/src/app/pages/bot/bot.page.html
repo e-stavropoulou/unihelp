@@ -1,15 +1,13 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <!-- 🔙 Πίσω -->
     <ion-buttons slot="start">
       <ion-button fill="clear" (click)="goBack()">
         <ion-icon slot="icon-only" name="arrow-back-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
 
-    <ion-title>UniHelp Bot</ion-title>
+    <ion-title> Thinkerbell 🧚‍♀️ </ion-title>
 
-    <!-- 🗑️ Κάδος διαγραφής -->
     <ion-buttons slot="end">
       <ion-button fill="clear" (click)="confirmClearMessages()">
         <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
@@ -20,22 +18,20 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
-  <!-- 🔁 Ιστορικό συνομιλίας -->
   <ion-list lines="none">
     <ion-item *ngFor="let msg of messages" [class.user-msg]="msg.role === 'user'" [class.bot-msg]="msg.role === 'bot'">
       <ion-label>
         <strong *ngIf="msg.role === 'user'">👤 Εσύ:</strong>
-        <strong *ngIf="msg.role === 'bot'">🤖 Bot:</strong>
+        <strong *ngIf="msg.role === 'bot'">🪄Thinkerbell:</strong>
         <p>{{ msg.text }}</p>
       </ion-label>
     </ion-item>
 
-    <!-- ⏳ Ενδείκτης φόρτωσης -->
     <ion-item *ngIf="isLoading">
-      <ion-label color="medium">🤖 Σκέφτομαι...</ion-label>
+      <ion-label color="medium">🧚‍♀️ Σκέφτομαι...</ion-label>
     </ion-item>
 
-    <div #bottom></div> <!-- ✅ για scroll -->
+    <div #bottom></div> 
   </ion-list>
 
   <!-- ✏️ Input για νέα ερώτηση -->
@@ -47,7 +43,6 @@
     ></ion-textarea>
   </ion-item>
 
-  <!-- 📤 Κουμπί αποστολής -->
   <ion-button expand="block" (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()">
     {{ isLoading ? 'Αποστολή...' : 'Αποστολή' }}
   </ion-button>

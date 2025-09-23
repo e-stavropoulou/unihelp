@@ -103,23 +103,38 @@ export class BotPage implements OnInit {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${token}`
     });
-
+  
     try {
       const res: any = await this.http
         .get(`${environment.API_URL}/bot/messages`, { headers })
         .toPromise();
-
+  
       this.messages = res.map((msg: any) => ({
         role: msg.role,
         text: msg.content
       }));
-
+  
+      if (!this.messages || this.messages.length === 0) {
+        const welcomeText = 'Γεια σου!👋 Είμαι η Thinkerbell 🧚‍♀️, η προσωπική σου βοηθός στην κοινότητα του UniHelp. Ρώτησέ με ό,τι θέλεις και θα σε καθοδηγήσω!';
+        
+        
+        this.messages.push({
+          role: 'bot',
+          text: welcomeText
+        });
+      
+        
+        await this.saveBotMessage(welcomeText, true);
+      }
+      
+  
       this.scrollToBottom();
-
+  
     } catch (err) {
       console.error('❌ Σφάλμα κατά την ανάκτηση ιστορικού bot:', err);
     }
   }
+  
 
   async saveBotMessage(content: string, isBot: boolean) {
     const token = localStorage.getItem('token');
