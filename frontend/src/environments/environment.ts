@@ -1,9 +1,10 @@
 export const environment = {
   production: false,
-  API_URL: 'http://localhost:5050',
+  API_URL: 'https://api-unihelp.imslab.gr',
 
-  ADMIN_ORIGIN: 'http://localhost:4201',
-  UNIHELP_ORIGIN: 'http://localhost:8080',
+  ADMIN_ORIGIN: 'https://admin-unihelp.imslab.gr',
+  UNIHELP_ORIGIN: 'https://unihelp.imslab.gr',
+
 
 
   firebase: {

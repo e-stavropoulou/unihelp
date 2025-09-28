@@ -10,61 +10,67 @@ from typing import List
 
 rag_bp = Blueprint("rag_bp", __name__)
 
-# fortosi FAISS index
-embedding = OpenAIEmbeddings(model="text-embedding-3-small")
-vectorstore = FAISS.load_local("faiss_index", embedding, allow_dangerous_deserialization=True)
+qa_chain = None  # global cache
 
-#  FAISS retriever
-base_retriever = vectorstore.as_retriever(search_kwargs={"k": 20})
+def build_pipeline():
+    global qa_chain
+    if qa_chain:
+        return qa_chain
 
-# euresi summary doc (FAISS index)
-summary_doc = None
-for doc in vectorstore.similarity_search("πίνακας μεταδεδομένων", k=20):
-    if doc.metadata.get("type") == "global_summary":
-        summary_doc = doc
-        print("✅ Βρέθηκε το summary document ✅")
-        break
+    print("🔄 Initializing RAG pipeline...", file=sys.stderr)
+
+    # Fortosi FAISS index (τώρα πια με loaded .env)
+    embedding = OpenAIEmbeddings(model="text-embedding-3-small")
+    vectorstore = FAISS.load_local("faiss_index", embedding, allow_dangerous_deserialization=True)
+
+    base_retriever = vectorstore.as_retriever(search_kwargs={"k": 20})
+
+    # Euresei summary doc
+    summary_doc = None
+    for doc in vectorstore.similarity_search("πίνακας μεταδεδομένων", k=20):
+        if doc.metadata.get("type") == "global_summary":
+            summary_doc = doc
+            print("✅ Βρέθηκε το summary document ✅", file=sys.stderr)
+            break
+
+    # Custom retriever
+    class SummaryBoostingRetriever(BaseRetriever):
+        def __init__(self, base_retriever, summary_doc):
+            super().__init__()
+            self._base_retriever = base_retriever
+            self._summary_doc = summary_doc
+
+        def get_relevant_documents(self, query: str):
+            base_docs = self._base_retriever.get_relevant_documents(query)
+            if self._summary_doc and self._summary_doc not in base_docs:
+                print("📌 Προστέθηκε το summary doc στο context", file=sys.stderr)
+                return [self._summary_doc] + base_docs
+            return base_docs
+
+        async def aget_relevant_documents(self, query: str):
+            base_docs = await self._base_retriever.aget_relevant_documents(query)
+            if self._summary_doc and self._summary_doc not in base_docs:
+                return [self._summary_doc] + base_docs
+            return base_docs
+
+        @property
+        def lc_attributes(self) -> dict:
+            return {}
+
+    retriever = SummaryBoostingRetriever(base_retriever, summary_doc)
+
+    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+
+    qa_chain = RetrievalQA.from_chain_type(
+        llm=llm,
+        retriever=retriever,
+        chain_type="stuff",
+        return_source_documents=True
+    )
+    return qa_chain
 
 
-# Custom retriever poy vazei to summary doc
-class SummaryBoostingRetriever(BaseRetriever):
-    def __init__(self, base_retriever, summary_doc):
-        super().__init__()
-        self._base_retriever = base_retriever
-        self._summary_doc = summary_doc
-
-    def get_relevant_documents(self, query: str) -> List[Document]:
-        base_docs = self._base_retriever.get_relevant_documents(query)
-        if self._summary_doc and self._summary_doc not in base_docs:
-            print("📌 Προστέθηκε το summary doc στο context")
-            return [self._summary_doc] + base_docs
-        return base_docs
-
-    async def aget_relevant_documents(self, query: str) -> List[Document]:
-        base_docs = await self._base_retriever.aget_relevant_documents(query)
-        if self._summary_doc and self._summary_doc not in base_docs:
-            return [self._summary_doc] + base_docs
-        return base_docs
-
-    @property
-    def lc_attributes(self) -> dict:
-        return {}
-
-# xrisi enhanced retriever
-retriever = SummaryBoostingRetriever(base_retriever, summary_doc)
-
-# Set up LLM
-llm = ChatOpenAI(model="gpt-4o", temperature=0)
-
-# RAG QA chain
-qa_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    retriever=retriever,
-    chain_type="stuff",
-    return_source_documents=True
-)
-
-# RAG endpoint
+# Endpoint
 @rag_bp.route("/ask-rag", methods=["POST"])
 @jwt_required()
 def ask_rag():
@@ -77,11 +83,9 @@ def ask_rag():
     print("\n--- 📥 Ερώτηση χρήστη:", query, file=sys.stderr)
 
     try:
-        result = qa_chain.invoke({"query": query})
-        answer = result["result"]
-
+        result = build_pipeline().invoke({"query": query})
         return jsonify({
-            "result": answer,
+            "result": result["result"],
             "source_docs": [doc.metadata for doc in result["source_documents"]]
         })
 

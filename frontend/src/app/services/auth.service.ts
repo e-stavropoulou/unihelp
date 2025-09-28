@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
 import { clearFcmToken } from '../firebase';
+import { NotificationsService } from './notifications.service';
+
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +26,9 @@ export class AuthService {
     if (refreshToken) {
       localStorage.setItem('refresh_token', refreshToken);
     }
+
+// this.notificationsService.requestWebPushToken();
+
   }
   
   getRefreshToken(): string | null {

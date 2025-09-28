@@ -30,8 +30,14 @@ export class SsoService {
 
       switch (msg.type) {
         case 'READY':
-          this.replyWithTokens(event.source as Window);
+          if (!this.pendingWin) {
+            this.pendingWin = event.source as Window;
+            console.log('[SSO] 🟢 READY – ξεκινά αποστολή token');
+            this.replyWithTokens(this.pendingWin);
+            this.kickoffReplyLoop();
+          }
           break;        
+       
           case 'LOGOUT_REQUEST':
             console.warn('[SSO] Λήφθηκε LOGOUT από το admin.');
           
@@ -126,7 +132,7 @@ export class SsoService {
 
   /** epanalamvanomeni apostoli token mexri na to parei */
   private kickoffReplyLoop() {
-    if (this.sendTimer) clearInterval(this.sendTimer);
+    if (this.sendTimer) return; 
     this.attempts = 0;
 
     this.sendTimer = setInterval(() => {

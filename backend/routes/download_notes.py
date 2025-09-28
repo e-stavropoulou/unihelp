@@ -8,7 +8,8 @@ import mimetypes
 
 download_notes_bp = Blueprint('download_notes', __name__)
 
-NOTES_UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads', 'notes')
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+NOTES_UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads', 'notes')
 
 @download_notes_bp.route('/download/<int:note_id>', methods=['GET'])
 @jwt_required(optional=True)
@@ -20,7 +21,8 @@ def download_note(note_id):
     note.downloads += 1
     db.session.commit()
 
-    file_path = note.filepath
+    file_path = note.filepath or os.path.join(NOTES_UPLOAD_FOLDER, note.filename)
+
     if not os.path.exists(file_path):
         return jsonify({'error': 'Το αρχείο δεν βρέθηκε στον server'}), 404
 
