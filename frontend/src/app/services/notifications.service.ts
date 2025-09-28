@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { map } from 'rxjs/operators';
 
@@ -38,10 +38,15 @@ export class NotificationsService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService,
+    private injector: Injector, 
     private chatService: ChatService,
     private zone: NgZone  
   ) {}
+
+  private get authService(): AuthService {
+    return this.injector.get(AuthService);
+  }
+  
 
   async initPush(): Promise<void> {
     if (this.isInitialized) return;

@@ -63,6 +63,11 @@ export class AppComponent implements OnInit {
   
       if (platform === 'web') {
         this.notificationsService.initPush(); 
+
+        if (localStorage.getItem('token')) {
+          this.notificationsService.requestWebPushToken();
+        }
+        
       } else {
         console.log('🚫 Push notifications skipped on native platform:', platform);
       }

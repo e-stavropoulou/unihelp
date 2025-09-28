@@ -230,6 +230,11 @@ def upload_note():
 
     print("\n📥 [UPLOAD] Νέα αίτηση για ανέβασμα σημείωσης")
 
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    NOTES_UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads', 'notes')
+    os.makedirs(NOTES_UPLOAD_FOLDER, exist_ok=True)
+
+
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
     print(f"👤 Συνδεδεμένος χρήστης: {user.username} (ID: {user.id})")

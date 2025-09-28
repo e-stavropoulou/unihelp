@@ -2,9 +2,26 @@
 
 import os
 from flask import Flask, request, jsonify, send_from_directory
+import sys
 
 from dotenv import load_dotenv
-load_dotenv()
+# Βρες ποιο περιβάλλον τρέχεις
+env = os.getenv("FLASK_ENV", "development")
+
+# Ανάλογα με το env, φόρτωσε το σωστό αρχείο
+if env == "production":
+    dotenv_file = ".env.production"
+else:
+    dotenv_file = ".env"
+
+if os.path.exists(dotenv_file):
+    load_dotenv(dotenv_file)
+    print(f"📦 Loaded environment from {dotenv_file}", file=sys.stderr)
+else:
+    print(f"⚠️ No {dotenv_file} file found", file=sys.stderr)
+
+# Δοκιμή ότι το κλειδί φορτώθηκε
+print("🔑 OPENAI_API_KEY loaded:", os.getenv("OPENAI_API_KEY"), file=sys.stderr)
 
 import pymysql
 pymysql.install_as_MySQLdb()
@@ -94,16 +111,18 @@ def create_app():
     CORS(
         app,
         resources={r"/*": {"origins": [
-            app.config['FRONTEND_URL'],
-            "http://localhost:4201",   # admin frontend
-            "http://192.168.2.6:8080",   # UniHelp app
-            "http://192.168.2.6:4201",   # Admin
-            "capacitor://localhost"
+            app.config['FRONTEND_URL'],        # https://unihelp.imslab.gr
+            "https://admin-unihelp.imslab.gr", # Admin dashboard
+            "https://unihelp.imslab.gr",       # UniHelp app
+            "http://localhost:8080",           # Frontend dev
+            "http://localhost:4201",           # Admin dashboard dev
+            "capacitor://localhost"            # iOS/Android build
         ]}},
         methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Content-Type", "Authorization"],
         supports_credentials=True
     )
+
 
 
 
