@@ -9,7 +9,7 @@ import { BehaviorSubject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ChatService } from './chat.service';
 import { NgZone } from '@angular/core';
-import { registerFcmToken } from '../firebase';
+import { registerFcmToken, forceRefreshToken } from '../firebase';
 //import { MessagePayload } from 'firebase/messaging';
 
 
@@ -79,6 +79,7 @@ export class NotificationsService {
       }
   
       this.isListenerAttached = true;
+
   
       await onMessageWeb?.(messaging, (payload: MessagePayload) => {
         console.log('📩 [Push] Web message received (raw):', JSON.stringify(payload));
@@ -143,14 +144,24 @@ export class NotificationsService {
       console.error('❌ Web FCM error:', err);
     }
   }
+
+  public async registerToken(): Promise<void> {
+    console.log("🔄 [Push] registerToken() called – refreshing FCM token...");
+    await this.requestWebPushToken();
+  }  
   
 
   public async requestWebPushToken(): Promise<void> {
     try {
-      const token = await registerFcmToken();  // αυτό ήδη στέλνει στο backend
+      const token = await registerFcmToken();
       if (token) {
         this.fcmToken = token;
         console.log('📡 Got FCM token:', token);
+  
+        const userId = this.authService.getUserId(); // helper που διαβάζει το user_id από localStorage
+        if (userId) {
+          this.sendTokenToBackend(userId, token);
+        }
       } else {
         console.warn('⚠️ Token not received from Firebase');
       }
@@ -158,6 +169,7 @@ export class NotificationsService {
       console.error('❌ Failed to request push token:', err);
     }
   }
+  
   
   
   private sendTokenToBackend(userId: number, token: string) {
@@ -178,9 +190,18 @@ export class NotificationsService {
         console.log('✅ [Push] Token sent successfully!');
         console.log('📥 Backend response:', res);
       },
-      error: err => {
+      error: async err => {
         console.error('❌ [Push] Token send failed:', err);
+      
+        if (err?.status === 404 && err?.error?.details?.[0]?.errorCode === 'UNREGISTERED') {
+          console.warn("⚠️ Token UNREGISTERED, retrying force refresh...");
+          const newToken = await forceRefreshToken();
+          if (newToken) {
+            this.sendTokenToBackend(userId, newToken);
+          }
+        }
       }
+      
     });
   }
   

@@ -9,8 +9,8 @@ if env == "production":
 else:
     load_dotenv(".env")
 
-BASE_URL = os.getenv("BASE_URL", "http://localhost:5050")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8080")
+BASE_URL = os.getenv("BASE_URL", "https://api-unihelp.imslab.gr")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://unihelp.imslab.gr")
 JWT_SECRET = os.getenv("JWT_SECRET", "fallback-secret")
 SQLALCHEMY_DATABASE_URI = os.getenv(
     "DATABASE_URI",

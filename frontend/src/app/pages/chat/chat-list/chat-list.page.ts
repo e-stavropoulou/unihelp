@@ -211,11 +211,17 @@ export class ChatListPage implements OnInit {
   deleteChat(chatId: number) {
     const token = localStorage.getItem('token') || '';
     const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
-
-    this.http.delete(`${environment.API_URL}/chats/${chatId}`, { headers }).subscribe({
-      next: () => {
+  
+    this.http.post(`${environment.API_URL}/chats/${chatId}/hide`, {}, { headers }).subscribe({
+      next: (res: any) => {
         this.chats = this.chats.filter((c) => c.chat_id !== chatId);
-        this.toast.present('Η συνομιλία διαγράφηκε.', 'success');
+        this.toast.present('Η συνομιλία διαγράφηκε από τη λίστα σου.', 'success');
+  
+        // ✅ Αν το backend δώσει flag για refresh token
+        if (res?.require_fcm_refresh) {
+          console.log("🔄 Backend ζητά FCM refresh...");
+          this.notificationsService.registerToken();
+        }
       },
       error: (err) => {
         console.error('[deleteChat] error', err);
@@ -223,6 +229,8 @@ export class ChatListPage implements OnInit {
       },
     });
   }
+  
+  
 
   trackByChatId = (_: number, item: ChatPreview) => item.chat_id;
 }

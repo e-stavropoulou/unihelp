@@ -3,7 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
 import { clearFcmToken } from '../firebase';
-import { NotificationsService } from './notifications.service';
+import { tap, map } from 'rxjs/operators';
+
 
 
 @Injectable({
@@ -59,8 +60,11 @@ export class AuthService {
   clearToken() {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_ID_KEY);
+    localStorage.removeItem(this.EMAIL_KEY);
     localStorage.removeItem(this.ROLE_KEY);
+    localStorage.removeItem('refresh_token');
   }
+  
 
   // Login
   loginUser(credentials: { email: string; password: string }): Observable<any> {
@@ -85,9 +89,17 @@ export class AuthService {
   }
 
   logout(redirect = true): void {
-
+    const jwt = this.getToken();
+  
     clearFcmToken();
-
+  
+    this.http.post(`${environment.API_URL}/logout`, {}, {
+      headers: { Authorization: `Bearer ${jwt}` }
+    }).subscribe({
+      next: () => console.log('✅ Backend logout done'),
+      error: (err) => console.warn('⚠️ Backend logout failed:', err)
+    });
+  
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_ID_KEY);
     localStorage.removeItem(this.EMAIL_KEY);
@@ -95,17 +107,32 @@ export class AuthService {
     localStorage.removeItem('refresh_token');
     sessionStorage.clear();
   
-  this.http.post(`${environment.API_URL}/logout`, {}, {
-    headers: { Authorization: `Bearer ${this.getToken()}` }
-  }).subscribe({
-    next: () => console.log('✅ Backend logout done'),
-    error: (err) => console.warn('⚠️ Backend logout failed:', err)
-  });
-  
     if (redirect) {
-      window.location.replace('/login'); 
+      window.location.replace('/login');
     }
   }
+  
+
+  refreshAccess(): Observable<string> {
+    const refresh = this.getRefreshToken();
+    if (!refresh) {
+      throw new Error('No refresh token available');
+    }
+  
+    return this.http.post<{ access_token: string }>(
+      `${environment.API_URL}/refresh`,
+      {},
+      { headers: { Authorization: `Bearer ${refresh}` } }
+    ).pipe(
+      tap(res => {
+        if (res.access_token) {
+          localStorage.setItem(this.TOKEN_KEY, res.access_token);
+        }
+      }),
+      map(res => res.access_token)
+    );
+  }
+  
   
   
 }

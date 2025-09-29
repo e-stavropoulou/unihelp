@@ -2,7 +2,7 @@ export const environment = {
   production: false,
   API_URL: 'https://api-unihelp.imslab.gr',
 
-  ADMIN_ORIGIN: 'https://admin-unihelp.imslab.gr',
+  ADMIN_ORIGIN: 'http://localhost:4201',
   UNIHELP_ORIGIN: 'https://unihelp.imslab.gr',
 
 

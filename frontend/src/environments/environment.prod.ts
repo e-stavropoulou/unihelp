@@ -2,7 +2,7 @@ export const environment = {
   production: true,
   API_URL: 'https://api-unihelp.imslab.gr',
 
-  ADMIN_ORIGIN: 'https://admin-unihelp.imslab.gr',
+  ADMIN_ORIGIN: 'http://localhost:4201',
   UNIHELP_ORIGIN: 'https://unihelp.imslab.gr',
 
   firebase: {

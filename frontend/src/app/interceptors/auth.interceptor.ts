@@ -54,11 +54,19 @@ import {
                 return next(newReq);
               }),
               catchError((err) => {
-                console.error("❌ Refresh failed, logging out...");
+                console.error("❌ Refresh failed:", err);
                 isRefreshing = false;
-                auth.logout();
+              
+                // Αν όντως είναι expired refresh token (π.χ. 403 από backend)
+                if (err.status === 403) {
+                  console.warn("🚪 Refresh token invalid → forcing logout");
+                  auth.logout();
+                }
+              
+                // Αλλιώς άστον μέσα, μην τον πετάς
                 return throwError(() => err);
               })
+              
             );
           } else {
             auth.logout();

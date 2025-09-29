@@ -83,7 +83,7 @@ def ask_rag():
     print("\n--- 📥 Ερώτηση χρήστη:", query, file=sys.stderr)
 
     try:
-        result = build_pipeline().invoke({"query": query})
+        result = build_pipeline().invoke({"query": "οι απαντήσεις που θα δώσεις στις ερωτήσεις που θα ακολουθήσουν πρέπει να είναι σε φιλικό ύφος αλλά πάντα κόσμιες και σοβαρές. Πρέπει επίσης να απαντάς μόνο σε θέματα σχετικά με το Πανεπιστήμιο, τα μαθήματα και την ζωή γύρω από αυτό."}).invoke({"query": query})
         return jsonify({
             "result": result["result"],
             "source_docs": [doc.metadata for doc in result["source_documents"]]
