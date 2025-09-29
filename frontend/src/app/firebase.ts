@@ -1,5 +1,4 @@
 import { initializeApp } from 'firebase/app';
-import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { Capacitor } from '@capacitor/core';
 import { PushNotifications } from '@capacitor/push-notifications';
@@ -43,7 +42,7 @@ export async function registerFcmToken(): Promise<string | null> {
       if (currentToken) {
         console.log('🌐 Web FCM Token:', currentToken);
         localStorage.setItem('fcm_token', currentToken);
-        await sendTokenToBackend(currentToken);
+        //await sendTokenToBackend(currentToken);
         return currentToken;   
       } else {
         console.warn('⚠️ Δεν δημιουργήθηκε Web FCM token.');
@@ -64,7 +63,7 @@ export async function registerFcmToken(): Promise<string | null> {
       PushNotifications.addListener('registration', (token) => {
         console.log('📱 Native FCM Token:', token.value);
         localStorage.setItem('fcm_token', token.value);
-        sendTokenToBackend(token.value);
+        //sendTokenToBackend(token.value);
       });
 
       PushNotifications.addListener('pushNotificationReceived', (notification) => {
@@ -105,19 +104,6 @@ export async function onMessageWeb(messaging: any, callback: any) {
   return onMessage(messaging, callback);
 }
 
-async function sendTokenToBackend(token: string) {
-  const jwt = localStorage.getItem('token'); 
-  if (!jwt) return;
-  await fetch(`${environment.API_URL}/update-fcm-token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${jwt}`
-    },
-    body: JSON.stringify({ fcm_token: token })
-  });
-}
-
 export async function clearFcmToken() {
   const messaging = await getMessagingInstance();
   if (!messaging) return;
@@ -127,20 +113,33 @@ export async function clearFcmToken() {
       await deleteToken(messaging);
       localStorage.removeItem("fcm_token");
       console.log("🗑️ FCM token deleted");
-
-      const jwt = localStorage.getItem("token");
-      if (jwt) {
-        await fetch(`${environment.API_URL}/update-fcm-token`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${jwt}`
-          },
-          body: JSON.stringify({ fcm_token: null })
-        });
-      }
     }
   } catch (err) {
     console.error("❌ Failed to delete FCM token:", err);
+  }
+}
+
+export async function forceRefreshToken(): Promise<string | null> {
+  if (!isWeb) return null;
+  const messaging = await getMessagingInstance();
+  if (!messaging) return null;
+
+  try {
+    const { getToken } = await import('firebase/messaging');
+    const newToken = await getToken(messaging, {
+      vapidKey: environment.vapidKey
+    });
+
+    if (newToken) {
+      console.log("🔄 Νέο FCM token (force refresh):", newToken);
+      localStorage.setItem("fcm_token", newToken);
+      return newToken;
+    } else {
+      console.warn("⚠️ Δεν δημιουργήθηκε νέο token.");
+      return null;
+    }
+  } catch (err) {
+    console.error("❌ Σφάλμα στο forceRefreshToken:", err);
+    return null;
   }
 }

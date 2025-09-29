@@ -27,8 +27,18 @@ def get_profile():
     #an o user exei avatar_url, ftiaxnw to full url
     avatar_url = None
     if user.avatar_url:
-        filename = user.avatar_url.split("/")[-1]  # μόνο το όνομα αρχείου
-        avatar_url = url_for("profile_bp.serve_avatar", filename=filename, _external=True)
+        print(f"🟡 [BACKEND DEBUG] Raw avatar_url in DB for user {user.id}: {user.avatar_url}")
+
+        # Αν είναι ήδη full URL (π.χ. http://localhost:5050/...)
+        if user.avatar_url.startswith("http"):
+            filename = user.avatar_url.split("/")[-1]
+        else:
+            # Αν είναι relative (/static/avatars/...)
+            filename = user.avatar_url.split("/")[-1]
+
+        avatar_url = f"{BASE_URL}/static/avatars/{filename}"
+        print(f"🖼️ [BACKEND DEBUG] Final avatar_url for user {user.id}: {avatar_url}")
+
 
 
     # ypologismos mesou orou kai plithous kritikon
@@ -69,20 +79,25 @@ def upload_avatar():
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
 
-    # apothikeyo mono filename stin vasi
-    user.avatar_url = filename
+    # Σώζουμε ΠΑΝΤΑ full URL στη βάση
+    avatar_url = f"{BASE_URL}/static/avatars/{filename}"
+    user.avatar_url = avatar_url
     db.session.commit()
 
-    # url me url_for
-    avatar_url = url_for("profile_bp.serve_avatar", filename=filename, _external=True)
+    print(f"🖼️ [BACKEND DEBUG] Saved avatar_url for user {user.id}: {user.avatar_url}")
 
-
-    return jsonify({'message': 'Avatar uploaded successfully', 'avatar_url': avatar_url}), 200
+    return jsonify({
+        'message': 'Avatar uploaded successfully',
+        'avatar_url': avatar_url
+    }), 200
 
 
 @profile_bp.route('/static/avatars/<filename>')
 def serve_avatar(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename)
+    response = send_from_directory(UPLOAD_FOLDER, filename)
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
 
 @profile_bp.route('/update-profile', methods=['POST'])
 @jwt_required()

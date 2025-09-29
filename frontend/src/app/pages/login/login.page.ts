@@ -52,7 +52,7 @@ export class LoginPage {
   
     console.log('✅ Sending HTTP request to:', `${environment.API_URL}/login`);
   
-    this.http.post<{ message: string; token: string; email: string; user_id: number; role: string }>(
+    this.http.post<{ message: string; token: string; refresh_token: string;email: string; user_id: number; role: string }>(
       `${environment.API_URL}/login`,
       {
         email: this.email,
@@ -61,7 +61,7 @@ export class LoginPage {
     ).subscribe({
       next: (res) => {
         console.log('✅ Login success response', res);
-        this.authService.setToken(res.token, res.user_id, res.email, res.role);
+        this.authService.setToken(res.token, res.user_id, res.email, res.role, res.refresh_token);
         this.showResend = false;
       
         // FCM push registration (Web)

@@ -173,48 +173,36 @@ export class ProfileSettingsPage implements OnInit {
 
     try {
       await this.http.post(`${environment.API_URL}/update-profile`, profilePayload, { headers }).toPromise();
-
+    
+      // ✅ Δείξε μήνυμα και κάνε redirect αμέσως
+      this.zone.run(async () => {
+        await this.toastService.present('Το προφίλ ενημερώθηκε!', 'success');
+        this.goBackToProfile();
+      });
+    
+      // Τα υπόλοιπα τρέχουν "παράλληλα"
       if (this.avatarFile) {
         const formData = new FormData();
         formData.append('avatar', this.avatarFile);
-      
-        console.log('📸 Ανεβάζουμε avatar...', this.avatarFile);
-      
-        const res = await this.http.post(`${environment.API_URL}/upload-avatar`, formData, { headers }).toPromise();
-        console.log('✅ Απάντηση από το backend μετά το upload:', res);
+        this.http.post(`${environment.API_URL}/upload-avatar`, formData, { headers }).subscribe();
       }
-      
-
+    
       const updates = this.allCourses.filter(course => {
         const wasSelected = this.originalCourseIds.includes(course.id);
         const isSelected = this.selectedCourseIds.includes(course.id);
         return wasSelected !== isSelected;
       });
-
-      const updateRequests = updates.map(course => {
-        const payload = {
-          course_id: course.id,
-          can_help: this.selectedCourseIds.includes(course.id)
-        };
-        return this.http.post(`${environment.API_URL}/update-can-help`, payload, { headers }).toPromise();
+    
+      updates.forEach(course => {
+        const payload = { course_id: course.id, can_help: this.selectedCourseIds.includes(course.id) };
+        this.http.post(`${environment.API_URL}/update-can-help`, payload, { headers }).subscribe();
       });
-
-      await Promise.all(updateRequests);
-
-      this.zone.run(async () => {
-        await this.toastService.present('Το προφίλ ενημερώθηκε!', 'success');
-      
-        console.log("✅ Toast done, πάμε redirect...");
-        this.goBackToProfile();
-      });
-      
-
+    
     } catch (error) {
       this.zone.run(async () => {
         await this.toastService.present('Σφάλμα κατά την αποθήκευση.', 'error');
       });
-      
-
     }
+    
   }
 }

@@ -65,6 +65,7 @@ export class ChatDetailPage implements OnInit {
 
   @ViewChild(IonContent) content!: IonContent;
 
+  private pollingInterval: any;
 
   ngOnInit() {
     const nav = this.router.getCurrentNavigation();
@@ -81,7 +82,6 @@ export class ChatDetailPage implements OnInit {
   
     this.loadMessages();
     this.loadChatPartnerInfo();
-  
     
     this.messageSub = this.chatService.newChatMessage$.subscribe((message) => {
       if (!message) return;
@@ -115,9 +115,13 @@ export class ChatDetailPage implements OnInit {
     if (this.messageSub) {
       this.messageSub.unsubscribe();
     }
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
   }
   
   
+  ionViewWillLeave() {
+    if (this.pollingInterval) clearInterval(this.pollingInterval);
+  }
   
 
   ionViewDidEnter() {
@@ -133,6 +137,10 @@ export class ChatDetailPage implements OnInit {
 
     
     setTimeout(() => this.scrollToBottom(), 200);
+
+    this.pollingInterval = setInterval(() => {
+      this.loadMessages(true); // pass flag για να μη σβήνει το state
+    }, 3000);
   }
 
   loadChatPartnerInfo() {
@@ -182,30 +190,43 @@ export class ChatDetailPage implements OnInit {
     });
   }
 
-  loadMessages() {
+  loadMessages(append: boolean = false) {
     const token = localStorage.getItem('token');
     if (!token) return;
   
-    const headers = {
-      Authorization: `Bearer ${token}`
-    };
+    const headers = { Authorization: `Bearer ${token}` };
   
     this.http
       .get<any[]>(`${environment.API_URL}/chats/${this.chatId}/messages`, { headers })
       .subscribe({
         next: (res) => {
-          this.messages = res.map(m => ({
+          const parsed = res.map(m => ({
             ...m,
             sender_id: Number(m.sender_id),
-            timestamp: m.timestamp instanceof Date ? m.timestamp : new Date(m.timestamp),
+            timestamp: new Date(m.timestamp),
             is_read: !!m.is_read
           }));
-          this.scrollToBottom();
+  
+          if (append) {
+            const lastId = this.messages.length > 0 ? this.messages[this.messages.length - 1].id : 0;
+            const newOnes = parsed.filter(m => m.id > lastId);
+            if (newOnes.length > 0) {
+              this.messages = [...this.messages, ...newOnes];
+              this.scrollToBottom();
+
+              this.markMessagesAsRead().then(() => {
+                this.chatService.refreshUnreadMessages();
+              });
+            }
+          }
+          else {
+            this.messages = parsed;
+            this.scrollToBottom();
+          }
         },
         error: (err) => console.error('🚫 Failed to fetch messages:', err)
       });
   }
-  
   
 
   sendMessage() {
