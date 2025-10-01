@@ -6,6 +6,9 @@ import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { ToastService } from 'src/app/services/toast.service';
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
+
 
 
 @Component({
@@ -115,5 +118,26 @@ export class MyNotesPage implements OnInit {
   
     await alert.present();
   }  
+  
+
+  openNote(note: any) {
+    const token = this.authService.getToken();
+    if (!token) {
+      this.toastService.present('Πρέπει να είσαι συνδεδεμένος για να ανοίξεις τις σημειώσεις σου.', 'error');
+      return;
+    }
+  
+    // ✅ Direct URL με JWT στο query
+    const directUrl = `${environment.API_URL}/download/${note.id}?jwt=${encodeURIComponent(token)}`;
+  
+    if (Capacitor.isNativePlatform()) {
+      // iOS/Android
+      Browser.open({ url: directUrl });
+    } else {
+      // Web
+      window.open(directUrl, '_blank', 'noopener,noreferrer');
+    }
+  }
+  
   
 }

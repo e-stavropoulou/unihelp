@@ -541,7 +541,8 @@ def get_note(note_id):
         'course': {
             'id': course.id,
             'name': course.name,
-            'semester': course.semester
+            'semester': course.semester,
+            'type': course.type
         } if course else None
     }), 200
 

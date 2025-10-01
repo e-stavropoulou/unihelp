@@ -97,7 +97,7 @@
         <div class="note-meta-grid">
           <div><strong>📅 Ανέβηκε:</strong><br> {{ note.upload_date | date:'dd/MM/yyyy HH:mm' }}</div>
           <div><strong>📥 Λήψεις:</strong><br> {{ note.downloads }}</div>
-          <div><strong>Εξάμηνο:</strong><br> {{ note.semester }}ο</div>
+          <div><strong>Εξάμηνο:</strong><br> {{ note.semester ? (note.semester + 'ο') : note.type }}</div>
           <div><strong>Τύπος:</strong><br> {{ note.type }}</div>
         </div>
       

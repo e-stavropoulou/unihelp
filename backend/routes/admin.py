@@ -12,8 +12,15 @@ from utils.decorators import admin_required
 from models.notification import Notification
 from utils.push_utils import send_push_notification
 from datetime import datetime
+from flask import send_file
+import os
+from config import BASE_URL
+from flask_jwt_extended import verify_jwt_in_request, decode_token
+from flask_jwt_extended.exceptions import NoAuthorizationError
 
 admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
+
+NOTES_UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'uploads', 'notes')
 
 # =========================================================
 # 1. ΔΙΑΧΕΙΡΙΣΗ ADMIN ΡΟΛΩΝ
@@ -63,48 +70,44 @@ def admin_dashboard_access():
 # =========================================================
 # 2. ΣΤΑΤΙΣΤΙΚΑ DASHBOARD
 # =========================================================
-@admin_bp.route('/stats', methods=['GET'])
+@admin_bp.route('/stats/top-commented-note', methods=['GET'])
 @jwt_required()
 @admin_required
-def dashboard_stats():
-    total_users = User.query.count()
-    total_notes = Note.query.count()
-
-    top_users = User.query.order_by(User.upoints.desc()).limit(10).all()
-
-    course_stats = db.session.query(
-        Course.name, db.func.count(Note.id)
-    ).join(Note, Note.course_id == Course.id)\
-     .group_by(Course.id)\
-     .order_by(db.func.count(Note.id).desc())\
-     .limit(5).all()
-
-    top_commented = db.session.query(
-        Note.id, Note.title, db.func.count(Comment.id)
+def get_top_commented_note():
+    result = db.session.query(
+        Note.id, db.func.count(Comment.id).label("comments")
     ).join(Comment, Comment.note_id == Note.id)\
      .group_by(Note.id)\
-     .order_by(db.func.count(Comment.id).desc()).first()
+     .order_by(db.func.count(Comment.id).desc())\
+     .first()
 
-    top_downloaded = Note.query.order_by(Note.downloads.desc()).first()
+    if not result:
+        return jsonify(None), 200
 
+    note = Note.query.get(result[0])
     return jsonify({
-        "total_users": total_users,
-        "total_notes": total_notes,
-        "top_users": [{"username": u.username, "points": u.upoints} for u in top_users],
-        "top_courses": [{"course": c[0], "count": c[1]} for c in course_stats],
-        "top_commented_note": {
-            "id": top_commented[0],
-            "title": top_commented[1],
-            "comments": top_commented[2]
-        } if top_commented else None,
-        "top_downloaded_note": {
-            "id": top_downloaded.id,
-            "title": top_downloaded.title,
-            "downloads": top_downloaded.downloads
-        } if top_downloaded else None
+        "id": note.id,
+        "title": note.title,
+        "comments": result[1],
+        "filepath": f"{BASE_URL}/admin/download/{note.id}"
     })
 
 
+@admin_bp.route('/stats/top-downloaded-note', methods=['GET'])
+@jwt_required()
+@admin_required
+def get_top_downloaded_note():
+    note = Note.query.order_by(Note.downloads.desc()).first()
+    if not note:
+        return jsonify(None), 200
+
+    return jsonify({
+        "id": note.id,
+        "title": note.title,
+        "downloads": note.downloads,
+        "filepath": f"{BASE_URL}/admin/download/{note.id}"
+
+    })
 # =========================================================
 # 3. ΔΙΑΧΕΙΡΙΣΗ ΑΝΑΦΟΡΩΝ
 # =========================================================
@@ -186,7 +189,7 @@ def get_all_notes():
             "description": n.description,
             "category": n.category,
             "upload_date": n.upload_date.isoformat() if n.upload_date else None,
-            "filepath": f"/static/notes/{n.filename}" if n.filename else None,
+            "filepath": f"{BASE_URL}/admin/download/{n.id}", 
             "course": course.name if course else "Άγνωστο",
             "semester": course.semester if course else None,
             "type": course.type if course else None,
@@ -255,12 +258,14 @@ def add_course():
     semester = data.get('semester')
     ctype = data.get('type')
 
-    if not name or not semester or not ctype:
+    if not name or not ctype:
         return jsonify({'error': 'Λείπουν απαιτούμενα πεδία'}), 400
 
    
     name = name.strip()
     ctype = ctype.strip()
+    if semester in ("", None, 0):
+        semester = None
 
     # Έλεγχος αν υπάρχει ήδη μάθημα με το ίδιο όνομα
     existing = Course.query.filter_by(name=name).first()
@@ -374,6 +379,44 @@ def toggle_block_user(user_id):
             print(f"❌ Failed to send push: {e}")
 
     return jsonify({"message": f"User {'blocked' if is_blocked else 'unblocked'}."}), 200
+
+# =========================================================
+# 7. ΛΗΨΗ ΑΡΧΕΙΩΝ ΑΠΟ ADMIN
+# =========================================================
+@admin_bp.route('/download/<int:note_id>', methods=['GET'])
+def admin_download(note_id):
+    # 🔑 Ελέγχουμε αν δόθηκε token ως query param
+    token = request.args.get("jwt")
+
+    if token:
+        try:
+            decoded = decode_token(token)
+            if decoded.get("role") != "admin":
+                return jsonify({"error": "Not authorized"}), 403
+        except Exception as e:
+            return jsonify({"error": "Invalid token"}), 401
+    else:
+        # fallback → χρησιμοποιεί το Authorization header
+        try:
+            verify_jwt_in_request()
+        except NoAuthorizationError:
+            return jsonify({"error": "Missing token"}), 401
+
+    note = Note.query.get(note_id)
+    if not note:
+        return jsonify({'error': 'Σημείωση δεν βρέθηκε'}), 404
+
+    file_path = note.filepath or os.path.join(NOTES_UPLOAD_FOLDER, note.filename)
+
+    if not file_path or not os.path.exists(file_path):
+        return jsonify({'error': 'Το αρχείο δεν βρέθηκε στο server'}), 404
+
+    return send_file(
+        file_path,
+        as_attachment=False,
+        download_name=note.filename
+    )
+
 
 @admin_bp.route('/reports/history', methods=['GET'])
 @jwt_required()

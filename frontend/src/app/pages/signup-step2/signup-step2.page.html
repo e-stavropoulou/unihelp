@@ -28,7 +28,7 @@
       <ion-label class="course-label">
         <div class="course-row">
           <span class="course-name">{{ course.name }}</span>
-          <span class="course-semester">Εξάμηνο: {{ course.semester }}ο</span>
+          <span class="course-semester">Εξάμηνο: {{ course.semester ? (course.semester + 'ο εξάμηνο') : course.type }}</span>
         </div>
       </ion-label>
     </ion-item>    
@@ -38,7 +38,7 @@
   <div class="selected-courses" *ngIf="selectedCourses.length > 0">
     <ion-chip *ngFor="let course of selectedCourses">
       <ion-label>
-        {{ course.name }} ({{ course.semester }}ο)
+        {{ course.name }} ({{ course.semester ? (course.semester + 'ο εξάμηνο') : course.type }})
       </ion-label>    
       <ion-icon
       name="close-circle"

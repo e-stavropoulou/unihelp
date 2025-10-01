@@ -61,7 +61,7 @@
       lines="full"
       class="custom-option"
     >
-      {{ course.name }} ({{ course.semester }}ο • {{ course.type }})
+    {{ course.name }} ({{ course.semester ? course.semester + 'ο' : course.type }})
     </ion-item>
   </ion-list>
 </div>
@@ -71,7 +71,7 @@
     <ion-label class="course-row">
       <span class="course-name">{{ selectedCourseName }}</span>
       <span class="course-semester">
-        ({{ selectedCourseSemester }}ο)
+        ({{ selectedCourseSemester ? selectedCourseSemester + 'ο' : selectedCourseType }})
       </span>
     </ion-label>
     <ion-icon

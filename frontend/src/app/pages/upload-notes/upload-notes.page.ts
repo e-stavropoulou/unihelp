@@ -27,6 +27,7 @@ export class UploadNotesPage implements OnInit {
   filteredCourses: any[] = [];
   selectedCourseName: string = ''; 
   selectedCourseSemester: number | null = null;
+  selectedCourseType: string | null = null;
   courses: any[] = [];
   showDropdown: boolean = false;
   
@@ -114,6 +115,7 @@ export class UploadNotesPage implements OnInit {
     this.searchTerm = '';
     this.filteredCourses = [];
     this.selectedCourseSemester = course.semester;
+    this.selectedCourseType = course.type; 
   }
   
   clearSelectedCourse() {

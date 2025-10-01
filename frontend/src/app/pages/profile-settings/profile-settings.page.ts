@@ -13,7 +13,8 @@ import { NgZone } from '@angular/core';
 interface Course {
   id: number;
   name: string;
-  semester: number;
+  semester: number | null;
+  type: string; 
 }
 
 @Component({
