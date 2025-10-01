@@ -4,6 +4,8 @@ import os
 from flask import Flask, request, jsonify, send_from_directory
 import sys
 
+
+
 from dotenv import load_dotenv
 # Βρες ποιο περιβάλλον τρέχεις
 env = os.getenv("FLASK_ENV", "development")
@@ -72,27 +74,13 @@ from config import (
 def create_app():
     app = Flask(__name__)
 
+    app.config.from_object("config")  
     
-    app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_TRACK_MODIFICATIONS
-
-    app.config['EMAIL_USER'] = EMAIL_USER
-    app.config['EMAIL_PASS'] = EMAIL_PASS
-    app.config['BASE_URL']   = BASE_URL
-    app.config['FRONTEND_URL'] = FRONTEND_URL     
-    
-
     # Firebase Admin init 
     if not firebase_admin._apps:
         cred = credentials.Certificate("firebase/service-account.json")
         firebase_admin.initialize_app(cred)
-
-    #  JWT related settings
-    app.config['JWT_SECRET_KEY'] = JWT_SECRET
-    app.config['JWT_ACCESS_TOKEN_EXPIRES']  = timedelta(minutes=15)
-    app.config['JWT_REFRESH_TOKEN_EXPIRES'] = timedelta(days=7)
-    app.config['JWT_DECODE_LEEWAY'] = 10
-
+    
     jwt = JWTManager(app)
 
     @jwt.expired_token_loader
@@ -122,8 +110,6 @@ def create_app():
         allow_headers=["Content-Type", "Authorization"],
         supports_credentials=True
     )
-
-
 
 
     # exentions 

@@ -45,7 +45,7 @@ import {
                   auth.getUserId()!,
                   localStorage.getItem('email')!,
                   auth.getRole()!,
-                  refresh
+                  
                 );
   
                 const newReq = req.clone({

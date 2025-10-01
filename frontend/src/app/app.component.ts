@@ -41,6 +41,8 @@ export class AppComponent implements OnInit {
     this.setupSSO();
 
     this.startGlobalPolling();
+    this.startTokenAutoRefresh();
+
 
     const token = this.authService.getToken();
     if (token) {
@@ -164,5 +166,33 @@ export class AppComponent implements OnInit {
       this.notificationsService.refreshUnreadCount();
     }, 3000); // κάθε 3 δευτερόλεπτα
   }
+
+  private startTokenAutoRefresh() {
+    setInterval(() => {
+      const token = this.authService.getToken();
+      if (token && this.isTokenExpiredSoon(token, 5)) { // 5 λεπτά πριν
+        const refresh = this.authService.getRefreshToken();
+        if (refresh) {
+          console.log("🔄 Προληπτικό refresh...");
+          this.authService.refreshAccess().subscribe({
+            next: () => console.log("✅ Token ανανεώθηκε"),
+            error: () => console.warn("⚠️ Αποτυχία προληπτικού refresh")
+          });
+        }
+      }
+    }, 60_000); // έλεγχος κάθε 1 λεπτό
+  }
+  
+  private isTokenExpiredSoon(token: string, minutes: number): boolean {
+    try {
+      const decoded: any = jwtDecode(token);
+      if (!decoded.exp) return false;
+      const expiry = decoded.exp * 1000;
+      return Date.now() > expiry - minutes * 60 * 1000;
+    } catch {
+      return true;
+    }
+  }
+  
 
 }

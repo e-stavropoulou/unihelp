@@ -11,12 +11,17 @@ from models.note import Note
 from models.user import User
 from models.course import Course
 from models.comment import Comment
+from models.note_review import NoteReview
+from models.user_review import UserReview
 
 app = create_app()
 app.app_context().push()
 
 # fakelos me tis simioseis
-NOTES_FOLDER = '/Users/evelina/unihelp/backend/uploads/notes'
+# fakelos me tis simioseis (dynamic path για Mac + Server)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+NOTES_FOLDER = os.path.join(BASE_DIR, "uploads", "notes")
+
 
 # 📑 Υποστηριζόμενες επεκτάσεις
 ALLOWED_EXTENSIONS = ('.pdf', '.docx', '.txt', '.png', '.jpg', '.jpeg')
@@ -57,6 +62,22 @@ def extract_text_from_image(path):
     img = Image.open(path)
     return pytesseract.image_to_string(img, lang="ell+eng")
 
+def get_note_avg_rating(note_id):
+    reviews = NoteReview.query.filter_by(note_id=note_id).all()
+    if not reviews:
+        return None, 0
+    avg = round(sum(r.rating for r in reviews) / len(reviews), 2)
+    return avg, len(reviews)
+
+
+def get_user_avg_rating(user_id):
+    reviews = UserReview.query.filter_by(reviewed_id=user_id).all()
+    if not reviews:
+        return None, 0
+    avg = round(sum(r.rating for r in reviews) / len(reviews), 2)
+    return avg, len(reviews)
+
+
 
 def extract_text(path, ext):
     try:
@@ -84,6 +105,20 @@ def process_all_notes():
         filename = (note.filename or "").strip()
         ext = os.path.splitext(filename)[1].lower().strip()
 
+        note_rating, note_count = get_note_avg_rating(note.id)
+        user_rating, user_count = get_user_avg_rating(note.user.id) if note.user else (None, 0)
+
+        semester_val = None
+        course_type_val = None
+
+        if note.course:
+            if note.course.semester:  # Αν υπάρχει εξάμηνο
+                semester_val = note.course.semester
+                course_type_val = note.course.type
+            else:  # Αν ΔΕΝ υπάρχει εξάμηνο
+                semester_val = note.course.type  # ➡️ Εδώ βάζουμε τον τύπο στο πεδίο εξάμηνο
+                course_type_val = note.course.type
+
         if ext not in ALLOWED_EXTENSIONS:
             print(f"⏩ Παράλειψη μη υποστηριζόμενου αρχείου: {filename}")
 
@@ -102,8 +137,14 @@ def process_all_notes():
                 "downloads": getattr(note, "downloads", 0),
                 "comments": len(note.comments) if hasattr(note, "comments") else 0,
                 "uploader": note.user.username if note.user else "Άγνωστος",
-                "course": note.course.name if note.course else "Άγνωστο μάθημα"
+                "course": note.course.name if note.course else "Άγνωστο μάθημα",
+                "semester": semester_val,
+                "course_type": course_type_val,
+                "upload_date": note.upload_date.isoformat() if note.upload_date else None,  # ➕ Ημερομηνία
+                "note_rating": f"{note_rating} ⭐ ({note_count} reviews)" if note_rating else "χωρίς αξιολόγηση",
+                "uploader_rating": f"{user_rating} ⭐ ({user_count} reviews)" if user_rating else "χωρίς αξιολόγηση"
             })
+
 
             continue  
 
@@ -140,8 +181,14 @@ def process_all_notes():
             "downloads": getattr(note, "downloads", 0),
             "comments": len(note.comments) if hasattr(note, "comments") else 0,
             "uploader": note.user.username if note.user else "Άγνωστος",
-            "course": note.course.name if note.course else "Άγνωστο μάθημα"
+            "course": note.course.name if note.course else "Άγνωστο μάθημα",
+            "semester": semester_val,
+            "course_type": course_type_val,
+            "upload_date": note.upload_date.strftime("%Y-%m-%d %H:%M") if note.upload_date else None,
+            "note_rating": f"{note_rating} ⭐ ({note_count} reviews)" if note_rating else "χωρίς αξιολόγηση",
+            "uploader_rating": f"{user_rating} ⭐ ({user_count} reviews)" if user_rating else "χωρίς αξιολόγηση"
         })
+
 
     with open("notes_text_dataset.json", "w", encoding="utf-8") as f:
         json.dump(results, f, ensure_ascii=False, indent=2)

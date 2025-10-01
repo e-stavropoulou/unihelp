@@ -20,15 +20,15 @@
       <p>{{ note.description || 'Χωρίς περιγραφή.' }}</p>
 
       <div class="note-meta">
-        <p><strong>Εξάμηνο:</strong> {{ note.semester }}ο</p>
+        <p><strong>Εξάμηνο:</strong> {{ note.semester ? (note.semester + 'ο') : note.type }}</p>
         <p><strong>Τύπος:</strong> {{ note.type }}</p>
         <p><strong>📅 Ανέβηκε:</strong> {{ note.upload_date | date:'dd/MM/yyyy, HH:mm' }}</p>
       </div>
 
       <div class="actions">
-        <a [href]="note.filepath" target="_blank" class="file-link">
+        <span class="file-link" (click)="openNote(note)">
           📄 Άνοιγμα αρχείου
-        </a>
+        </span>
         <ion-button
           size="small"
           fill="clear"

@@ -4,6 +4,9 @@ import { IonicModule } from '@ionic/angular';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from 'src/app/services/auth.service';
 import { environment } from 'src/environments/environment';
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
+
 
 @Component({
   selector: 'app-favorite-notes',
@@ -63,4 +66,25 @@ export class FavoriteNotesPage implements OnInit {
         }
       });
   }
+
+  openNote(note: any) {
+    const token = this.authService.getToken();
+    if (!token) {
+      console.warn('No token found. User might not be logged in.');
+      return;
+    }
+  
+    // ✅ Direct URL με JWT
+    const directUrl = `${environment.API_URL}/download/${note.id}?jwt=${encodeURIComponent(token)}`;
+  
+    if (Capacitor.isNativePlatform()) {
+      // Mobile build: SafariViewController / Chrome Custom Tab
+      Browser.open({ url: directUrl });
+    } else {
+      // Web build: ανοίγει σε νέα καρτέλα
+      window.open(directUrl, '_blank', 'noopener,noreferrer');
+    }
+  }
+  
+  
 }

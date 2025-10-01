@@ -5,7 +5,7 @@ class Report(db.Model):
     __tablename__ = 'report'
 
     id = db.Column(db.Integer, primary_key=True)
-    reported_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    reported_by = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     reported_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     note_id = db.Column(
     db.Integer,

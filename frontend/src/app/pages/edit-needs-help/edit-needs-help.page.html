@@ -31,7 +31,7 @@
     >
       <div class="course-row">
         <span class="course-name">{{ course.name }}</span>
-        <span class="course-semester">({{ course.semester }}ο)</span>
+        <span class="course-semester">({{ course.semester ? course.semester + 'ο' : course.type }})</span>
       </div>
       <ion-icon
         slot="end"
@@ -46,7 +46,7 @@
       <ion-chip *ngFor="let course of allCoursesFilteredSelected()">
         <ion-label class="course-row">
           <span class="course-name">{{ course.name }}</span>
-          <span class="course-semester">({{ course.semester }}ο)</span>
+          <span class="course-semester">({{ course.semester ? course.semester + 'ο' : course.type }})</span>
         </ion-label>        
         <ion-icon
           name="close-circle"

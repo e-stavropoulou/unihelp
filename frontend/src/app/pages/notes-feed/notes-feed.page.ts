@@ -10,6 +10,7 @@ import { ToastService } from 'src/app/services/toast.service';
 import { Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 
 @Component({
@@ -157,19 +158,23 @@ export class NotesFeedPage implements OnInit {
   }
 
 
-  downloadNote(note: any) {
+  async downloadNote(note: any) {
     const token = this.authService.getToken();
-    const downloadUrl = `${environment.API_URL}/download/${note.id}`;
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.setAttribute('target', '_blank');
-    link.setAttribute('rel', 'noopener');
-
-    this.zone.run(() => {
-      note.downloads += 1;
-    });
-
-    link.click();
+    if (!token) {
+      await this.toastService.present('Πρέπει να είσαι συνδεδεμένος για να ανοίξεις σημειώσεις.', 'error');
+      return;
+    }
+  
+    // ✅ Χτίζουμε direct URL με JWT στο query
+    const directUrl = `${environment.API_URL}/download/${note.id}?jwt=${encodeURIComponent(token)}`;
+  
+    if (this.isMobile) {
+      // iOS/Android: in-app browser (SafariViewController/Chrome Custom Tab)
+      await Browser.open({ url: directUrl });
+    } else {
+      // Web: νέα καρτέλα
+      window.open(directUrl, '_blank', 'noopener,noreferrer');
+    }
   }
 
   toggleComments(note: any) {

@@ -18,7 +18,7 @@ class Course(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
-    semester = db.Column(db.Integer, nullable=False)
+    semester = db.Column(db.Integer, nullable=True)
     type = db.Column(db.String(50), nullable=False, default="υποχρεωτικό")
 
     course_users = db.relationship('UserCourse', back_populates='course')

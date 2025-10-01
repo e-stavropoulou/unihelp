@@ -55,7 +55,8 @@
       
         <div class="selected-courses" *ngIf="selectedCourse">
           <ion-chip>
-            <ion-label>{{ selectedCourse.name }} ({{ selectedCourse.semester }}ο)</ion-label>
+            <ion-label>{{ selectedCourse.name }}
+              ({{ selectedCourse.semester ? selectedCourse.semester + 'ο' : selectedCourse.type }})</ion-label>
             <ion-icon
               name="close-circle"
               class="remove-icon"
@@ -74,7 +75,7 @@
           >
             <div class="course-row">
               <span class="course-name">{{ course.name }}</span>
-              <span class="course-semester">({{ course.semester }}ο)</span>
+              <span class="course-semester">({{ course.semester ? course.semester + 'ο' : course.type }})</span>
             </div>
             <ion-icon
               slot="end"
