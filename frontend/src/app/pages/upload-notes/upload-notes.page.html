@@ -101,12 +101,19 @@
     
       <ion-button
   expand="block"
-  type="button"
+  type="submit"
   class="custom-red-btn"
-  (click)="handleUploadClick()"
+  [disabled]="isUploading"
 >
-  Ανέβασε
+  <ng-container *ngIf="!isUploading; else uploading">
+    Ανέβασε
+  </ng-container>
+  <ng-template #uploading>
+    <ion-spinner name="crescent" style="margin-right:8px;"></ion-spinner>
+    Ανεβαίνει...
+  </ng-template>
 </ion-button>
+
 
     </form>    
   </div>

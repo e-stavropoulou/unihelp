@@ -212,21 +212,21 @@ export class ChatDetailPage implements OnInit {
             const newOnes = parsed.filter(m => m.id > lastId);
             if (newOnes.length > 0) {
               this.messages = [...this.messages, ...newOnes];
-              this.scrollToBottom();
-
-              this.markMessagesAsRead().then(() => {
-                this.chatService.refreshUnreadMessages();
-              });
+              this.markMessagesAsRead().then(() => this.chatService.refreshUnreadMessages());
             }
-          }
-          else {
+          } else {
             this.messages = parsed;
-            this.scrollToBottom();
           }
+  
+          // ✅ Περίμενε λίγο για να γίνει render και μετά scroll
+          setTimeout(() => {
+            this.content.scrollToBottom(300);
+          }, 400);
         },
         error: (err) => console.error('🚫 Failed to fetch messages:', err)
       });
   }
+  
   
 
   sendMessage() {
@@ -266,10 +266,16 @@ export class ChatDetailPage implements OnInit {
 
   }
 
-  scrollToBottom() {
-    setTimeout(() => {
-      this.content.scrollToBottom(300);
-    }, 100); 
+  async scrollToBottom() {
+    try {
+      await this.content.scrollToBottom(300);
+    } catch (e) {
+      // Αν αποτύχει (π.χ. IonContent δεν είναι έτοιμο ακόμα), κάνε retry
+      setTimeout(() => {
+        this.content.scrollToBottom(300);
+      }, 200);
+    }
   }
+  
   
 }

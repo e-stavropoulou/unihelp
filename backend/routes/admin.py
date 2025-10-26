@@ -22,9 +22,7 @@ admin_bp = Blueprint('admin_bp', __name__, url_prefix='/admin')
 
 NOTES_UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'uploads', 'notes')
 
-# =========================================================
-# 1. ΔΙΑΧΕΙΡΙΣΗ ADMIN ΡΟΛΩΝ
-# =========================================================
+
 @admin_bp.route('/users/<int:user_id>/role', methods=['PATCH'])
 @jwt_required()
 @admin_required
@@ -67,30 +65,38 @@ def admin_dashboard_access():
     return jsonify({"access": "granted"}), 200
 
 
-# =========================================================
-# 2. ΣΤΑΤΙΣΤΙΚΑ DASHBOARD
-# =========================================================
+
 @admin_bp.route('/stats/top-commented-note', methods=['GET'])
 @jwt_required()
 @admin_required
 def get_top_commented_note():
-    result = db.session.query(
-        Note.id, db.func.count(Comment.id).label("comments")
-    ).join(Comment, Comment.note_id == Note.id)\
-     .group_by(Note.id)\
-     .order_by(db.func.count(Comment.id).desc())\
-     .first()
+    result = (
+        db.session.query(
+            Note,
+            db.func.count(Comment.id).label("comment_count")
+        )
+        .outerjoin(Comment, Comment.note_id == Note.id)
+        .group_by(Note.id)
+        .order_by(db.desc(db.func.count(Comment.id)))
+        .limit(1)
+        .first()
+    )
 
     if not result:
         return jsonify(None), 200
 
-    note = Note.query.get(result[0])
+    note, comment_count = result
+    course = Course.query.get(note.course_id)
+    uploader = User.query.get(note.user_id)
+
     return jsonify({
         "id": note.id,
         "title": note.title,
-        "comments": result[1],
+        "course": course.name if course else "Άγνωστο",
+        "uploader": uploader.username if uploader else "Άγνωστος",
+        "comment_count": int(comment_count),
         "filepath": f"{BASE_URL}/admin/download/{note.id}"
-    })
+    }), 200
 
 
 @admin_bp.route('/stats/top-downloaded-note', methods=['GET'])
@@ -108,9 +114,8 @@ def get_top_downloaded_note():
         "filepath": f"{BASE_URL}/admin/download/{note.id}"
 
     })
-# =========================================================
-# 3. ΔΙΑΧΕΙΡΙΣΗ ΑΝΑΦΟΡΩΝ
-# =========================================================
+
+
 @admin_bp.route('/reports', methods=['GET'])
 @jwt_required()
 @admin_required
@@ -133,7 +138,7 @@ def resolve_report(report_id):
     if not report:
         return jsonify({"error": "Report not found"}), 404
 
-    # 🔑 Κανονικοποίηση
+  
     if action == "accept":
         report.status = "accepted"
     else:
@@ -144,9 +149,7 @@ def resolve_report(report_id):
 
 
 
-# =========================================================
-# 4. ΔΙΑΧΕΙΡΙΣΗ ΧΡΗΣΤΩΝ
-# =========================================================
+
 @admin_bp.route('/users', methods=['GET'])
 @jwt_required()
 @admin_required
@@ -169,9 +172,6 @@ def get_all_users():
 
 
 
-# =========================================================
-# 5. ΔΙΑΧΕΙΡΙΣΗ ΣΗΜΕΙΩΣΕΩΝ ΚΑΙ ΣΧΟΛΙΩΝ
-# =========================================================
 @admin_bp.route('/notes', methods=['GET'])
 @jwt_required()
 @admin_required
@@ -246,9 +246,7 @@ def delete_comment(comment_id):
     return jsonify({"message": "Comment deleted"}), 200
 
 
-# =========================================================
-# 6. ΠΡΟΣΘΗΚΗ ΝΕΟΥ ΜΑΘΗΜΑΤΟΣ
-# =========================================================
+
 @admin_bp.route('/add-course', methods=['POST'])
 @jwt_required()
 @admin_required
@@ -267,12 +265,12 @@ def add_course():
     if semester in ("", None, 0):
         semester = None
 
-    # Έλεγχος αν υπάρχει ήδη μάθημα με το ίδιο όνομα
+   
     existing = Course.query.filter_by(name=name).first()
     if existing:
         return jsonify({'error': 'Το μάθημα υπάρχει ήδη'}), 409
 
-    # Δημιουργία νέου μαθήματος
+   
     new_course = Course(name=name, semester=semester, type=ctype)
     db.session.add(new_course)
     db.session.commit()
@@ -287,7 +285,7 @@ def delete_course(course_id):
     if not course:
         return jsonify({"error": "Course not found"}), 404
 
-    # έλεγχος αν το μάθημα έχει σημειώσεις
+  
     notes_count = Note.query.filter_by(course_id=course.id).count()
     if notes_count > 0:
         return jsonify({
@@ -353,7 +351,7 @@ def toggle_block_user(user_id):
     user.is_blocked = is_blocked
     db.session.commit()
 
-    # Δημιουργία ειδοποίησης
+
     message = "Ο λογαριασμός σου έχει μπλοκαριστεί από τον διαχειριστή." if is_blocked \
               else "Ο λογαριασμός σου έχει επανενεργοποιηθεί."
     notif = Notification(
@@ -380,12 +378,10 @@ def toggle_block_user(user_id):
 
     return jsonify({"message": f"User {'blocked' if is_blocked else 'unblocked'}."}), 200
 
-# =========================================================
-# 7. ΛΗΨΗ ΑΡΧΕΙΩΝ ΑΠΟ ADMIN
-# =========================================================
+
 @admin_bp.route('/download/<int:note_id>', methods=['GET'])
 def admin_download(note_id):
-    # 🔑 Ελέγχουμε αν δόθηκε token ως query param
+  
     token = request.args.get("jwt")
 
     if token:
@@ -396,7 +392,7 @@ def admin_download(note_id):
         except Exception as e:
             return jsonify({"error": "Invalid token"}), 401
     else:
-        # fallback → χρησιμοποιεί το Authorization header
+     
         try:
             verify_jwt_in_request()
         except NoAuthorizationError:

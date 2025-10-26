@@ -94,6 +94,9 @@ def create_app():
     @jwt.unauthorized_loader
     def missing_token_callback(reason):
         return jsonify(msg='Missing Authorization Header'), 401
+    
+    print("💡 ACTIVE FRONTEND_URL:", app.config.get('FRONTEND_URL'), file=sys.stderr)
+
 
     # cors related settings
     CORS(
@@ -103,7 +106,8 @@ def create_app():
             "https://admin-unihelp.imslab.gr", # Admin dashboard
             "https://unihelp.imslab.gr",       # UniHelp app
             "http://localhost:8080",           # Frontend dev
-            "http://localhost:4201",           # Admin dashboard dev
+            "http://localhost:4201",
+            "http://192.168.2.6:4201",
             "capacitor://localhost"            # iOS/Android build
         ]}},
         methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],

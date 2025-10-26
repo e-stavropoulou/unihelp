@@ -13,6 +13,7 @@ import {
   IonInput,
   IonButton,
   IonList,
+  IonFooter,
   IonItem,
   IonLabel,
   IonTextarea,
@@ -41,6 +42,7 @@ import { environment } from 'src/environments/environment';
     IonList,
     IonItem,
     IonLabel,
+    IonFooter,
     IonTextarea,
     CommonModule,
     FormsModule,
@@ -170,7 +172,7 @@ export class BotPage implements OnInit {
   async confirmClearMessages() {
     const alert = await this.alertCtrl.create({
       header: 'Καθαρισμός Συνομιλίας',
-      message: 'Θέλεις σίγουρα να διαγράψεις όλα τα μηνύματα του bot;',
+      message: 'Θέλεις σίγουρα να διαγράψεις όλα τα μηνύματα με την Thinkerbell;',
       buttons: [
         {
           text: 'Ακύρωση',
