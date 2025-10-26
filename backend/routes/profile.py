@@ -29,14 +29,14 @@ def get_profile():
     if user.avatar_url:
         print(f"🟡 [BACKEND DEBUG] Raw avatar_url in DB for user {user.id}: {user.avatar_url}")
 
-        # Αν είναι ήδη full URL (π.χ. http://localhost:5050/...)
+    
         if user.avatar_url.startswith("http"):
             filename = user.avatar_url.split("/")[-1]
         else:
-            # Αν είναι relative (/static/avatars/...)
+      
             filename = user.avatar_url.split("/")[-1]
 
-        avatar_url = f"{BASE_URL}/static/avatars/{filename}"
+        avatar_url = f"{BASE_URL}/uploads/avatars/{filename}"
         print(f"🖼️ [BACKEND DEBUG] Final avatar_url for user {user.id}: {avatar_url}")
 
 
@@ -79,8 +79,8 @@ def upload_avatar():
     filepath = os.path.join(UPLOAD_FOLDER, filename)
     file.save(filepath)
 
-    # Σώζουμε ΠΑΝΤΑ full URL στη βάση
-    avatar_url = f"{BASE_URL}/static/avatars/{filename}"
+    avatar_url = f"{BASE_URL}/uploads/avatars/{filename}"
+
     user.avatar_url = avatar_url
     db.session.commit()
 
@@ -92,11 +92,12 @@ def upload_avatar():
     }), 200
 
 
-@profile_bp.route('/static/avatars/<filename>')
+@profile_bp.route('/uploads/avatars/<filename>')
 def serve_avatar(filename):
     response = send_from_directory(UPLOAD_FOLDER, filename)
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
+
 
 
 @profile_bp.route('/update-profile', methods=['POST'])

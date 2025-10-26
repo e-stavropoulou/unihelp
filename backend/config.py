@@ -5,13 +5,13 @@ from datetime import timedelta
 
 env = os.getenv("FLASK_ENV", "development")
 
-if env == "production":
-    load_dotenv(".env.production")
-else:
-    load_dotenv(".env")
+dotenv_file = ".env.production" if env == "production" else ".env"
+load_dotenv(dotenv_file)
+print(f"📦 [config.py] Loaded environment from {dotenv_file}")
 
-BASE_URL = os.getenv("BASE_URL", "https://api-unihelp.imslab.gr")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://unihelp.imslab.gr")
+
+BASE_URL = os.getenv("BASE_URL", "http://192.168.2.6:5050")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8080")
 JWT_SECRET = os.getenv("JWT_SECRET", "fallback-secret")
 SQLALCHEMY_DATABASE_URI = os.getenv(
     "DATABASE_URI",

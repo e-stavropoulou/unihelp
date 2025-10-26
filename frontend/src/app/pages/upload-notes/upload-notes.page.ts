@@ -7,6 +7,8 @@ import { ToastService } from 'src/app/services/toast.service';
 import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/auth.service';
 import { NotificationsService } from 'src/app/services/notifications.service';
+import { HttpEventType } from '@angular/common/http';
+
 
 
 @Component({
@@ -30,6 +32,8 @@ export class UploadNotesPage implements OnInit {
   selectedCourseType: string | null = null;
   courses: any[] = [];
   showDropdown: boolean = false;
+  isUploading = false;
+  uploadProgress = 0;
   
 
 
@@ -130,28 +134,39 @@ export class UploadNotesPage implements OnInit {
   
 
   async onSubmit() {
+    if (this.isUploading) return; // ✅ μπλοκάρει διπλό κλικ
+  
+    this.isUploading = true;
+    this.uploadProgress = 0;
+  
     const formData = new FormData();
     formData.append('title', this.title);
     formData.append('description', this.description || '');
     formData.append('category', this.category);
     formData.append('course_id', this.courseId?.toString() || '');
-
+  
     for (let file of this.files) {
       formData.append('files', file);
     }
-
+  
     this.http.post(`${environment.API_URL}/upload-note`, formData, {
-      headers: {
-        Authorization: `Bearer ${this.authService.getToken()}`
-      }
+      headers: { Authorization: `Bearer ${this.authService.getToken()}` },
+      reportProgress: true,
+      observe: 'events'
     }).subscribe({
-      next: async res => {
-        this.toastService.present('Οι σημειώσεις ανέβηκαν με επιτυχία!', 'success');
-        this.notificationService.refreshUnreadCount();
-        this.navCtrl.back();
+      next: (event: any) => {
+        if (event.type === HttpEventType.UploadProgress) {
+          this.uploadProgress = Math.round(100 * event.loaded / event.total);
+        } else if (event.type === HttpEventType.Response) {
+          this.toastService.present('Οι σημειώσεις ανέβηκαν με επιτυχία!', 'success');
+          this.notificationService.refreshUnreadCount();
+          this.isUploading = false;
+          this.navCtrl.back();
+        }
       },
-      error: async err => {
+      error: () => {
         this.toastService.present('Κάτι πήγε στραβά. Δοκίμασε ξανά.', 'error');
+        this.isUploading = false;
       }
     });
   }

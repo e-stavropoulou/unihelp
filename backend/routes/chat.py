@@ -28,9 +28,7 @@ def to_athens_iso(dt: datetime) -> str:
     return dt.astimezone(ATHENS_TZ).isoformat()
 
 
-# -------------------------------------------------------------------
-# Δημιουργία ή εύρεση chat
-# -------------------------------------------------------------------
+
 @chat_bp.route('/chats/<int:other_user_id>', methods=['POST'])
 @jwt_required()
 def start_or_get_chat(other_user_id):
@@ -53,9 +51,7 @@ def start_or_get_chat(other_user_id):
     return jsonify({"chat_id": new_chat.id})
 
 
-# -------------------------------------------------------------------
-# Λίστα chats χρήστη
-# -------------------------------------------------------------------
+
 @chat_bp.route('/chats', methods=['GET'])
 @jwt_required()
 def get_user_chats():
@@ -105,9 +101,7 @@ def get_user_chats():
     return jsonify(result)
 
 
-# -------------------------------------------------------------------
-# Ανάκτηση μηνυμάτων
-# -------------------------------------------------------------------
+
 @chat_bp.route('/chats/<int:chat_id>/messages', methods=['GET'])
 @jwt_required()
 def get_chat_messages(chat_id):
@@ -152,9 +146,7 @@ def get_chat_messages(chat_id):
         return jsonify({"error": str(e)}), 500
 
 
-# -------------------------------------------------------------------
-# Αποστολή μηνύματος
-# -------------------------------------------------------------------
+
 @chat_bp.route('/chats/<int:chat_id>/messages', methods=['POST'])
 @jwt_required()
 def send_message(chat_id):
@@ -235,9 +227,7 @@ def send_message(chat_id):
         return jsonify({"error": str(e)}), 500
 
 
-# -------------------------------------------------------------------
-# Unread count
-# -------------------------------------------------------------------
+
 @chat_bp.route('/messages/unread-count', methods=['GET'])
 @jwt_required()
 def get_unread_message_count():
@@ -250,9 +240,7 @@ def get_unread_message_count():
     return jsonify({"unread_count": count})
 
 
-# -------------------------------------------------------------------
-# Mark messages as read
-# -------------------------------------------------------------------
+
 @chat_bp.route('/chats/<int:chat_id>/mark-read', methods=['PUT'])
 @jwt_required()
 def mark_messages_as_read(chat_id):
@@ -267,9 +255,7 @@ def mark_messages_as_read(chat_id):
     return jsonify({"message": "Messages marked as read"})
 
 
-# -------------------------------------------------------------------
-# Hide chat
-# -------------------------------------------------------------------
+
 @chat_bp.route('/chats/<int:chat_id>/hide', methods=['POST'])
 @jwt_required()
 def hide_chat(chat_id):
@@ -303,9 +289,6 @@ def hide_chat(chat_id):
     return jsonify({"message": "Chat hidden for this user"})
 
 
-# -------------------------------------------------------------------
-# Manual unhide
-# -------------------------------------------------------------------
 def unhide_and_reset_visibility(user_id: int, chat_id: int) -> None:
     vis = ChatVisibility.query.filter_by(user_id=user_id, chat_id=chat_id).first()
     if vis:
@@ -320,15 +303,13 @@ def unhide_and_reset_visibility(user_id: int, chat_id: int) -> None:
             chat_id=chat_id,
             hidden=False,
             hidden_at=None,
-            reset_at=datetime.utcnow()
+            reset_at=None
         )
         db.session.add(vis)
     db.session.add(vis)
 
 
-# -------------------------------------------------------------------
-# Partner info (για header στο chat)
-# -------------------------------------------------------------------
+
 @chat_bp.route('/chats/<int:chat_id>/partner', methods=['GET'])
 @jwt_required()
 def get_chat_partner(chat_id):

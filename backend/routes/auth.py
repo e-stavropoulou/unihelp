@@ -41,9 +41,7 @@ JWT_EXPIRATION_MINUTES = 60
 ATHENS_TZ = ZoneInfo("Europe/Athens")
 
 def to_athens_iso(dt: datetime) -> str:
-    """
-    datetime (UTC ή naive) se ISO string Europe/Athens
-    """
+   
     if dt is None:
         return None
     if dt.tzinfo is None:
@@ -495,14 +493,13 @@ def delete_note(note_id):
         return jsonify({'error': 'Δεν έχεις δικαίωμα διαγραφής αυτής της σημείωσης.'}), 403
 
     try:
-        # 🗑️ Διαγραφή αρχείου αν υπάρχει
         if note.filepath and os.path.exists(note.filepath):
             os.remove(note.filepath)
             print(f"🗑️ Αρχείο διαγράφηκε: {note.filepath}")
         else:
             print(f"⚠️ Το αρχείο δεν βρέθηκε στο filesystem: {note.filepath}")
 
-        # 🗑️ Διαγραφή σημείωσης (θα καθαρίσει αυτόματα favorites/comments/reports λόγω cascade)
+       
         db.session.delete(note)
         db.session.commit()
 

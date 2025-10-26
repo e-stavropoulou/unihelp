@@ -6,6 +6,11 @@ const config: CapacitorConfig = {
   webDir: 'www',
   server: {
     cleartext: true
+  },
+  plugins: {
+    Keyboard: {
+      resize: 'body'
+    }
   }
 };
 

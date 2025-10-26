@@ -92,4 +92,12 @@
     white-space: nowrap;
   }
   
+  ion-title {
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    text-align: center;
+    font-size: 17px; /* μπορείς να το μικρύνεις λίγο για κινητό */
+    padding: 0 40px; /* αφήνει χώρο για το back button */
+    line-height: 1.2;
+  }
   

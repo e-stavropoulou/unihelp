@@ -16,25 +16,31 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<!-- 💬 Περιοχή μηνυμάτων -->
+<ion-content
+  [fullscreen]="true"
+  class="ion-padding"
+  scroll-events="true"
+  keyboard-offset="true"
+  #content
+>
+  <div *ngFor="let msg of messages" [ngClass]="msg.role === 'user' ? 'user-msg' : 'bot-msg'">
+    <div class="bubble">
+      <strong *ngIf="msg.role === 'user'">👤 Εσύ:</strong>
+      <strong *ngIf="msg.role === 'bot'">🪄 Thinkerbell:</strong>
+      <p>{{ msg.text }}</p>
+    </div>
+  </div>
 
-  <ion-list lines="none">
-    <ion-item *ngFor="let msg of messages" [class.user-msg]="msg.role === 'user'" [class.bot-msg]="msg.role === 'bot'">
-      <ion-label>
-        <strong *ngIf="msg.role === 'user'">👤 Εσύ:</strong>
-        <strong *ngIf="msg.role === 'bot'">🪄Thinkerbell:</strong>
-        <p>{{ msg.text }}</p>
-      </ion-label>
-    </ion-item>
+  <div *ngIf="isLoading" class="bot-msg">
+    <div class="bubble loading">🧚‍♀️ Σκέφτομαι...</div>
+  </div>
 
-    <ion-item *ngIf="isLoading">
-      <ion-label color="medium">🧚‍♀️ Σκέφτομαι...</ion-label>
-    </ion-item>
+  <div style="height: 10px;"></div>
+</ion-content>
 
-    <div #bottom></div> 
-  </ion-list>
-
-  <!-- ✏️ Input για νέα ερώτηση -->
+<!-- ✏️ Input + κουμπί μέσα στο footer -->
+<ion-footer class="chat-footer">
   <ion-item class="input-area">
     <ion-textarea
       [(ngModel)]="userInput"
@@ -46,5 +52,4 @@
   <ion-button expand="block" (click)="sendMessage()" [disabled]="isLoading || !userInput.trim()">
     {{ isLoading ? 'Αποστολή...' : 'Αποστολή' }}
   </ion-button>
-
-</ion-content>
+</ion-footer>

@@ -13,17 +13,19 @@
 </ion-header>
 
 
-<ion-content class="ion-padding chat-content">
-  <div *ngFor="let msg of messages" class="message-row" [ngClass]="{ 'me': msg.sender_id === userId, 'other': msg.sender_id !== userId }">
-    <div class="bubble">{{ msg.content }}</div>
-    <div class="timestamp">
-      {{ msg.timestamp ? (msg.timestamp | date:'shortTime') : '⏳ no timestamp' }}
+<ion-content class="chat-content">
+  <div class="messages-container">
+    <div *ngFor="let msg of messages" 
+         class="message-row" 
+         [ngClass]="{ 'me': msg.sender_id === userId, 'other': msg.sender_id !== userId }">
+      <div class="bubble">{{ msg.content }}</div>
+      <div class="timestamp">
+        {{ msg.timestamp ? (msg.timestamp | date:'shortTime') : '⏳ no timestamp' }}
+      </div>
     </div>
-    
-    
-    
   </div>
 </ion-content>
+
 
 <ion-footer class="input-footer">
   <ion-toolbar>

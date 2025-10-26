@@ -164,18 +164,31 @@ export class NotesFeedPage implements OnInit {
       await this.toastService.present('Πρέπει να είσαι συνδεδεμένος για να ανοίξεις σημειώσεις.', 'error');
       return;
     }
+    
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+
+    this.http.post(`${environment.API_URL}/notes/${note.id}/increment-downloads`, {}, { headers })
+    .subscribe({
+      next: (res: any) => {
+        this.zone.run(() => {
+          note.downloads = res.downloads; 
+        });
+      },
+      error: (err) => {
+        console.error('Download increment error:', err);
+      }
+    });
+
+    
   
     // ✅ Χτίζουμε direct URL με JWT στο query
     const directUrl = `${environment.API_URL}/download/${note.id}?jwt=${encodeURIComponent(token)}`;
-  
-    if (this.isMobile) {
-      // iOS/Android: in-app browser (SafariViewController/Chrome Custom Tab)
-      await Browser.open({ url: directUrl });
-    } else {
-      // Web: νέα καρτέλα
-      window.open(directUrl, '_blank', 'noopener,noreferrer');
-    }
+  if (this.isMobile) {
+    await Browser.open({ url: directUrl });
+  } else {
+    window.open(directUrl, '_blank', 'noopener,noreferrer');
   }
+}
 
   toggleComments(note: any) {
     note.showComments = !note.showComments;
