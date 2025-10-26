@@ -2,7 +2,7 @@
 
 ## Overview
 
-**UniHelp** is a hybrid mobile and web (PWA) application developed using **Ionic + Angular** for the frontend and **Flask (Python)** for the backend.UniHelp aims to support university students throughout their academic process by providing a centralized and intelligent environment for managing study materials, connecting with peers, and leveraging AI assistance.
+**UniHelp** is a hybrid mobile and web (PWA) application developed using **Ionic + Angular** for the frontend and **Flask (Python)** for the backend. UniHelp aims to support university students throughout their academic process by providing a centralized and intelligent environment for managing study materials, connecting with peers, and leveraging AI assistance.
 It offers a seamless mobile and web experience (via PWA) that allows students to upload, explore, and interact with academic content efficiently.
 
 ---
