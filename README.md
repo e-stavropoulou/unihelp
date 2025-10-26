@@ -62,7 +62,7 @@ Frontend ↔ FCM ↔ Backend
 
 ## Demo Video
 
-(Coming soon — a demonstration video will be added once published.)
+[![UniHelp Demo Video](https://img.youtube.com/vi/1gppOfO6knI/mqdefault.jpg)](https://youtu.be/1gppOfO6knI)
 
 ---
 
