@@ -110,3 +110,10 @@ backend/__pycache__/
 *.p12
 *.p8
 *.keystore
+
+
+gitleaks.json
+gitleaks.toml
+gitleaks-report.*
+*.sarif
+.cache_ggshield/
