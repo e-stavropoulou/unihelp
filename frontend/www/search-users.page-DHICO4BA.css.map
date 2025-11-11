@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/pages/search-users/search-users.page.scss"],
+  "sourcesContent": ["/* search-users.page.scss */\n\nion-searchbar {\n    margin-bottom: 16px;\n  }\n  \nion-list {\n  background: transparent !important;\n  padding: 0;\n  margin: 0;\n}\n\nion-item {\n  --background: transparent !important;\n  background: transparent !important;\n  border: none !important;\n  box-shadow: none !important;\n  --inner-border-width: 0;\n  padding: 12px 0;\n  min-height: 60px;\n}\n\nion-label h2 {\n  font-size: 15px;\n  font-weight: 600;\n  color: #000;\n}\n\nion-label p {\n  font-size: 13px;\n  color: #555;\n  margin-top: 2px;\n}\n\nion-item::after {\n  content: \"\";\n  display: block;\n  height: 1px;\n  background: rgba(140, 19, 16, 0.2);\n  margin: 0 0 0 12px; \n}\n"],
+  "mappings": "AAEA,cACI,cAAA,KAGJ,SACE,WAAA,sBAPF,QAQE,EARF,OASE,EAGF,SACE,cAAA,uBACA,WAAA,sBACA,OAAA,eACA,WAAA,eACA,sBAAA,EAjBF,QAkBE,KAAA,EACA,WAAA,KAGF,UAAA,GACE,UAAA,KACA,YAAA,IACA,MAAA,KAGF,UAAA,EACE,UAAA,KACA,MAAA,KACA,WAAA,IAGF,QAAA,OACE,QAAA,GACA,QAAA,MACA,OAAA,IACA,WAAA,UAtCF,OAuCE,EAAA,EAAA,EAAA",
+  "names": []
+}

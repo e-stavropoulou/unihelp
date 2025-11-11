@@ -26,13 +26,11 @@ def build_pipeline():
 
     print("🔄 Initializing RAG pipeline...", file=sys.stderr)
 
-    # Φόρτωση FAISS index
     embedding = OpenAIEmbeddings(model="text-embedding-3-small")
     vectorstore = FAISS.load_local("faiss_index", embedding, allow_dangerous_deserialization=True)
 
     base_retriever = vectorstore.as_retriever(search_kwargs={"k": 20})
 
-    # Εύρεση summary doc
     summary_doc = None
     for doc in vectorstore.similarity_search("πίνακας μεταδεδομένων", k=20):
         if doc.metadata.get("type") == "global_summary":
@@ -40,7 +38,6 @@ def build_pipeline():
             print("✅ Βρέθηκε το summary document ✅", file=sys.stderr)
             break
 
-    # Custom retriever με summary boost
     class SummaryBoostingRetriever(BaseRetriever):
         def __init__(self, base_retriever, summary_doc):
             super().__init__()
@@ -112,7 +109,7 @@ def build_pipeline():
 
     history_aware_retriever = create_history_aware_retriever(
     llm,
-    retriever,   # εδώ βάζεις τον SummaryBoostingRetriever
+    retriever,   
     contextualize_prompt
 )
 
@@ -154,7 +151,7 @@ def ask_rag():
 
         return jsonify({
             "result": res["answer"],
-            "source_docs": [doc.metadata for doc in res["context"]]  # προσοχή: τώρα γυρνάει "context"
+            "source_docs": [doc.metadata for doc in res["context"]]  
         })
 
     except Exception as e:

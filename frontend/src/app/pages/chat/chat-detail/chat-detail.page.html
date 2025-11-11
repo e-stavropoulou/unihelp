@@ -5,15 +5,25 @@
     </ion-buttons>
 
     
-    <div class="chat-header-user">
-      <img [src]="chatPartnerAvatarUrl || 'assets/img/placeholder-avatar.png'" class="avatar-img" />
-      <span class="chat-partner-name">{{ chatPartnerName || 'Συνομιλία' }}</span>
+    <div class="chat-header-user" *ngIf="chatPartnerName || isNewChat">
+      <img
+        [src]="chatPartnerAvatarUrl || 'assets/img/placeholder-avatar.png'"
+        class="avatar-img"
+        alt="avatar"
+      />
+      <span class="chat-partner-name">
+        {{ chatPartnerName || 'Φόρτωση...' }}
+      </span>
     </div>
   </ion-toolbar>
 </ion-header>
 
 
-<ion-content class="chat-content">
+<ion-content
+  class="chat-content"
+  scroll-y="true"
+  [scrollEvents]="true"
+  (ionScroll)="onScroll($event)">
   <div class="messages-container">
     <div *ngFor="let msg of messages" 
          class="message-row" 

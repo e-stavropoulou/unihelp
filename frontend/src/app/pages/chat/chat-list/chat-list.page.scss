@@ -1,11 +1,9 @@
-/* 🔹 Ενιαίο background στη λίστα */
 ion-list {
   background: transparent !important;
   padding: 0; 
   margin: 0;
 }
 
-/* 🔹 Κάθε chat item */
 ion-item {
   --background: transparent !important;
   background: transparent !important;
@@ -16,14 +14,12 @@ ion-item {
   min-height: 60px;
 }
 
-/* 🔹 Avatar styling */
 ion-avatar img {
   border: 2px solid #7B1E3B; 
   border-radius: 50%; 
   object-fit: cover;
 }
 
-/* 🔹 Label (username + badge) */
 ion-label h2 {
   font-size: 15px;
   font-weight: 500;
@@ -33,12 +29,10 @@ ion-label h2 {
   justify-content: space-between;
 }
 
-/* 🔹 Bold αν έχει αδιάβαστα */
 .bold-chat {
   font-weight: bold;
 }
 
-/* 🔹 Badge για αδιάβαστα */
 .chat-badge {
   margin-left: 6px;
   font-size: 12px;
@@ -46,7 +40,6 @@ ion-label h2 {
   border-radius: 12px;
 }
 
-/* 🔹 Διαχωριστικό ανάμεσα στις συνομιλίες */
 ion-item::after {
   content: "";
   display: block;

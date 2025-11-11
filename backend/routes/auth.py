@@ -480,16 +480,16 @@ def delete_note(note_id):
 
     user_id = get_jwt_identity()
     user = User.query.get(int(user_id))
-    print(f"🟢 Διαγραφή σημείωσης: note_id={note_id}, user_id={user_id}")
+    print(f" Διαγραφή σημείωσης: note_id={note_id}, user_id={user_id}")
 
     note = Note.query.get(note_id)
 
     if not note:
-        print("❌ Σημείωση δεν βρέθηκε στη βάση")
+        print(" Σημείωση δεν βρέθηκε στη βάση")
         return jsonify({'error': 'Η σημείωση δεν βρέθηκε.'}), 404
 
     if note.user_id != user.id:
-        print(f"❌ Ο χρήστης {user.id} προσπάθησε να διαγράψει σημείωση που ανήκει στον {note.user_id}")
+        print(f"Ο χρήστης {user.id} προσπάθησε να διαγράψει σημείωση που ανήκει στον {note.user_id}")
         return jsonify({'error': 'Δεν έχεις δικαίωμα διαγραφής αυτής της σημείωσης.'}), 403
 
     try:
@@ -503,11 +503,11 @@ def delete_note(note_id):
         db.session.delete(note)
         db.session.commit()
 
-        print(f"✅ Η σημείωση {note.id} διαγράφηκε επιτυχώς από DB")
+        print(f"Η σημείωση {note.id} διαγράφηκε επιτυχώς από DB")
         return jsonify({'message': 'Η σημείωση διαγράφηκε επιτυχώς.'}), 200
 
     except Exception as e:
-        print("❌ Σφάλμα κατά τη διαγραφή:", str(e))
+        print("Σφάλμα κατά τη διαγραφή:", str(e))
         traceback.print_exc()
         db.session.rollback()
         return jsonify({'error': f'Σφάλμα κατά τη διαγραφή: {str(e)}'}), 500

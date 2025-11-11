@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/pages/points-info/points-info.page.scss"],
+  "sourcesContent": [".info-text {\n    font-size: 15px;\n    line-height: 1.6;\n    color: #333;\n  \n    h3 {\n      font-size: 16px;\n      font-weight: 600;\n      margin: 16px 0 8px;\n      color: #7B1E3B;\n    }\n  \n    ul {\n      padding-left: 18px;\n      margin-bottom: 1rem;\n  \n      li {\n        margin-bottom: 6px;\n        list-style: none;\n        position: relative;\n        padding-left: 1.2em;\n  \n        &::before {\n          content: \"•\";\n          color: #7B1E3B;\n          position: absolute;\n          left: 0;\n        }\n      }\n    }\n  \n    p {\n      margin-bottom: 12px;\n    }\n  \n    a {\n      color: #7B1E3B;\n      text-decoration: underline;\n    }\n  }\n  \n  .info-text i {\n    color: white;\n  }\n  "],
+  "mappings": "iBAAA,CAAA,UACI,UAAA,KACA,YAAA,IACA,MAAA,KAEA,CALJ,UAKI,GACE,UAAA,KACA,YAAA,WACA,KAAA,EAAA,IACA,MAAA,QAGF,CAZJ,UAYI,GACE,aAAA,KACA,cAAA,KAEA,CAhBN,UAgBM,GAAA,GACE,cAAA,IACA,WAAA,KACA,SAAA,SACA,aAAA,MAEA,CAtBR,UAsBQ,GAAA,EAAA,QACE,QAAA,QACA,MAAA,QACA,SAAA,SACA,KAAA,EAKN,CA/BJ,UA+BI,EACE,cAAA,KAGF,CAnCJ,UAmCI,EACE,MAAA,QACA,gBAAA,UAIJ,CAzCF,UAyCE,EACE,MAAA",
+  "names": []
+}

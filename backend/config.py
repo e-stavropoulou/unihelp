@@ -10,12 +10,12 @@ load_dotenv(dotenv_file)
 print(f"📦 [config.py] Loaded environment from {dotenv_file}")
 
 
-BASE_URL = os.getenv("BASE_URL", "http://192.168.2.6:5050")
+BASE_URL = os.getenv("BASE_URL", "http://localhost:5050")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:8080")
 JWT_SECRET = os.getenv("JWT_SECRET", "fallback-secret")
 SQLALCHEMY_DATABASE_URI = os.getenv(
     "DATABASE_URI",
-    "mysql+pymysql://unihelp:supersecurepass@localhost/unihelp" # fallback
+    "mysql+pymysql://unihelp:supersecurepass@localhost/unihelp" 
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -29,9 +29,8 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # JWT config
 JWT_SECRET_KEY = JWT_SECRET
-JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)   # access λήγει σε 30 λεπτά
-JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)      # refresh ισχύει 7 μέρες
+JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=30)   
+JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)      
 
-# 👇 Επιπλέον ρυθμίσεις για να δουλεύει και με ?jwt=...
 JWT_TOKEN_LOCATION = ["headers", "query_string"]
 JWT_QUERY_STRING_NAME = "jwt"

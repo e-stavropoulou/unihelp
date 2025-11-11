@@ -96,7 +96,6 @@ export class MyNotesPage implements OnInit {
               error: err => {
                 console.error('❌ Delete note error:', err);
               
-                // Εμφάνισε πιο αναλυτικά το περιεχόμενο
                 if (err && typeof err === 'object') {
                   try {
                     console.log('🔍 Error JSON:', JSON.stringify(err));
@@ -127,14 +126,11 @@ export class MyNotesPage implements OnInit {
       return;
     }
   
-    // ✅ Direct URL με JWT στο query
     const directUrl = `${environment.API_URL}/download/${note.id}?jwt=${encodeURIComponent(token)}`;
   
     if (Capacitor.isNativePlatform()) {
-      // iOS/Android
       Browser.open({ url: directUrl });
     } else {
-      // Web
       window.open(directUrl, '_blank', 'noopener,noreferrer');
     }
   }

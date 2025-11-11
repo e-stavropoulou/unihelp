@@ -1,8 +1,8 @@
 export const environment = {
   production: false,
-  API_URL: 'http://192.168.2.6:5050',
+  API_URL: 'http://localhost:5050',
 
-  ADMIN_ORIGIN: 'http://192.168.2.6:4201',
+  ADMIN_ORIGIN: 'http://localhost:4201',
   UNIHELP_ORIGIN: 'http://localhos:8080',
 
 

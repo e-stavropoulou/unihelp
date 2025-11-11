@@ -7,7 +7,6 @@ import { NgZone } from '@angular/core';
 
 
 
-
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
@@ -53,6 +52,11 @@ export class ChatDetailPage implements OnInit {
   chatPartnerName: string = '';
   chatPartnerAvatarUrl: string = '';
   private messageSub!: Subscription;
+  recipientId: number | null = null;
+  isNewChat = false;
+  isUserNearBottom: boolean = true;
+
+
 
 
   constructor(
@@ -73,16 +77,25 @@ export class ChatDetailPage implements OnInit {
       this.returnTo = nav.extras.state['returnTo'];
     }
   
-    this.chatId = Number(this.route.snapshot.paramMap.get('chatId'));
-    this.chatService.setCurrentChatId(this.chatId);
-
-
+    const idParam = this.route.snapshot.paramMap.get('chatId');
+    this.chatId = idParam === 'new' ? 0 : Number(idParam);
+    this.isNewChat = idParam === 'new';
+  
+    this.recipientId = Number(this.route.snapshot.queryParamMap.get('recipient_id'));
+  
+    this.chatService.setCurrentChatId(this.chatId || null);
+  
     const storedUserId = localStorage.getItem('user_id');
     this.userId = storedUserId ? Number(storedUserId) : 0;
+
+    if (this.isNewChat) {
+      this.loadChatPartnerInfo();
+    } else {
+      this.loadMessages();
+      this.loadChatPartnerInfo();
+    }
   
-    this.loadMessages();
-    this.loadChatPartnerInfo();
-    
+   
     this.messageSub = this.chatService.newChatMessage$.subscribe((message) => {
       if (!message) return;
   
@@ -91,7 +104,7 @@ export class ChatDetailPage implements OnInit {
   
       if (incomingChatId === currentChatId) {
         if (Number(message.sender_id) === this.userId) return;
-      
+  
         this.ngZone.run(() => {
           const cleanedMessage = {
             ...message,
@@ -99,14 +112,15 @@ export class ChatDetailPage implements OnInit {
             timestamp: new Date(message.timestamp || message.created_at || Date.now()),
             is_read: true
           };
-      
+  
           this.messages = [...this.messages, cleanedMessage];
           console.log('📩 Messages length after push:', this.messages.length);
           this.scrollToBottom();
         });
-      }      
+      }
     });
   }
+  
   
 
   ngOnDestroy() {
@@ -139,31 +153,65 @@ export class ChatDetailPage implements OnInit {
     setTimeout(() => this.scrollToBottom(), 200);
 
     this.pollingInterval = setInterval(() => {
-      this.loadMessages(true); // pass flag για να μη σβήνει το state
+      this.loadMessages(true); 
     }, 3000);
   }
 
   loadChatPartnerInfo() {
     const token = localStorage.getItem('token');
     if (!token) return;
-
-    const headers = {
-      Authorization: `Bearer ${token}`
-    };
-
+  
+    const headers = { Authorization: `Bearer ${token}` };
+  
+    if (this.isNewChat && this.recipientId) {
+      this.http
+        .get(`${environment.API_URL}/user-profile/${this.recipientId}`, { headers })
+        .subscribe({
+          next: (res: any) => {
+            this.chatPartnerName = res.username;
+  
+            if (res.avatar_url) {
+              const isAbsolute = res.avatar_url.startsWith('http');
+              this.chatPartnerAvatarUrl = isAbsolute
+                ? res.avatar_url
+                : `${environment.API_URL}${res.avatar_url}`;
+            } else {
+              this.chatPartnerAvatarUrl = 'assets/img/placeholder-avatar.png';
+            }
+          },
+          error: (err) => {
+            console.error('❌ Σφάλμα φόρτωσης προφίλ παραλήπτη:', err);
+            this.chatPartnerName = 'Χρήστης';
+            this.chatPartnerAvatarUrl = 'assets/img/placeholder-avatar.png';
+          },
+        });
+      return;
+    }
+  
     this.http
       .get(`${environment.API_URL}/chats/${this.chatId}/partner`, { headers })
       .subscribe({
         next: (res: any) => {
           this.chatPartnerName = res.other_username;
-          this.chatPartnerAvatarUrl = res.other_avatar;
+  
+          if (res.other_avatar) {
+            const isAbsolute = res.other_avatar.startsWith('http');
+            this.chatPartnerAvatarUrl = isAbsolute
+              ? res.other_avatar
+              : `${environment.API_URL}${res.other_avatar}`;
+          } else {
+            this.chatPartnerAvatarUrl = 'assets/img/placeholder-avatar.png';
+          }
         },
         error: (err) => {
           console.error('❌ Σφάλμα συνομιλητή:', err);
           this.chatPartnerName = 'Χρήστης';
-        }
+          this.chatPartnerAvatarUrl = 'assets/img/placeholder-avatar.png';
+        },
       });
   }
+  
+  
 
   goBack() {
     this.router.navigateByUrl(this.returnTo);
@@ -218,10 +266,8 @@ export class ChatDetailPage implements OnInit {
             this.messages = parsed;
           }
   
-          // ✅ Περίμενε λίγο για να γίνει render και μετά scroll
-          setTimeout(() => {
-            this.content.scrollToBottom(300);
-          }, 400);
+          setTimeout(() => this.scrollToBottom(), 400);
+
         },
         error: (err) => console.error('🚫 Failed to fetch messages:', err)
       });
@@ -229,53 +275,70 @@ export class ChatDetailPage implements OnInit {
   
   
 
-  sendMessage() {
-    if (!this.newMessage.trim()) return;
-
+  async sendMessage() {
+    const content = this.newMessage.trim();
+    if (!content) return;
+  
     const token = localStorage.getItem('token');
     if (!token) return;
-
-    const headers = {
-      Authorization: `Bearer ${token}`
-    };
-
-    const messagePayload = {
-      content: this.newMessage
-    };
-
-    this.http
-  .post(`${environment.API_URL}/chats/${this.chatId}/messages`, messagePayload, { headers })
-  .subscribe({
-    next: (res: any) => {
+    const headers = { Authorization: `Bearer ${token}` };
+  
+    try {
+      if (this.isNewChat && this.recipientId) {
+        const res: any = await this.http
+          .post(`${environment.API_URL}/chats/${this.recipientId}`, {}, { headers })
+          .toPromise();
+  
+        this.chatId = res.chat_id;
+        this.isNewChat = false;
+      }
+  
+      const res: any = await this.http
+        .post(`${environment.API_URL}/chats/${this.chatId}/messages`, { content }, { headers })
+        .toPromise();
+  
       this.newMessage = '';
-
       const newMsg = {
         id: res.id,
         chat_id: this.chatId,
         sender_id: this.userId,
-        content: messagePayload.content,
+        content,
         timestamp: new Date(),
         is_read: true
       };
-
+  
       this.messages = [...this.messages, newMsg];
-      this.scrollToBottom();
-    },
-    error: (err) => console.error('🚫 Failed to send message:', err)
-  });
+      this.scrollToBottom(true);
 
-  }
-
-  async scrollToBottom() {
-    try {
-      await this.content.scrollToBottom(300);
-    } catch (e) {
-      // Αν αποτύχει (π.χ. IonContent δεν είναι έτοιμο ακόμα), κάνε retry
-      setTimeout(() => {
-        this.content.scrollToBottom(300);
-      }, 200);
+  
+      if (this.recipientId && !this.chatPartnerName) {
+        this.loadChatPartnerInfo();
+      }
+    } catch (err) {
+      console.error('🚫 Failed to send or create chat:', err);
     }
   }
+  
+
+  async scrollToBottom(force: boolean = false) {
+    if (!this.isUserNearBottom && !force) return;
+  
+    try {
+      await this.content.scrollToBottom(300);
+    } catch {
+      setTimeout(() => this.content.scrollToBottom(300), 200);
+    }
+  }
+  
+
+  async onScroll(ev: CustomEvent) {
+    const detail = ev.detail as any; 
+    const el = await this.content.getScrollElement();
+    const distanceFromBottom = detail.scrollHeight - detail.scrollTop - el.clientHeight;
+    const threshold = 100;
+    this.isUserNearBottom = distanceFromBottom < threshold;
+  }
+  
   
   
 }

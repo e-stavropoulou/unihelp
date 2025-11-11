@@ -56,11 +56,12 @@
     <ion-card *ngFor="let note of filteredNotes" class="note-card">
 
       <ion-card-content>
-        <div class="report-btn">
-          <ion-button size="small" fill="clear" (click)="goToReport(note.id)">
+        <div class="report-btn" *ngIf="note.user_id !== currentUserId">
+          <ion-button size="small" fill="clear" (click)="goToReport(note.id, note.user_id)">
             <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
           </ion-button>
         </div>
+        
       
         <!-- title + uploader -->
         <div class="note-header">
@@ -169,10 +170,11 @@
           <ion-button size="small" class="delete-btn" (click)="deleteComment(note, c)">Delete</ion-button>
         </ng-container>
     
-          <ion-button size="small" fill="clear" color="medium"
-            (click)="goToReport(note.id, c.user_id)">
-            <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
-          </ion-button>
+        <ion-button size="small" fill="clear" color="medium"
+        *ngIf="c.user_id !== currentUserId"
+        (click)="goToReport(note.id, c.user_id)">
+        <ion-icon slot="icon-only" name="warning-outline"></ion-icon>
+      </ion-button>      
           </div>
         </div>        
       </ng-template>

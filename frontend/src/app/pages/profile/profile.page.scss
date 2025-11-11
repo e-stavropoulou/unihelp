@@ -91,7 +91,7 @@ ion-button[color="danger"][fill="outline"] {
 /* === Container (Mobile default) === */
 .button-row {
   display: flex !important;
-  flex-direction: column !important;   /* 📱 Mobile: κάθετα */
+  flex-direction: column !important;   
   align-items: center !important;
   gap: 0.4rem !important;
   width: 100% !important;
@@ -99,7 +99,7 @@ ion-button[color="danger"][fill="outline"] {
 }
 
 .button-row ion-button {
-  width: 100% !important;    /* 📱 Full width */
+  width: 100% !important;    
   height: 44px !important;
   margin: 0 !important;
 }
@@ -119,26 +119,23 @@ ion-button[color="danger"][fill="outline"] {
     height: 44px !important;
   }
 
-  /* === 3 κουμπιά → όλα σε 1 σειρά === */
   .button-row:has(ion-button:nth-child(3)):not(:has(ion-button:nth-child(4))) {
     grid-template-columns: repeat(3, 220px) !important;
   }
 
-  /* === 4 κουμπιά → 2 + 2 === */
   .button-row:has(ion-button:nth-child(4)):not(:has(ion-button:nth-child(5))) {
     grid-template-columns: repeat(2, 220px) !important;
   }
 
- /* === 5 κουμπιά → 3 πάνω + 2 κάτω στα κενά === */
 .button-row:has(ion-button:nth-child(5)):not(:has(ion-button:nth-child(6))) {
-  grid-template-columns: repeat(5, 130px) !important; /* 5 στήλες ίσου πλάτους */
-  gap: 0.5rem !important;                           /* μικρότερο κενό */
+  grid-template-columns: repeat(5, 130px) !important;
+  gap: 0.5rem !important;                           
   justify-items: center !important;
 }
 
 .button-row:has(ion-button:nth-child(5)):not(:has(ion-button:nth-child(6)))
   ion-button {
-  width: 200px !important;  /* σταθερό πλάτος κουμπιών */
+  width: 200px !important;  
   height: 44px !important;
 }
 
@@ -166,7 +163,6 @@ ion-button[color="danger"][fill="outline"] {
 }
 
 
-/* === Tags === */
 .upoints-tag {
   background-color: #7B1E3B;
   color: white;
@@ -230,7 +226,6 @@ ion-popover {
   --backdrop-opacity: 0.2;
 }
 
-/* === Buttons small === */
 .mini-btn {
   font-size: 13px;
   --padding-start: 10px;

@@ -180,7 +180,7 @@ export class AppComponent implements OnInit {
           });
         }
       }
-    }, 60_000); // έλεγχος κάθε 1 λεπτό
+    }, 60_000); 
   }
   
   private isTokenExpiredSoon(token: string, minutes: number): boolean {

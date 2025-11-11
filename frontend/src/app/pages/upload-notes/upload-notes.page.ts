@@ -134,7 +134,7 @@ export class UploadNotesPage implements OnInit {
   
 
   async onSubmit() {
-    if (this.isUploading) return; // ✅ μπλοκάρει διπλό κλικ
+    if (this.isUploading) return; 
   
     this.isUploading = true;
     this.uploadProgress = 0;

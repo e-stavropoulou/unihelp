@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["src/app/pages/chat/chat-list/chat-list.page.scss"],
+  "sourcesContent": ["ion-list {\n  background: transparent !important;\n  padding: 0; \n  margin: 0;\n}\n\nion-item {\n  --background: transparent !important;\n  background: transparent !important;\n  border: none !important;\n  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08) !important;\n  --inner-border-width: 0; \n  padding: 10px 0;\n  min-height: 60px;\n}\n\nion-avatar img {\n  border: 2px solid #7B1E3B; \n  border-radius: 50%; \n  object-fit: cover;\n}\n\nion-label h2 {\n  font-size: 15px;\n  font-weight: 500;\n  color: #000;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n}\n\n.bold-chat {\n  font-weight: bold;\n}\n\n.chat-badge {\n  margin-left: 6px;\n  font-size: 12px;\n  padding: 2px 6px;\n  border-radius: 12px;\n}\n\nion-item::after {\n  content: \"\";\n  display: block;\n  height: 1px;\n  background: rgb(128, 3, 76); \n  margin: 0 0 0 60px; \n}\n"],
+  "mappings": "AAAA,SACE,WAAA,sBADF,QAEE,EAFF,OAGE,EAGF,SACE,cAAA,uBACA,WAAA,sBACA,OAAA,eACA,WAAA,EAAA,IAAA,KAAA,oBACA,sBAAA,EAXF,QAYE,KAAA,EACA,WAAA,KAGF,WAAA,IACE,OAAA,IAAA,MAAA,QAjBF,cAkBE,IACA,WAAA,MAGF,UAAA,GACE,UAAA,KACA,YAAA,IACA,MAAA,KACA,QAAA,KACA,YAAA,OACA,gBAAA,cAGF,CAAA,UACE,YAAA,IAGF,CAAA,WACE,YAAA,IACA,UAAA,KArCF,QAsCE,IAAA,IAtCF,cAuCE,KAGF,QAAA,OACE,QAAA,GACA,QAAA,MACA,OAAA,IACA,WAAA,QA9CF,OA+CE,EAAA,EAAA,EAAA",
+  "names": []
+}

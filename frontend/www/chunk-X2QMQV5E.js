@@ -1,0 +1,2 @@
+import{c as l}from"./chunk-G2M5FGVR.js";import{f as s}from"./chunk-D72WJ5EW.js";var o=class extends l{constructor(){super(),this._lastWindow=null}open(n){return s(this,null,function*(){this._lastWindow=window.open(n.url,n.windowName||"_blank")})}close(){return s(this,null,function*(){return new Promise((n,t)=>{this._lastWindow!=null?(this._lastWindow.close(),this._lastWindow=null,n()):t("No active window to close!")})})}},w=new o;export{w as Browser,o as BrowserWeb};
+//# sourceMappingURL=chunk-X2QMQV5E.js.map

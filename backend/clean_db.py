@@ -6,7 +6,7 @@ from models.notification import Notification
 from models.report import Report
 from models.comment import Comment
 from models.comment_history import CommentEditHistory
-from models.course import UserCourse   # κρατάμε Course
+from models.course import UserCourse   
 from models.chat import ChatRoom, Message
 from models.chat_history import ChatHistory
 from models.note import Note
@@ -15,10 +15,8 @@ from models.user_review import UserReview
 app = create_app()
 
 with app.app_context():
-    # Reset points
     User.query.update({User.upoints: 0})
 
-    # DIAGRAFI DEDOMENOS EKTOS APO COURSE
     Notification.query.delete()
     Report.query.delete()
     CommentEditHistory.query.delete()

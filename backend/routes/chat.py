@@ -63,30 +63,35 @@ def get_user_chats():
         func.max(Message.timestamp).label('last_message_time')
     ).group_by(Message.chat_id).subquery()
 
-    chats = db.session.query(ChatRoom, last_message_times.c.last_message_time). \
-        outerjoin(last_message_times, ChatRoom.id == last_message_times.c.chat_id). \
-        filter(
-            (ChatRoom.user1_id == current_user_id) | (ChatRoom.user2_id == current_user_id)
-        ). \
-        order_by(last_message_times.c.last_message_time.desc()).all()
+    hidden_chats_subq = db.session.query(ChatVisibility.chat_id).filter_by(
+        user_id=current_user_id,
+        hidden=True
+    )
 
-    log(f"Found {len(chats)} chats for user {current_user_id}")
+
+    chats = (
+        db.session.query(ChatRoom, last_message_times.c.last_message_time)
+        .outerjoin(last_message_times, ChatRoom.id == last_message_times.c.chat_id)
+        .filter(
+            ((ChatRoom.user1_id == current_user_id) | (ChatRoom.user2_id == current_user_id)),
+            ~ChatRoom.id.in_(hidden_chats_subq)  # 👈 ΕΞΑΙΡΟΥΜΕ ΤΑ HIDDEN
+        )
+        .order_by(last_message_times.c.last_message_time.desc())
+        .all()
+    )
+
     result = []
     for chat, last_time in chats:
         other_user_id = chat.user2_id if chat.user1_id == current_user_id else chat.user1_id
         other_user = User.query.get(other_user_id)
         if not other_user:
-            log(f"Chat {chat.id} partner {other_user_id} not found")
             continue
 
-        visibility = ChatVisibility.query.filter_by(
-            user_id=current_user_id, chat_id=chat.id
-        ).first()
-
-        unread_count = Message.query.filter_by(chat_id=chat.id, is_read=False) \
-            .filter(Message.sender_id != current_user_id).count()
-
-        log(f"Chat {chat.id} → other={other_user.username}, unread={unread_count}")
+        unread_count = (
+            Message.query.filter_by(chat_id=chat.id, is_read=False)
+            .filter(Message.sender_id != current_user_id)
+            .count()
+        )
 
         result.append({
             "chat_id": chat.id,
@@ -95,10 +100,9 @@ def get_user_chats():
             "other_avatar": other_user.avatar_url,
             "unread_count": unread_count,
             "last_message_time": to_athens_iso(last_time) if last_time else None,
-            "hidden": (visibility.hidden if visibility else False) if visibility else False
         })
 
-    return jsonify(result)
+    return jsonify(result) 
 
 
 
