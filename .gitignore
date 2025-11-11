@@ -99,3 +99,14 @@ backend/firebase/service-account.json
 *.credentials.json
 .cache_ggshield/
 .cache_ggshield/
+
+
+# Build artifacts from C extensions
+backend/mysqlclient-*/
+backend/__pycache__/
+
+# Sensitive files
+*.pem
+*.p12
+*.p8
+*.keystore
