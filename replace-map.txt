@@ -1,5 +1,0 @@
-regex:(apiKey\s*:\s*")[^"]+(")==>$1FAKE_FIREBASE_WEB_API_KEY$2
-regex:(vapidKey\s*:\s*")[^"]+(")==>$1FAKE_VAPID_PUBLIC_KEY$2
-regex:(messagingSenderId\s*:\s*")[^"]+(")==>$1FAKE_SENDER_ID$2
-regex:(appId\s*:\s*")[^"]+(")==>$1FAKE_APP_ID$2
-regex:(measurementId\s*:\s*")[^"]+(")==>$1FAKE_MEASUREMENT_ID$2
