@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/favorite-notes/favorite-notes.page.scss"],
-  "sourcesContent": ["\n.note-meta {\n    font-size: 14px;\n    color: #444;\n    margin-top: 8px;\n  \n    p {\n      margin: 4px 0;\n    }\n  }\n  \n  .actions {\n    display: flex;\n    justify-content: space-between;\n    align-items: center;\n    flex-wrap: wrap;\n    margin-top: 8px;\n  }\n  \n  .file-link {\n    text-decoration: none;\n    color: #7B1E3B;\n    font-weight: 600;\n    font-size: 14px;\n  \n    display: flex;\n    align-items: center;\n    gap: 4px;\n  }\n  \n  .remove-btn {\n    display: block;        \n    margin: 0 auto;        \n    color: #7B1E3B;\n    font-weight: bold;\n    font-size: 14px;\n    text-transform: uppercase;\n  }\n  "],
-  "mappings": "AACA,CAAA,UACI,UAAA,KACA,MAAA,KACA,WAAA,IAEA,CALJ,UAKI,EALJ,OAMM,IAAA,EAIJ,CAAA,QACE,QAAA,KACA,gBAAA,cACA,YAAA,OACA,UAAA,KACA,WAAA,IAGF,CAAA,UACE,gBAAA,KACA,MAAA,QACA,YAAA,IACA,UAAA,KAEA,QAAA,KACA,YAAA,OACA,IAAA,IAGF,CAAA,WACE,QAAA,MA9BJ,OA+BI,EAAA,KACA,MAAA,QACA,YAAA,IACA,UAAA,KACA,eAAA",
-  "names": []
-}

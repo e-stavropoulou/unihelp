@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/components/footer-nav/footer-nav.component.scss"],
-  "sourcesContent": [".icon-with-badge {\n    position: relative;\n    display: inline-block;\n  \n    .notification-icon {\n      font-size: 24px;\n    }\n  \n    .notif-badge {\n      position: absolute;\n      top: -4px;\n      right: -6px;\n      background-color: red;\n      color: white;\n      font-size: 10px;\n      font-weight: bold;\n      padding: 2px 5px;\n      border-radius: 50%;\n      min-width: 16px;\n      height: 16px;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n    }\n  }\n  "],
-  "mappings": "AAAA,CAAA,gBACI,SAAA,SACA,QAAA,aAEA,CAJJ,gBAII,CAAA,kBACE,UAAA,KAGF,CARJ,gBAQI,CAAA,YACE,SAAA,SACA,IAAA,KACA,MAAA,KACA,iBAAA,IACA,MAAA,KACA,UAAA,KACA,YAAA,IAfN,QAgBM,IAAA,IAhBN,cAiBM,IACA,UAAA,KACA,OAAA,KACA,QAAA,KACA,YAAA,OACA,gBAAA",
-  "names": []
-}

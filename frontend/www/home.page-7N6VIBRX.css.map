@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/home/home.page.scss"],
-  "sourcesContent": ["#container {\n  text-align: center;\n\n  position: absolute;\n  left: 0;\n  right: 0;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n#container strong {\n  font-size: 20px;\n  line-height: 26px;\n}\n\n#container p {\n  font-size: 16px;\n  line-height: 22px;\n\n  color: #8c8c8c;\n\n  margin: 0;\n}\n\n#container a {\n  text-decoration: none;\n}"],
-  "mappings": "AAAA,CAAA,UACE,WAAA,OAEA,SAAA,SACA,KAAA,EACA,MAAA,EACA,IAAA,IACA,UAAA,WAAA,MAGF,CAVA,UAUA,OACE,UAAA,KACA,YAAA,KAGF,CAfA,UAeA,EACE,UAAA,KACA,YAAA,KAEA,MAAA,QAnBF,OAqBE,EAGF,CAxBA,UAwBA,EACE,gBAAA",
-  "names": []
-}

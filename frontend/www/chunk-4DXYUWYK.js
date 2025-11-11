@@ -1,2 +1,0 @@
-import{b as r}from"./chunk-E77L6273.js";import{b as s}from"./chunk-OBG6AGUS.js";import{i as c,m as o,n as a}from"./chunk-LB57PFZX.js";import"./chunk-D72WJ5EW.js";var n=":host(.ion-color){color:var(--ion-color-base)}",d=(()=>{let t=class{constructor(e){c(this,e)}render(){let e=s(this);return o(a,{key:"361035eae7b92dc109794348d39bad2f596eb6be",class:r(this.color,{[e]:!0})},o("slot",{key:"c7b8835cf485ba9ecd73298f0529276ce1ea0852"}))}};return t.style=n,t})();export{d as ion_text};
-//# sourceMappingURL=chunk-4DXYUWYK.js.map

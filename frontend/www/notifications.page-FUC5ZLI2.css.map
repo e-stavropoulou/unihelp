@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/app/pages/notifications/notifications.page.scss"],
-  "sourcesContent": ["ion-list {\n    background: transparent !important;\n    padding: 0;\n    margin: 0;\n  }\n  \n  ion-item {\n    --background: transparent !important;\n    background: transparent !important;\n    border: none !important;\n    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;\n    --inner-border-width: 0;\n    padding: 12px 0;\n    align-items: flex-start;\n  }\n  \n  ion-label h3 {\n    font-size: 15px;\n    margin: 0 0 4px 0;\n    color: #000;\n  }\n  \n  ion-label p {\n    font-size: 13px;\n    color: #555;\n    margin: 0;\n  }\n  \n  ion-item::after {\n    content: \"\";\n    display: block;\n    height: 1px;\n    background: rgb(128, 3, 76); \n    margin: 8px 0 0 0; \n  }\n  \n  ion-buttons {\n    display: flex;\n    gap: 6px;\n  }\n  \n  ion-button {\n    --padding-start: 6px;\n    --padding-end: 6px;\n  }\n  "],
-  "mappings": "AAAA,SACI,WAAA,sBADJ,QAEI,EAFJ,OAGI,EAGF,SACE,cAAA,uBACA,WAAA,sBACA,OAAA,eACA,WAAA,EAAA,IAAA,KAAA,oBACA,sBAAA,EAXJ,QAYI,KAAA,EACA,YAAA,WAGF,UAAA,GACE,UAAA,KAjBJ,OAkBI,EAAA,EAAA,IACA,MAAA,KAGF,UAAA,EACE,UAAA,KACA,MAAA,KAxBJ,OAyBI,EAGF,QAAA,OACE,QAAA,GACA,QAAA,MACA,OAAA,IACA,WAAA,QAhCJ,OAiCI,IAAA,EAAA,EAGF,YACE,QAAA,KACA,IAAA,IAGF,WACE,iBAAA,IACA,eAAA",
-  "names": []
-}

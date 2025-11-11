@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["src/environments/environment.prod.ts"],
-  "sourcesContent": ["export const environment = {\n  production: true,\n  API_URL: 'http://localhost:5050',\n\n  ADMIN_ORIGIN: 'http://localhost:4201',\n  UNIHELP_ORIGIN: 'http://localhos:8080',\n\n  firebase: {\n    apiKey: \"AIzaSyB4jRTATu4V9_rEK1qzRKTuOU1sFtA8d1g\",\n    authDomain: \"unihelp-notifications.firebaseapp.com\",\n    projectId: \"unihelp-notifications\",\n    storageBucket: \"unihelp-notifications.appspot.com\", \n    messagingSenderId: \"480151685287\",\n    appId: \"1:480151685287:web:c7f858997f9a52055af382\",\n    measurementId: \"G-YHWF328860\"\n  },\n\n  vapidKey: \"BIsSXcHlg8P0Pgx7kLF6Yt2DPK1u47vFt5IsLMl-glIMUrb6uF_Bh1U90N5otuxwASqUHSHs5Z1VzDk37ixT7CM\",\n\n  \n};\n"],
-  "mappings": "AAAO,IAAMA,EAAc,CACzBC,WAAY,GACZC,QAAS,wBAETC,aAAc,wBACdC,eAAgB,uBAEhBC,SAAU,CACRC,OAAQ,0CACRC,WAAY,wCACZC,UAAW,wBACXC,cAAe,oCACfC,kBAAmB,eACnBC,MAAO,4CACPC,cAAe,gBAGjBC,SAAU",
-  "names": ["environment", "production", "API_URL", "ADMIN_ORIGIN", "UNIHELP_ORIGIN", "firebase", "apiKey", "authDomain", "projectId", "storageBucket", "messagingSenderId", "appId", "measurementId", "vapidKey"]
-}
