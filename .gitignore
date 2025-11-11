@@ -98,3 +98,4 @@ backend/firebase/service-account.json
 *.serviceAccount*.json
 *.credentials.json
 .cache_ggshield/
+.cache_ggshield/
