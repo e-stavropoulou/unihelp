@@ -91,3 +91,9 @@ backend/faiss_index/
 *.sqlite
 *.sqlite3
 *.pdf
+
+# Firebase / Google Cloud credentials
+backend/firebase/service-account.json
+*service-account*.json
+*.serviceAccount*.json
+*.credentials.json
