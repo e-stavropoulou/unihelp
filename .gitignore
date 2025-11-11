@@ -117,3 +117,6 @@ gitleaks.toml
 gitleaks-report.*
 *.sarif
 .cache_ggshield/
+
+src/environments/environment.ts
+src/environments/environment.prod.ts
