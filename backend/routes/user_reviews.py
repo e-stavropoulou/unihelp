@@ -5,12 +5,14 @@ from models.user import User
 from models.shared import db
 from sqlalchemy.sql import func
 from utils.points_utils import award_points
+from models.notification import Notification
+from datetime import datetime
+from utils.push_utils import send_push_notification as send_fcm_push
 
 
 user_reviews_bp = Blueprint("user_reviews_bp", __name__)
 
 
-# POST /reviews/user/<user_id>
 @user_reviews_bp.route("/reviews/user/<int:user_id>", methods=["POST"])
 @jwt_required()
 def create_or_update_user_review(user_id):
@@ -55,6 +57,24 @@ def create_or_update_user_review(user_id):
 
   
     if is_new:
+        notif_msg = f"Ο χρήστης {reviewer_user.username} σε βαθμολόγησε με {rating} αστέρια."
+        new_notif = Notification(
+            user_id=reviewed_user.id,
+            message=notif_msg,
+            timestamp=datetime.utcnow(),
+            is_read=False
+        )
+        db.session.add(new_notif)
+        db.session.commit()
+
+        if reviewed_user.fcm_token:
+            send_fcm_push(
+                token=reviewed_user.fcm_token,
+                title="Νέα αξιολόγηση ✨",
+                body=notif_msg,
+                data={"type": "user_rating"}
+            )
+
         award_points(reviewer_user, 5, "🎯 Ευχαριστούμε για την αξιολόγησή σου!")
 
         if rating == 4:
@@ -62,12 +82,13 @@ def create_or_update_user_review(user_id):
         elif rating == 5:
             award_points(reviewed_user, 5, "Έλαβες αξιολόγηση 5 αστέρων")
 
+        db.session.commit()
+
     return jsonify({
         "message": "Η αξιολόγηση αποθηκεύτηκε.",
         "review": review.to_dict()
     }), 200
 
-# GET /reviews/user/<user_id>
 @user_reviews_bp.route("/reviews/user/<int:user_id>", methods=["GET"])
 @jwt_required(optional=True)
 def get_user_reviews(user_id):

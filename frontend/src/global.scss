@@ -41,7 +41,6 @@
  * GLOBAL APP STYLES
  * ------------------------------------ */
 
-/* ------------------------ Avatar ------------------------ */
 .avatar-img {
   width: 80px;
   height: 80px;
@@ -50,7 +49,6 @@
   object-fit: cover;
 }
 
-/* ------------------------ Buttons ------------------------ */
 ion-button:not([fill="clear"]) {
   --background: #7B1E3B;
   --background-hover: #a2211f;
@@ -79,7 +77,6 @@ ion-button[color="danger"][fill="outline"] {
   text-transform: none;
 }
 
-/* ------------------------ Form box ------------------------ */
 .form-box {
   background: #fff;
   padding: 24px;
@@ -94,7 +91,6 @@ input[type="file"] {
   margin-top: 10px;
 }
 
-/* ------------------------ Label πάνω από πεδία ------------------------ */
 .form-label {
   font-weight: bold;
   font-size: 14px;
@@ -103,7 +99,6 @@ input[type="file"] {
   color: #333;
 }
 
-/* ------------------------ Styled inputs/select/textarea ------------------------ */
 
 ion-input,
 ion-select,
@@ -113,7 +108,6 @@ ion-textarea {
   --color: #000;
 }
 
-/* Fix για caret και focus */
 ion-input::part(native),
 ion-textarea::part(native)
 {
@@ -128,7 +122,6 @@ ion-textarea::part(native)
 }
 
 
-/* ------------------------ Footer ------------------------ */
 
 .footer-toolbar {
   --background: #fafafa;
@@ -163,7 +156,7 @@ ion-textarea::part(native)
 /* ion-toast {
   --top: 60px !important;
   border-radius: 12px;
-  z-index: 99999 !important;   // <-- πρόσθεσέ το αυτό
+  z-index: 99999 !important;   
 }
 
 .toast-top-adjust {
@@ -171,13 +164,13 @@ ion-textarea::part(native)
   border-radius: 12px;
   color: #fff;
   font-weight: 500;
-  z-index: 99999 !important;   // <-- και εδώ!
+  z-index: 99999 !important;  
 }
 
 ion-toast.toast-success {
   --background: #4CAF50;
   --color: #fff;
-  z-index: 99999 !important;   // <-- και εδώ για σιγουριά
+  z-index: 99999 !important;   
 }
 
 ion-toast.toast-warning {
@@ -193,13 +186,11 @@ ion-toast.toast-error {
 } */
 
 
-/* ------------------------ Back button ------------------------ */
 ion-back-button {
   --color: #7B1E3B !important;
   font-weight: 600;
 }
 
-/* ------------------------ Toolbar / Titles ------------------------ */
 /* 🔹 Toolbar πλήρως λευκό */
 ion-header,
 ion-toolbar {
@@ -219,7 +210,6 @@ ion-title {
   text-align: center;
 }
 
-/* ------------------------ Footer / Tab bar ------------------------ */
 ion-footer,
 ion-tab-bar {
   --background: #ffffff !important; 

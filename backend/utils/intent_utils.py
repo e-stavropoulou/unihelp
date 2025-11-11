@@ -4,20 +4,17 @@ import re
 import unicodedata
 from difflib import get_close_matches
 
-# 🔤 Normalize Greek text (lowercase, no accents, no punctuation)
 def normalize(text):
     text = unicodedata.normalize("NFD", text.lower())
     text = ''.join(c for c in text if unicodedata.category(c) != 'Mn')  # remove accents
     text = re.sub(r"[^\w\s]", "", text)  # remove punctuation
     return text.strip()
 
-# 🎯 Ορισμένα intents που απαιτούν επιπλέον πληροφορία (π.χ. μάθημα)
 FOLLOW_UP_REQUIRED = {
     "course_file_count",
     "suggest_notes_for_course"
 }
 
-# 🎯 Πιθανά intents και εναλλακτικές τους
 INTENTS = {
     "top_downloaded_note": [
         "πιο κατεβασμενη σημειωση",
@@ -66,7 +63,6 @@ INTENTS = {
     ]
 }
 
-# 🏷️ Labels για εμφάνιση στον χρήστη
 INTENT_LABELS_GR = {
     "top_downloaded_note": "Πιο κατεβασμένη σημείωση",
     "most_commented_note": "Σημείωση με τα περισσότερα σχόλια",
@@ -77,17 +73,14 @@ INTENT_LABELS_GR = {
 }
 
 
-# 🤖 Επιστρέφει το intent με βάση την ερώτηση
 def detect_intent(user_query, return_suggestion=False):
     query = normalize(user_query)
 
-    # 🔍 Αυστηρό partial match: αν κάποιο example υπάρχει μέσα στο query
     for intent, examples in INTENTS.items():
         for example in examples:
             if normalize(example) in query:
                 return intent, INTENT_LABELS_GR.get(intent, intent), None
 
-    # 💡 Προσπάθεια suggestion με πιο χαλαρό match
     if return_suggestion:
         for intent, examples in INTENTS.items():
             for example in examples:
@@ -95,11 +88,9 @@ def detect_intent(user_query, return_suggestion=False):
                 if example_start in query:
                     return None, intent, INTENT_LABELS_GR.get(intent, intent)
 
-    # ❌ Δεν καταλάβαμε τίποτα
     return None, None, None
 
 
 
-# ❓ Επιστρέφει αν το intent απαιτεί follow-up (π.χ. να ρωτήσουμε "Για ποιο μάθημα;")
 def requires_follow_up(intent):
     return intent in FOLLOW_UP_REQUIRED

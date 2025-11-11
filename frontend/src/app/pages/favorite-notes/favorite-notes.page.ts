@@ -74,14 +74,11 @@ export class FavoriteNotesPage implements OnInit {
       return;
     }
   
-    // ✅ Direct URL με JWT
     const directUrl = `${environment.API_URL}/download/${note.id}?jwt=${encodeURIComponent(token)}`;
   
     if (Capacitor.isNativePlatform()) {
-      // Mobile build: SafariViewController / Chrome Custom Tab
       Browser.open({ url: directUrl });
     } else {
-      // Web build: ανοίγει σε νέα καρτέλα
       window.open(directUrl, '_blank', 'noopener,noreferrer');
     }
   }

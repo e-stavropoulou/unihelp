@@ -7,10 +7,8 @@ import sys
 
 
 from dotenv import load_dotenv
-# Βρες ποιο περιβάλλον τρέχεις
 env = os.getenv("FLASK_ENV", "development")
 
-# Ανάλογα με το env, φόρτωσε το σωστό αρχείο
 if env == "production":
     dotenv_file = ".env.production"
 else:
@@ -22,7 +20,6 @@ if os.path.exists(dotenv_file):
 else:
     print(f"⚠️ No {dotenv_file} file found", file=sys.stderr)
 
-# Δοκιμή ότι το κλειδί φορτώθηκε
 print("🔑 OPENAI_API_KEY loaded:", os.getenv("OPENAI_API_KEY"), file=sys.stderr)
 
 import pymysql
@@ -102,7 +99,7 @@ def create_app():
     CORS(
         app,
         resources={r"/*": {"origins": [
-            app.config['FRONTEND_URL'],        # https://unihelp.imslab.gr
+            app.config['FRONTEND_URL'],        
             "https://admin-unihelp.imslab.gr", # Admin dashboard
             "https://unihelp.imslab.gr",       # UniHelp app
             "http://localhost:8080",           # Frontend dev

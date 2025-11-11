@@ -4,7 +4,7 @@ from models.note import Note
 from models.shared import db
 import os
 import mimetypes
-import imghdr  # ✅ για ανίχνευση εικόνων
+import imghdr  
 
 download_notes_bp = Blueprint('download_notes', __name__)
 
@@ -30,7 +30,6 @@ def download_note(note_id):
     except:
         current_user_id = None
 
-    # ✅ αύξηση downloads μόνο αν δεν είναι ο uploader
     if current_user_id != note.user_id:
         note.downloads += 1
         db.session.commit()
@@ -39,7 +38,6 @@ def download_note(note_id):
     if not os.path.exists(file_path):
         return jsonify({'error': 'Το αρχείο δεν βρέθηκε στον server'}), 404
 
-    # 1) PDF με signature → ΠΑΝΤΑ inline ως application/pdf
     if is_pdf_file(file_path):
         resp = send_file(
             file_path,
@@ -51,8 +49,7 @@ def download_note(note_id):
         resp.headers["Content-Disposition"] = f'inline; filename="{note.filename}"'
         return resp
 
-    # 2) Εικόνες (jpg/png/gif/webp) → inline με σωστό image/*
-    img_kind = imghdr.what(file_path)  # 'jpeg', 'png', 'gif', 'webp', ...
+    img_kind = imghdr.what(file_path)  
     if img_kind:
         img_mime = f'image/{ "jpeg" if img_kind=="jpeg" else img_kind }'
         resp = send_file(
@@ -65,14 +62,13 @@ def download_note(note_id):
         resp.headers["Content-Disposition"] = f'inline; filename="{note.filename}"'
         return resp
 
-    # 3) Ό,τι άλλο → attachment (κατέβασμα)
     mime_type, _ = mimetypes.guess_type(note.filename or file_path)
     if mime_type is None:
         mime_type = "application/octet-stream"
 
     return send_file(
         file_path,
-        as_attachment=True,              # 👉 θα βάλει μόνο του attachment disposition
+        as_attachment=True,              
         download_name=note.filename,
         mimetype=mime_type,
         conditional=True

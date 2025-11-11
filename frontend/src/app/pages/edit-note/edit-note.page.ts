@@ -96,7 +96,7 @@ export class EditNotePage implements OnInit {
   
   selectCourse(course: any) {
     this.selectedCourse = course;
-    this.courseId = course.id; // για το update
+    this.courseId = course.id; 
     this.isFocused = false;
     this.searchTerm = '';
   }

@@ -89,7 +89,6 @@ export class NotificationsService {
   
           this.currentMessage.next(payload);
   
-          // 👇 Αν υπάρχει notification στο payload → δείξε system notification
           if (payload?.notification) {
             const { title, body } = payload.notification;
             if (Notification.permission === 'granted') {
@@ -158,7 +157,7 @@ export class NotificationsService {
         this.fcmToken = token;
         console.log('📡 Got FCM token:', token);
   
-        const userId = this.authService.getUserId(); // helper που διαβάζει το user_id από localStorage
+        const userId = this.authService.getUserId(); 
         if (userId) {
           this.sendTokenToBackend(userId, token);
         }

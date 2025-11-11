@@ -1,5 +1,3 @@
-/* 🎯 Βασική διάταξη */
-
 ion-item {
   --background: transparent;
   margin-bottom: 12px;
@@ -160,7 +158,6 @@ ion-item.custom-ion-select ion-select::part(text) {
   flex-wrap: wrap;              
 }
 
-/* Όλα τα κουμπιά ίδια */
 .actions a,
 .actions ion-button {
   flex: 1 1 180px;              

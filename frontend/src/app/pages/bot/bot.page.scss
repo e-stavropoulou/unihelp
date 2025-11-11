@@ -1,8 +1,3 @@
-/* ===============================
-   🔹 Thinkerbell Chat Styling
-   =============================== */
-
-/* 🔸 Γενικό φόντο περιεχομένου */
 ion-content {
   --background: #ffffff !important;
   display: flex;
@@ -11,7 +6,6 @@ ion-content {
   --keyboard-offset: 0px;
 }
 
-/* 🔸 Header & κουμπιά */
 ion-header,
 ion-toolbar {
   --background: #ffffff !important;
@@ -33,9 +27,6 @@ ion-header ion-button {
   --box-shadow: none !important;
 }
 
-/* ===============================
-   💬 Περιοχή Μηνυμάτων
-   =============================== */
 
 .messages-container {
   display: flex;
@@ -88,10 +79,6 @@ ion-header ion-button {
   color: #777;
   background-color: #f2f2f2;
 }
-
-/* ===============================
-   ✏️ Input Περιοχή (μέσα σε ion-footer)
-   =============================== */
 
 .chat-footer {
   background: #fff;

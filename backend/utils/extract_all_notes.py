@@ -1,5 +1,5 @@
 import os
-import fitz  # PyMuPDF
+import fitz  
 import pytesseract
 from PIL import Image
 from docx import Document
@@ -17,13 +17,11 @@ from models.user_review import UserReview
 app = create_app()
 app.app_context().push()
 
-# fakelos me tis simioseis
 # fakelos me tis simioseis (dynamic path για Mac + Server)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 NOTES_FOLDER = os.path.join(BASE_DIR, "uploads", "notes")
 
 
-# 📑 Υποστηριζόμενες επεκτάσεις
 ALLOWED_EXTENSIONS = ('.pdf', '.docx', '.txt', '.png', '.jpg', '.jpeg')
 
 

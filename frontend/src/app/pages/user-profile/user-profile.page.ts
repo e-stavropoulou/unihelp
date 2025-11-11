@@ -81,22 +81,12 @@ export class UserProfilePage implements OnInit {
 
   startChatWithUser() {
     if (!this.user || this.currentUserId === this.user.id) return;
-
-    const token = this.authService.getToken();
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
-
-    this.http.post(`${environment.API_URL}/chats/${this.user.id}`, {}, { headers }).subscribe({
-      next: (res: any) => {
-        const chatId = res.chat_id;
-        this.router.navigate(['/chat', chatId]);
-      },
-      error: (err) => {
-        console.error('🚫 Αποτυχία δημιουργίας chat:', err);
-      }
+  
+    this.router.navigate(['/chat', 'new'], {
+      queryParams: { recipient_id: this.user.id }
     });
   }
+  
 
   openReportUser() {
     if (!this.user) return;

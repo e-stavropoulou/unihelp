@@ -40,7 +40,6 @@ export class FooterNavComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Μόνο αρχικό sync
     this.notificationsService.refreshUnreadCount();
     this.chatService.refreshUnreadMessages();
   }

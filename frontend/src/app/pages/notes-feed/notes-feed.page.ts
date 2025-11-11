@@ -181,7 +181,6 @@ export class NotesFeedPage implements OnInit {
 
     
   
-    // ✅ Χτίζουμε direct URL με JWT στο query
     const directUrl = `${environment.API_URL}/download/${note.id}?jwt=${encodeURIComponent(token)}`;
   if (this.isMobile) {
     await Browser.open({ url: directUrl });
@@ -336,9 +335,18 @@ export class NotesFeedPage implements OnInit {
       });
   }
 
-  goToReport(noteId?: number, reportedUserId?: number) {
+  canReportComment(comment: any): boolean {
+    return comment?.user_id !== this.currentUserId;
+  }
+  
+  goToReport(noteId?: number, reportedUserId?: number, commentId?: number) {
+    if (reportedUserId && reportedUserId === this.currentUserId) {
+      this.toastService.present('Δεν μπορείς να κάνεις αναφορά στο δικό σου σχόλιο.', 'warning');
+      return;
+    }
     this.router.navigate(['/report'], {
-      queryParams: { noteId, reportedUserId }
+      queryParams: { noteId, reportedUserId, commentId }
     });
   }
+  
 }

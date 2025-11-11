@@ -33,7 +33,6 @@ import { CommonModule } from '@angular/common';
 import { ToastService } from 'src/app/services/toast.service';
 
 
-// TYPOS CHAT
 interface ChatPreview {
   chat_id: number;
   other_username: string;
@@ -85,7 +84,7 @@ export class ChatListPage implements OnInit {
 
   ngOnInit() {
     this.fetchChats();
-    this.listenForMessages(); // REAL-TIME UPDATES
+    this.listenForMessages(); 
   }
 
   ionViewWillEnter() {
@@ -131,7 +130,6 @@ export class ChatListPage implements OnInit {
     });
   }
   
-  // ➕ Νέα helper μέθοδος
   private handleIncomingMessage(chatId: number) {
     const currentChatId = this.chatService.currentChatId$.value;
   
@@ -217,7 +215,6 @@ export class ChatListPage implements OnInit {
         this.chats = this.chats.filter((c) => c.chat_id !== chatId);
         this.toast.present('Η συνομιλία διαγράφηκε από τη λίστα σου.', 'success');
   
-        // ✅ Αν το backend δώσει flag για refresh token
         if (res?.require_fcm_refresh) {
           console.log("🔄 Backend ζητά FCM refresh...");
           this.notificationsService.registerToken();
