@@ -120,3 +120,36 @@ gitleaks-report.*
 
 src/environments/environment.ts
 src/environments/environment.prod.ts
+frontend/src/environments/
+backend/utils/fcm/
+
+
+**/service_account.json
+**/*service-account*.json
+**/*serviceAccount*.json
+
+
+# Xcode / iOS
+DerivedData/
+ios/App/*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+ios/App/**/xcuserdata/
+ios/App/GoogleService-Info.plist
+
+# Android
+android/app/google-services.json
+android/**/build/
+android/.gradle/
+android/local.properties
+
+# Flask instance/config
+backend/instance/
+backend/.flaskenv
+
+
+*secret*
+*secrets*
+*credential*
+*credentials*
+*token*
+*apikey*
+*api_key*

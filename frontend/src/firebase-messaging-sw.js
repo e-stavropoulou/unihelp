@@ -4,14 +4,15 @@
 importScripts('https://www.gstatic.com/firebasejs/10.12.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.1/firebase-messaging-compat.js');
 
+
 firebase.initializeApp({
-  $1FAKE_FIREBASE_WEB_API_KEY$2,
+  apiKey: "AIzaSyAhn1trN0bQ9FTs_UlgHJCwigr2rGqgcDA",
   authDomain: "unihelp-notifications.firebaseapp.com",
   projectId: "unihelp-notifications",
   storageBucket: "unihelp-notifications.appspot.com",
-  $1FAKE_SENDER_ID$2,
-  $1FAKE_APP_ID$2,
-  $1FAKE_MEASUREMENT_ID$2
+  messagingSenderId: "480151685287",
+  appId: "1:480151685287:web:c7f858997f9a52055af382",
+  measurementId: "G-YHWF328860"
 });
 
 const messaging = firebase.messaging();
